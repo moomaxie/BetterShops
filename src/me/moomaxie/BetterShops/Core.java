@@ -55,9 +55,9 @@ import java.io.IOException;
 
 /**
  * ***********************************************************************
- * Copyright moomaxie (c) 2014. All Rights Reserved.
+ * Copyright Max Hubbard (c) 2014. All Rights Reserved.
  * Any code contained within this document, and any associated documents with similar branding
- * are the sole property of moomaxie. Distribution, reproduction, taking snippets, or
+ * are the sole property of Max. Distribution, reproduction, taking snippets, or
  * claiming any contents as your own will break the terms of the license, and void any
  * agreements with you, the third party.
  * ************************************************************************
@@ -68,22 +68,6 @@ public class Core extends JavaPlugin {
     //TODO: Manager Admins
     //TODO: Villager/skeleton/sizes/ types - 1.8 animals
     //TODO: Add more types of shops: Holographic, Sign, Floating Item
-
-
-    //Change Log:
-    //GUI Language Translations
-    // /bs language
-    //perm: bettershops.command.language
-    // /bs open <Shop>
-    //perm: bettershops.command.open
-    // Change perm: bettershops.command.config
-    //perm: bettershops.shop.break
-    // New NPCs
-    //perm: bettershops.npc.*
-    //perm: bettershops.npc.NAME
-    // MCStats
-    // Transaction history
-    // MASSIVE TPS increase
 
 
     private static Core instance;
