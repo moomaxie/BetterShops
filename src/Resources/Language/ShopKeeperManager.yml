@@ -1,0 +1,23 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Shop Keeper" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+AddKeeperDisplayName: '&a&lAdd Keeper'
+AddKeeperLore: '&e&lLeft Click &7to &aAdd &7a &dShop Keeper'
+
+RemoveKeeperDisplayName: '&a&lRemove Keeper'
+RemoveKeeperLore: '&e&lLeft Click &7to &cRemove &7a &dShop Keeper'
+
+KeeperInformationDisplayName: '&a&lShop Keeper Information'
+KeeperManage: '&dShop Keepers &7have the ability to help manage the shop'
+KeeperDeposit: '&7They &aCan Only &dDeposit Items &7into the shop'
+KeeperWithdraw: '&7They &cCannot &dWithdraw Items &7or change &dShop Settings'
+
+ClickRemoveKeeper: '&e&lLeft Click &7to &cRemove Keeper'

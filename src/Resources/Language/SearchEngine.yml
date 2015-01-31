@@ -1,0 +1,25 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Search Engine" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+SearchBuyItems: '&a&lSearch Buying Items'
+SearchSellItems: '&a&lSearch Selling Items'
+
+SearchMaterials: '&a&lSearch Materials'
+SearchMaterialsLore: '&e&lLeft Click &7to &aSearch &7by &dMaterials'
+
+SearchName: '&a&lSearch Name'
+SearchNameLore: '&e&lLeft Click &7to &aSearch &7by &dItem Name'
+
+SearchId: '&a&lSearch Id'
+SearchIdLore: '&e&lLeft Click &7to &aSearch &7by &dItem Id'
+
+SearchPrice: '&a&lSearch Price'
+SearchPriceLore: '&e&lLeft Click &7to &aSearch &7by &dItem Price'

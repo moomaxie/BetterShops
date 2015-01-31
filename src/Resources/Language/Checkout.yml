@@ -1,0 +1,32 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Checkout" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+Prices: '&d&lPrices'
+NothingInCart: '&c&lNo Items In Cart'
+
+BuyItems: '&a&lBuy Items'
+CannotAfford: '&c&lCannot Afford'
+
+TotalPrice: '&eTotal Price:'
+Balance: '&eBalance:'
+NewBalance: '&eNew Balance:'
+
+ClickToRemove: '&e&lLeft Click to &aRemove'
+
+SelectAmount: '&eSelect An Amount'
+AmountToBuy: '&eAmount to buy:'
+Confirm: '&eClick to &aConfirm'
+
+AddOne: '&eAdd One'
+AddStack: '&eAdd A Stack'
+
+RemoveOne: '&eRemove One'
+RemoveStack: '&eRemove A Stack'

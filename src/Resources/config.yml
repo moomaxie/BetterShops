@@ -1,0 +1,83 @@
+#
+#                 Better Shop's Config File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#     Lines starting with # are comments and will be ignored.
+#
+
+Version: 1.5.0
+
+####  General  ####
+
+# Have Chest Contents Automatically be Added To The Shop (True/False)
+Auto Add: True
+
+# Enable Permissions (True/False)
+Permissions: False
+
+# Use Anvil to Name Shop Use Items (True/False)
+Anvil: True
+
+# Allows players to use shop when closed if they had opened it while the shop was open (True/False)
+UseOnClose: False
+
+# Enable Titles and Subtitles (True/False) (1.8 and Above)
+Titles: True
+
+# Disable deleting shops by breaking the chest(Can only use /sremove)
+DeleteByBreak: True
+
+# Toggle Server Metrics
+Metrics: True
+
+
+####  Shop Creation  ####
+
+# Enable Shop Creation Limits (True/False)
+Creation Limit: False
+
+# Set Creation Limit
+Limit: 3
+
+# Forces players to pay for each shop creation (True/False)
+CostOnShops: False
+
+# The cost for each shop creation (Previous must be true)
+CostForShops: 19.99
+
+
+####  NPCs  ####
+
+# Enable NPC Shops (True/False)
+EnableNPC: True
+
+# The Type of NPC that a shop can use
+NPC:
+  Villager: true
+  Cave Spider: true
+  Chicken: true
+  Cow: true
+  Horse: true
+  Iron Golem: true
+  Magma Cube: true
+  Mushroom Cow: true
+  Ocelot: true
+  Pig Zombie: true
+  Sheep: true
+  Silverfish: true
+  Skeleton: true
+  Slime: true
+  Snowman: true
+  Spider: true
+  Wolf: true
+  Zombie: true
+
+
+####  World Guard  ####
+
+# If World Guard is detected then players can only create shops in regions with the 'Allow-Shop' flag (True/False)
+EnableAllowShopsFlag: False
+
+# Override a region to allow NPCs to spawn (only if Mob-Spawning is disabled in the region. If False, NPCs will not spawn in these regions) (True/False)
+NPCOverride: True

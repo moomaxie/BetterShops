@@ -1,0 +1,32 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Buying/Selling" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+BuyItem: '&a&lBuy Item'
+BuyItemLore: '&e&lLeft Click &7to &aBuy &7this item'
+
+SellItem: '&a&lSell'
+SellItemLore: '&e&lLeft Click &7to &aSell &7this item'
+
+Cancel: '&c&lCancel'
+CancelLore: '&e&lLeft Click &7to &cCancel'
+SellCancelLore: '&e&lLeft Click &7to &cCancel &7and go back'
+
+NotEnough: '&a&lNot Enough'
+NotEnoughMoney: '&cYou Do Not Have Enough Money'
+NotEnoughStock: '&cThere Are Not Enough Items In Stock'
+NotEnoughItems: '&cYou do not have enough &aItems'
+OutOfMoney: '&cThe Owner is out of money'
+NoAccount: '&a&lNo Account'
+NoAccountLore: '&cYou do not have an account'
+
+AdjustedPrice: '&a&lSell For Adjusted Price'
+AdjustedPriceLore: '&cBut you can still sell &aAll &cof your Items for &e<Amount>'
+

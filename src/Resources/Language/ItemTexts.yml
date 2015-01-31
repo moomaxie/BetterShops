@@ -1,0 +1,42 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Item Manager" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+PriceDisplayName: '&a&lChange Price of Item'
+SellPriceDisplayName: '&a&lChange Price'
+PriceLore: '&e&lLeft Click &7to change the &dPrice &7of the item'
+
+RemoveItemDisplayName: '&a&lRemove Item From Shop'
+SellRemoveItemDisplayName: '&a&lRemove Item'
+RemoveItemLore: '&e&lLeft Click &7to &cRemove &7this item from the shop'
+
+AddStockDisplayName: '&a&lAdd Stock'
+AddStockLore: '&e&lLeft Click &7to &aAdd &7to the &dStock &7of the item'
+
+RemoveStockDisplayName: '&a&lRemove Stock'
+RemoveStockLore: '&e&lLeft Click &7to &cRemove &dStock &7from the item'
+
+AmountDisplayName: '&a&lChange Amount Sold'
+AmountLore: '&e&lLeft Click &7to change the &dAmount &7of the item'
+
+CollectStockDisplayName: '&a&lCollect Stock'
+CollectStockLore: '&e&lLeft Click &7to collect the &dStock &7of the item'
+
+ChangeAskingAmount: '&a&lChange Asking Amount'
+ChangeAskingAmountLore: '&e&lLeft Click &7to change the &dAmount &7of the item'
+
+ItemDataDisplayName: '&a&lChange Data of item &7(Advanced)'
+ItemDataWarning: '&4WARNING: &7This will reset the &dStock &7of the &aItem'
+ItemDataLore: '&e&lLeft Click &7to change the &dData Value &7of the item'
+ItemDataExample: '&8(Example) &7Use this to specify a wool color'
+
+InfiniteDisplayNameOn: '&a&lChange Infinite &7- &aOn'
+InfiniteDisplayNameOff: '&a&lChange Infinite &7- &cOff'
+InfiniteLore: '&e&lLeft Click &7to toggle &dInfinite'

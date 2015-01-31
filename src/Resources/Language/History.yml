@@ -1,0 +1,23 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Checkout" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+History: '&d&eShop History'
+
+OpenHistory: '&e&lClick &7to open &aShop History'
+
+ClearHistory: '&c&lClear History'
+ClearHistoryLore: '&e&lClick &7to &cclear &aShop History'
+
+Date: '&7Date:'
+Item: '&7Item:'
+Price: '&7Price:'
+Amount: '&7Amount:'
+Shop: '&7Shop:'

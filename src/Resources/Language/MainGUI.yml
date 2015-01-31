@@ -1,0 +1,75 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Main GUI" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+ShopCreate: '[Shop]'
+
+ShopInfoDisplayNameOpen: '&a&lOPEN'
+ShopInfoDisplayNameClosed: '&c&lCLOSED'
+
+Owner: '&e&lOwner:'
+Keepers: '&eKeepers:'
+
+OpenShopSettings: '&e&lRight Click &7to open &dShop Settings'
+ArrangementMode: '&e&lShift Click &7to start &aArrangement Mode'
+ToggleOpenAndClosed: '&e&lLeft Click &7to Toggle &aOpen&7/&cClosed'
+AddItemToShop: '&e&lLeft Click &7an &aInventory Item &7to add it to the shop'
+ManageItems: '&e&lLeft Click &7an &aItem &7to manage it'
+TurnOffServerShop: '&e&lLeft Click &7to turn &cOff &dServer Shop Mode'
+ClickAddItem: '&e&lLeft Click &aAdd Item &7to select an item'
+
+ShopKeepersDisplayName: '&e&lShop Keeper Management'
+ShopKeeperLore: '&e&lLeft Click &7to manage &dShop Keepers'
+
+Buying: '&e&lBuying'
+Selling: '&e&lSelling'
+ToggleShop: '&e&lRight Click &7to toggle &aBuying/Selling'
+SearchOptions: '&e&lLeft Click &7to open &aSearch Options'
+
+BuyingShop: '&eBuying Shop'
+SellingShop: '&eSelling Shop'
+
+Arrangement: '&a&lArrangement Mode'
+ArrangementLore: '&e&lClick &7to leave &aArrangement Mode'
+Selected: '&a&lSELECTED'
+
+Server: '&aServer'
+
+Page: '&dPage'
+NextPage: '&e&lNext Page'
+PreviousPage: '&e&lPrevious Page'
+BackArrow: '&e&lBack Arrow'
+
+CheckoutDisplayName: '&e&lCheckout'
+CheckoutLore: '&e&lLeft Click &7to open your &aCart'
+
+Stock: '&eStock:'
+Amount: '&eAmount:'
+AskingAmount: '&eAsking Amount:'
+Price: '&ePrice:'
+AskingPrice: '&eAsking Price:'
+
+ManageItem: '&e&lLeft Click &7to manage'
+LeftClickToBuy: '&e&lLeft Click &7to buy'
+AddToCart: '&e&lShift Click &7to add to &aCart'
+ShopKeeperManage: '&e&lRight Click &7to manage'
+SellItem: '&e&lLeft Click &7to sell'
+SellOptions: '&e&lLeft Click &7to see &aSelling Options'
+Arrange: '&e&lLeft Click &7to arrange'
+ChooseNPC: '&e&lLeft Click &7to choose &eNPC Type'
+
+AddItem: '&e&lAdd Item'
+AddItemLore: '&e&lLeft Click &7to add an &aItem &7to buy from players'
+
+SignLine1: '&b&k**************'
+SignLine2: '&aShop'
+SignLine3Open: '&aOpen'
+SignLine3Closed: '&cClosed'
+SignLine4: '&b&k**************'

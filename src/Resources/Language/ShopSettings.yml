@@ -1,0 +1,27 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Shop Settings" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.5.0
+
+NotificationsOn: '&a&lNotifications &7- &aOn'
+NotificationsOff: '&a&lNotifications &7- &cOff'
+NotificationsLore: '&e&lLeft Click &7to change shop &dNotifications'
+
+ChangeDescription: '&a&lChange Description'
+ChangeDescriptionLore: '&e&lLeft Click &7to change shop &dDescription'
+
+ServerShopOn: '&a&lServer Shop &7- &aOn'
+ServerShopOff: '&a&lServer Shop &7- &cOff'
+ServerShopLore: '&e&lLeft Click &7to change &dServer Shop Mode'
+
+NPCShopOn: '&a&lNPC Shop &7- &aOn'
+NPCShopOff: '&a&lNPC Shop &7- &cOff'
+Warning: '&4WARNING:'
+DeletedChest: '&cThe Chest &4Will &cBe Deleted'
+NPCLore: '&e&lLeft Click &7to change &dNPC Shop Mode'
