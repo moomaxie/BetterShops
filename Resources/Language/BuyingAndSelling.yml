@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.0 Beta 14
+Version: 1.5.0 Beta 15
 
 BuyItem: '&a&lBuy Item'
 BuyItemLore: '&e&lLeft Click &7to &aBuy &7this item'

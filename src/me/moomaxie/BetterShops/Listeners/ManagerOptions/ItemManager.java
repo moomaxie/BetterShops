@@ -30,6 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -215,7 +216,7 @@ public class ItemManager implements Listener {
                         }
 
                         if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(SearchEngine.getString("ReturnLore"))) {
-                            if (sell){
+                            if (!sell){
                                 OpenShop.openShopItems(e.getInventory(),p,shop,1);
                             } else{
                                 OpenSellShop.openSellerShop(e.getInventory(),p,shop,1);
@@ -248,6 +249,10 @@ public class ItemManager implements Listener {
                                                             ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
                                                             can = false;
                                                         }
+
+                                                        BigDecimal bd = new BigDecimal(amt);
+                                                        bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                                        amt = bd.doubleValue();
 
                                                         if (can) {
                                                             if (amt > 0) {

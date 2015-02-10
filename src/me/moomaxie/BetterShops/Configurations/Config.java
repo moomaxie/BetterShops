@@ -32,6 +32,20 @@ public class Config {
         return config.isBoolean("Auto Add") && config.getBoolean("Auto Add");
     }
 
+    public static boolean getAllowChest() {
+        return config.isBoolean("UseChests") && config.getBoolean("UseChests");
+    }
+
+    public static void setAllowChests(boolean b) {
+        config.set("UseChests", b);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void setAutoAddItems(boolean b) {
         config.set("Auto Add", b);
 

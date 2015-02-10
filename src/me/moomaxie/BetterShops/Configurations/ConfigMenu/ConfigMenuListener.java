@@ -111,6 +111,11 @@ public class ConfigMenuListener implements Listener{
                     Config.setUseSellingShops(!Config.useSellingShop());
                     ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
                 }
+
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eUse Chests §7-")){
+                    Config.setAllowChests(!Config.getAllowChest());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eDefault Price:")){
                     setDefaultPrice((Player) e.getWhoClicked());
                 }

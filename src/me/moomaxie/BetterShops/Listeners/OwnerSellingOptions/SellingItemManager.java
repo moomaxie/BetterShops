@@ -24,6 +24,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -180,6 +181,10 @@ public class SellingItemManager implements Listener {
                                                             ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
                                                             can = false;
                                                         }
+
+                                                        BigDecimal bd = new BigDecimal(amt);
+                                                        bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                                        amt = bd.doubleValue();
 
                                                         if (can) {
                                                             if (amt > 0) {

@@ -35,21 +35,21 @@ public class ConfigMenu {
         }
 
         //Glass
-        ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 7);
+        ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.setDisplayName(" ");
         glass.setItemMeta(glassMeta);
 
-        for (int i = 0; i < 9;i++) {
-            inv.setItem(i,glass);
+        for (int i = 0; i < 9; i++) {
+            inv.setItem(i, glass);
         }
 
-        for (int i = 8; i < 54;i= i+9) {
-            inv.setItem(i,glass);
+        for (int i = 8; i < 54; i = i + 9) {
+            inv.setItem(i, glass);
         }
 
-        for (int i = 0; i < 54;i= i+9) {
-            inv.setItem(i,glass);
+        for (int i = 0; i < 54; i = i + 9) {
+            inv.setItem(i, glass);
         }
 
         // General Options
@@ -59,7 +59,7 @@ public class ConfigMenu {
         generalMeta.setDisplayName("§eGeneral Options");
         general.setItemMeta(generalMeta);
 
-        ItemStack autoAdd = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack autoAdd = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta autoAddMeta = autoAdd.getItemMeta();
         if (Config.autoAddItems()) {
             autoAddMeta.setDisplayName("§eAuto Add §7- §aOn");
@@ -67,28 +67,28 @@ public class ConfigMenu {
             MaterialData data = autoAdd.getData();
             data.setData((byte) 14);
             autoAdd.setData(data);
-            autoAdd = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            autoAdd = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             autoAddMeta.setDisplayName("§eAuto Add §7- §cFalse");
         }
-        autoAddMeta.setLore(Arrays.asList("§7Have Chest Contents Automatically","§7be Added To The Shop","§e§lClick §7to toggle"));
+        autoAddMeta.setLore(Arrays.asList("§7Have Chest Contents Automatically", "§7be Added To The Shop", "§e§lClick §7to toggle"));
         autoAdd.setItemMeta(autoAddMeta);
 
-        ItemStack permissions = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack permissions = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta permissionsMeta = permissions.getItemMeta();
         if (Config.usePerms()) {
-            
+
             permissionsMeta.setDisplayName("§ePermissions §7- §aOn");
         } else {
             MaterialData data = permissions.getData();
             data.setData((byte) 14);
             permissions.setData(data);
-            permissions = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            permissions = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             permissionsMeta.setDisplayName("§ePermissions §7- §cFalse");
         }
-        permissionsMeta.setLore(Arrays.asList("§7Use permissions","§e§lClick §7to toggle"));
+        permissionsMeta.setLore(Arrays.asList("§7Use permissions", "§e§lClick §7to toggle"));
         permissions.setItemMeta(permissionsMeta);
 
-        ItemStack anvil = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack anvil = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta anvilMeta = anvil.getItemMeta();
         if (Config.useAnvil()) {
 
@@ -97,13 +97,13 @@ public class ConfigMenu {
             MaterialData data = anvil.getData();
             data.setData((byte) 14);
             anvil.setData(data);
-            anvil = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            anvil = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             anvilMeta.setDisplayName("§eAnvil §7- §cFalse");
         }
-        anvilMeta.setLore(Arrays.asList("§7Use Anvil to rename items","§e§lClick §7to toggle"));
+        anvilMeta.setLore(Arrays.asList("§7Use Anvil to rename items", "§e§lClick §7to toggle"));
         anvil.setItemMeta(anvilMeta);
 
-        ItemStack useOnClose = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack useOnClose = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta useOnCloseMeta = useOnClose.getItemMeta();
         if (Config.useWhenClosed()) {
 
@@ -112,13 +112,13 @@ public class ConfigMenu {
             MaterialData data = useOnClose.getData();
             data.setData((byte) 14);
             useOnClose.setData(data);
-            useOnClose = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            useOnClose = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             useOnCloseMeta.setDisplayName("§eUse Shop When Closed §7- §cFalse");
         }
-        useOnCloseMeta.setLore(Arrays.asList("§7Allows players to use shop when closed", "§7if they had opened it while the shop was open","§e§lClick §7to toggle"));
+        useOnCloseMeta.setLore(Arrays.asList("§7Allows players to use shop when closed", "§7if they had opened it while the shop was open", "§e§lClick §7to toggle"));
         useOnClose.setItemMeta(useOnCloseMeta);
 
-        ItemStack titles = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack titles = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta titlesMeta = titles.getItemMeta();
         if (Config.useTitles()) {
 
@@ -127,13 +127,13 @@ public class ConfigMenu {
             MaterialData data = titles.getData();
             data.setData((byte) 14);
             titles.setData(data);
-            titles = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            titles = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             titlesMeta.setDisplayName("§eTitles §7- §cFalse");
         }
-        titlesMeta.setLore(Arrays.asList("§7Use 1.8 Titles","§e§lClick §7to toggle"));
+        titlesMeta.setLore(Arrays.asList("§7Use 1.8 Titles", "§e§lClick §7to toggle"));
         titles.setItemMeta(titlesMeta);
 
-        ItemStack deleteOnBreak = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack deleteOnBreak = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta deleteOnBreakMeta = deleteOnBreak.getItemMeta();
         if (Config.useDeleteByBreak()) {
 
@@ -142,13 +142,13 @@ public class ConfigMenu {
             MaterialData data = deleteOnBreak.getData();
             data.setData((byte) 14);
             deleteOnBreak.setData(data);
-            deleteOnBreak = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            deleteOnBreak = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             deleteOnBreakMeta.setDisplayName("§eDelete By Break §7- §cFalse");
         }
-        deleteOnBreakMeta.setLore(Arrays.asList("§7Delete shops by breaking the chest","§e§lClick §7to toggle"));
+        deleteOnBreakMeta.setLore(Arrays.asList("§7Delete shops by breaking the chest", "§e§lClick §7to toggle"));
         deleteOnBreak.setItemMeta(deleteOnBreakMeta);
 
-        ItemStack metrics = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack metrics = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta metricsMeta = metrics.getItemMeta();
         if (Config.useMetrics()) {
 
@@ -157,19 +157,34 @@ public class ConfigMenu {
             MaterialData data = metrics.getData();
             data.setData((byte) 14);
             metrics.setData(data);
-            metrics = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            metrics = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             metricsMeta.setDisplayName("§eMetrics §7- §cFalse");
         }
-        metricsMeta.setLore(Arrays.asList("§7Toggle Server Metrics","§e§lClick §7to toggle"));
+        metricsMeta.setLore(Arrays.asList("§7Toggle Server Metrics", "§e§lClick §7to toggle"));
         metrics.setItemMeta(metricsMeta);
 
-        inv.setItem(10,general);
-        inv.setItem(11,autoAdd);
-        inv.setItem(12,permissions);
-        inv.setItem(13,anvil);
-        inv.setItem(14,useOnClose);
-        inv.setItem(15,titles);
-        inv.setItem(16,metrics);
+        ItemStack allowChest = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
+        ItemMeta allowChestMeta = allowChest.getItemMeta();
+        if (Config.getAllowChest()) {
+
+            allowChestMeta.setDisplayName("§eUse Chests §7- §aOn");
+        } else {
+            MaterialData data = allowChest.getData();
+            data.setData((byte) 14);
+            allowChest.setData(data);
+            allowChest = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+            allowChestMeta.setDisplayName("§eUse Chests §7- §cFalse");
+        }
+        allowChestMeta.setLore(Arrays.asList("§7Allow use of chests by Shop Owners", "§e§lClick §7to toggle"));
+        allowChest.setItemMeta(allowChestMeta);
+
+        inv.setItem(10, general);
+        inv.setItem(11, autoAdd);
+        inv.setItem(12, permissions);
+        inv.setItem(13, anvil);
+        inv.setItem(14, titles);
+        inv.setItem(15, metrics);
+        inv.setItem(16, allowChest);
 
         // Shop Creation
 
@@ -178,7 +193,7 @@ public class ConfigMenu {
         shopCreationMeta.setDisplayName("§eShop Creation Options");
         shopCreation.setItemMeta(shopCreationMeta);
 
-        ItemStack creationLimit = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack creationLimit = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta creationLimitMeta = creationLimit.getItemMeta();
         if (Config.useLimit()) {
 
@@ -187,10 +202,10 @@ public class ConfigMenu {
             MaterialData data = creationLimit.getData();
             data.setData((byte) 14);
             creationLimit.setData(data);
-            creationLimit = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            creationLimit = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             creationLimitMeta.setDisplayName("§eCreation Limit §7- §cFalse");
         }
-        creationLimitMeta.setLore(Arrays.asList("§7Use Shop Creation Limits","§e§lClick §7to toggle"));
+        creationLimitMeta.setLore(Arrays.asList("§7Use Shop Creation Limits", "§e§lClick §7to toggle"));
         creationLimit.setItemMeta(creationLimitMeta);
 
         ItemStack limitAmount = new ItemStack(Material.NAME_TAG);
@@ -199,7 +214,7 @@ public class ConfigMenu {
         limitAmountMeta.setLore(Arrays.asList("§7Set Creation Limit", "§e§lClick §7to change"));
         limitAmount.setItemMeta(limitAmountMeta);
 
-        ItemStack costOnShops = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack costOnShops = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta costOnShopsMeta = costOnShops.getItemMeta();
         if (Config.useCreationCost()) {
 
@@ -208,11 +223,11 @@ public class ConfigMenu {
             MaterialData data = costOnShops.getData();
             data.setData((byte) 14);
             costOnShops.setData(data);
-            costOnShops = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            costOnShops = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             costOnShopsMeta.setDisplayName("§eCost On Shops §7- §cFalse");
 
         }
-        costOnShopsMeta.setLore(Arrays.asList("§7Forces players to pay for each shop creation","§e§lClick §7to toggle"));
+        costOnShopsMeta.setLore(Arrays.asList("§7Forces players to pay for each shop creation", "§e§lClick §7to toggle"));
         costOnShops.setItemMeta(costOnShopsMeta);
 
         ItemStack costAmount = new ItemStack(Material.NAME_TAG);
@@ -221,13 +236,13 @@ public class ConfigMenu {
         costAmountMeta.setLore(Arrays.asList("§7Set shop creation cost", "§e§lClick §7to change"));
         costAmount.setItemMeta(costAmountMeta);
 
-        inv.setItem(19,shopCreation);
-        inv.setItem(20,creationLimit);
-        inv.setItem(21,limitAmount);
-        inv.setItem(22,costOnShops);
-        inv.setItem(23,costAmount);
+        inv.setItem(19, shopCreation);
+        inv.setItem(20, creationLimit);
+        inv.setItem(21, limitAmount);
+        inv.setItem(22, costOnShops);
+        inv.setItem(23, costAmount);
 
-        
+
         // Shop Options
 
         ItemStack shopOptions = new ItemStack(Material.MAP);
@@ -235,7 +250,7 @@ public class ConfigMenu {
         shopOptionsMeta.setDisplayName("§eShop Options");
         shopOptions.setItemMeta(shopOptionsMeta);
 
-        ItemStack sellingShop = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack sellingShop = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta sellingShopMeta = sellingShop.getItemMeta();
         if (Config.useSellingShop()) {
 
@@ -244,10 +259,10 @@ public class ConfigMenu {
             MaterialData data = sellingShop.getData();
             data.setData((byte) 14);
             sellingShop.setData(data);
-            sellingShop = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            sellingShop = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             sellingShopMeta.setDisplayName("§eSelling Shop §7- §cFalse");
         }
-        sellingShopMeta.setLore(Arrays.asList("§7Toggle the use of selling shops","§e§lClick §7to toggle"));
+        sellingShopMeta.setLore(Arrays.asList("§7Toggle the use of selling shops", "§e§lClick §7to toggle"));
         sellingShop.setItemMeta(sellingShopMeta);
 
         ItemStack defaultPrice = new ItemStack(Material.NAME_TAG);
@@ -270,12 +285,13 @@ public class ConfigMenu {
         maxPriceMeta.setLore(Arrays.asList("§7Set Max Price", "§e§lClick §7to change"));
         maxPrice.setItemMeta(maxPriceMeta);
 
-        inv.setItem(46,shopOptions);
-        inv.setItem(47,sellingShop);
-        inv.setItem(48,defaultPrice);
-        inv.setItem(49,deleteOnBreak);
-        inv.setItem(50,maxPrice);
-        
+        inv.setItem(46, shopOptions);
+        inv.setItem(47, sellingShop);
+        inv.setItem(48, defaultPrice);
+        inv.setItem(49, deleteOnBreak);
+        inv.setItem(50, maxPrice);
+        inv.setItem(51, useOnClose);
+
         // NPC Options
 
         ItemStack NPCOptions = new ItemStack(Material.MAP);
@@ -283,7 +299,7 @@ public class ConfigMenu {
         NPCOptionsMeta.setDisplayName("§eNPC Options");
         NPCOptions.setItemMeta(NPCOptionsMeta);
 
-        ItemStack NPCs = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack NPCs = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta NPCsMeta = NPCs.getItemMeta();
         if (Config.useNPCs()) {
 
@@ -292,10 +308,10 @@ public class ConfigMenu {
             MaterialData data = NPCs.getData();
             data.setData((byte) 14);
             NPCs.setData(data);
-            NPCs = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            NPCs = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             NPCsMeta.setDisplayName("§eNPCs §7- §cFalse");
         }
-        NPCsMeta.setLore(Arrays.asList("§7Enable NPCs","§e§lClick §7to toggle"));
+        NPCsMeta.setLore(Arrays.asList("§7Enable NPCs", "§e§lClick §7to toggle"));
         NPCs.setItemMeta(NPCsMeta);
 
         ItemStack NPCChoose = new ItemStack(Material.MAP);
@@ -303,11 +319,11 @@ public class ConfigMenu {
         NPCChooseMeta.setDisplayName("§eChoose NPCs");
         NPCChoose.setItemMeta(NPCChooseMeta);
 
-        inv.setItem(28,NPCOptions);
-        inv.setItem(29,NPCs);
-        inv.setItem(30,NPCChoose);
+        inv.setItem(28, NPCOptions);
+        inv.setItem(29, NPCs);
+        inv.setItem(30, NPCChoose);
 
-        
+
         // World Guard Options
 
         ItemStack worldGuard = new ItemStack(Material.MAP);
@@ -315,7 +331,7 @@ public class ConfigMenu {
         worldGuardMeta.setDisplayName("§eWorldGuard Options");
         worldGuard.setItemMeta(worldGuardMeta);
 
-        ItemStack allowShopFlag = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack allowShopFlag = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta allowShopFlagMeta = allowShopFlag.getItemMeta();
         if (Config.useAllowFlag()) {
             allowShopFlagMeta.setDisplayName("§eAllow-Shop Flag §7- §aOn");
@@ -323,13 +339,13 @@ public class ConfigMenu {
             MaterialData data = allowShopFlag.getData();
             data.setData((byte) 14);
             allowShopFlag.setData(data);
-            allowShopFlag = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            allowShopFlag = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             allowShopFlagMeta.setDisplayName("§eAllow-Shop Flag §7- §cFalse");
         }
-        allowShopFlagMeta.setLore(Arrays.asList("§7Players can only create shops in","§7regions with the 'Allow-Shop' flag","§e§lClick §7to toggle"));
+        allowShopFlagMeta.setLore(Arrays.asList("§7Players can only create shops in", "§7regions with the 'Allow-Shop' flag", "§e§lClick §7to toggle"));
         allowShopFlag.setItemMeta(allowShopFlagMeta);
 
-        ItemStack NPCOverride = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemStack NPCOverride = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta NPCOverrideMeta = NPCOverride.getItemMeta();
         if (Config.useNPCOverride()) {
 
@@ -338,15 +354,15 @@ public class ConfigMenu {
             MaterialData data = NPCOverride.getData();
             data.setData((byte) 14);
             NPCOverride.setData(data);
-            NPCOverride = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            NPCOverride = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             NPCOverrideMeta.setDisplayName("§eNPC Override §7- §cFalse");
         }
-        NPCOverrideMeta.setLore(Arrays.asList("§7Override a region to allow NPCs to spawn","§e§lClick §7to toggle"));
+        NPCOverrideMeta.setLore(Arrays.asList("§7Override a region to allow NPCs to spawn", "§e§lClick §7to toggle"));
         NPCOverride.setItemMeta(NPCOverrideMeta);
 
-        inv.setItem(37,worldGuard);
-        inv.setItem(38,allowShopFlag);
-        inv.setItem(39,NPCOverride);
+        inv.setItem(37, worldGuard);
+        inv.setItem(38, allowShopFlag);
+        inv.setItem(39, NPCOverride);
 
 
         if (open)

@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.0 Beta 14
+Version: 1.5.0 Beta 15
 
 Prices: '&d&lPrices'
 NothingInCart: '&c&lNo Items In Cart'
@@ -23,7 +23,9 @@ ClickToRemove: '&e&lLeft Click to &aRemove'
 
 SelectAmount: '&eSelect An Amount'
 AmountToBuy: '&eAmount to buy:'
-Confirm: '&eClick to &aConfirm'
+
+Cancel: '&eClick &7to &cCancel'
+Confirm: '&eClick &7to &aConfirm'
 
 AddOne: '&eAdd One'
 AddStack: '&eAdd A Stack'

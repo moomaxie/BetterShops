@@ -88,7 +88,7 @@ public class BuyItem implements Listener {
                                 }
                             }
                         } else {
-                            if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("LeftClickToBuy"))) {
+                            if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("LeftClickToBuy")) && !e.isShiftClick()) {
                                 if (!shop.isOpen() && !Config.useWhenClosed()) {
                                     p.closeInventory();
                                     p.sendMessage(Messages.getPrefix() + "§cShop Closed");
@@ -233,7 +233,27 @@ public class BuyItem implements Listener {
                     }
 
                     if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("BuyItem"))) {
+                        if (!shop.isOpen() && !Config.useWhenClosed()) {
+                            p.closeInventory();
+                            p.sendMessage(Messages.getPrefix() + "§cShop Closed");
+                            return;
+                        }
                         ItemStack item = e.getInventory().getItem(4);
+
+
+                        for (String s : item.getItemMeta().getLore()){
+                            if (s.contains(MainGUI.getString("Price"))){
+                                double pr = Double.parseDouble(s.substring(MainGUI.getString("Price").length() + 3));
+
+                                if (pr != shop.getPrice(item,false)){
+                                    p.closeInventory();
+                                    p.sendMessage(Messages.getPrefix() + "§cThe price of this item has just been changed. You have exited the shop to avoid fraud.");
+
+                                    return;
+                                }
+                            }
+                        }
+
 
                         if (item.getType() != Material.SKULL_ITEM) {
 

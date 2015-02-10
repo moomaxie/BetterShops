@@ -6,7 +6,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 1.5.0 Beta 14
+Version: 1.5.0 Beta 15
 
 ####  General  ####
 
@@ -19,17 +19,14 @@ Permissions: False
 # Use Anvil to Name Shop Use Items (True/False)
 Anvil: True
 
-# Allows players to use shop when closed if they had opened it while the shop was open (True/False)
-UseOnClose: False
-
 # Enable Titles and Subtitles (True/False) (1.8 and Above)
 Titles: True
 
-# Disable deleting shops by breaking the chest(Can only use /sremove)
-DeleteByBreak: True
-
 # Toggle Server Metrics
 Metrics: True
+
+# Allow use of chests by Shop Owners
+UseChests: True
 
 #### Shop Options ####
 
@@ -41,6 +38,12 @@ DefaultPrice: 5.00
 
 # Maximum Price
 MaxPrice: 1000000000.00
+
+# Disable deleting shops by breaking the chest(Can only use /sremove)
+DeleteByBreak: True
+
+# Allows players to use shop when closed if they had opened it while the shop was open (True/False)
+UseOnClose: False
 
 ####  Shop Creation  ####
 

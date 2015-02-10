@@ -197,7 +197,7 @@ public class CheckoutMenu implements Listener {
                                 BigDecimal bd = new BigDecimal(total);
                                 bd = bd.setScale(2,BigDecimal.ROUND_UP);
 
-                                BigDecimal bd2 = new BigDecimal((Core.getEconomy().getBalance(p) - Double.parseDouble(new DecimalFormat("#.00").format(total))));
+                                BigDecimal bd2 = new BigDecimal((Core.getEconomy().getBalance(p) - Double.parseDouble(new DecimalFormat("#.00").format(total).replaceFirst(",",".").replaceAll(",",""))));
                                 bd2 = bd2.setScale(2,BigDecimal.ROUND_HALF_UP);
 
                                 priceMeta.setLore(Arrays.asList(Checkout.getString("TotalPrice") + " §7" + bd.doubleValue(),
@@ -413,7 +413,7 @@ public class CheckoutMenu implements Listener {
                                         }
                                     } else {
                                         BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
-                                        bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+                                        bd = bd.setScale(2,BigDecimal.ROUND_UP);
                                         Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
                                         t = t + bd.doubleValue();
                                     }

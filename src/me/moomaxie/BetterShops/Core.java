@@ -68,13 +68,9 @@ public class Core extends JavaPlugin {
     //TODO: Add more types of shops: Holographic, Sign, Floating Item - 1.6.0
     //TODO: Shop connections - maybe
     //TODO: Claiming un-owned shops - maybe
-    //TODO: Messages/Language Files changing and saving
-    //TODO: Change Chat messages in-game
+    //TODO: Change Chat messages in-game - 1.6.0
 
     //Change WG message when changing versions
-
-    //Removed API
-
 
     private static Core instance;
     public static Metrics metrics;
@@ -267,7 +263,7 @@ public class Core extends JavaPlugin {
 
                 //Register WorldGuard
                 if (getWorldGuard() != null) {
-                    if (getWorldGuard().getDescription().getVersion().startsWith("\"6") || getWorldGuard().getDescription().getVersion().startsWith("6")) {
+                    if (!getWorldGuard().getDescription().getVersion().startsWith("\"6") && !getWorldGuard().getDescription().getVersion().startsWith("6")) {
                         wg = true;
                         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for §eWorldGuard");
                     } else {

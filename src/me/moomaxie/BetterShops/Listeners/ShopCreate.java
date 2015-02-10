@@ -89,49 +89,51 @@ public class ShopCreate implements Listener {
 
                 final Chest finalChest = chest;
 
-                if (Config.useAnvil()) {
+                if (finalChest != null && ShopLimits.fromLocation(finalChest.getLocation()) == null) {
 
-                    AnvilGUI gui = Core.getAnvilGUI();
+                    if (Config.useAnvil()) {
 
-                    gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {
-                        @Override
-                        public void onAnvilClick(AnvilGUI.AnvilClickEvent ev) {
-                            if (ev.getSlot() == 2) {
-                                ev.setWillClose(true);
-                                ev.setWillDestroy(true);
+                        AnvilGUI gui = Core.getAnvilGUI();
+
+                        gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {
+                            @Override
+                            public void onAnvilClick(AnvilGUI.AnvilClickEvent ev) {
+                                if (ev.getSlot() == 2) {
+                                    ev.setWillClose(true);
+                                    ev.setWillDestroy(true);
 
 
-                                if (ev.getCurrentItem().getType() == Material.PAPER) {
-                                    if (ev.getCurrentItem().hasItemMeta()) {
-                                        if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
-                                            String name = ev.getCurrentItem().getItemMeta().getDisplayName();
+                                    if (ev.getCurrentItem().getType() == Material.PAPER) {
+                                        if (ev.getCurrentItem().hasItemMeta()) {
+                                            if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                                                String name = ev.getCurrentItem().getItemMeta().getDisplayName();
 
-                                            if (isAlphaNumeric(name)) {
-                                                boolean can = true;
-                                                boolean Long = false;
+                                                if (isAlphaNumeric(name)) {
+                                                    boolean can = true;
+                                                    boolean Long = false;
 
-                                                if (name.length() > 16) {
-                                                    Long = true;
-                                                }
+                                                    if (name.length() > 16) {
+                                                        Long = true;
+                                                    }
 
-                                                if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
+                                                    if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
 
-                                                    for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
-                                                        if (file.getName().contains(".yml")) {
-                                                            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                                                        for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
+                                                            if (file.getName().contains(".yml")) {
+                                                                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-                                                            for (String s : config.getKeys(false)) {
-                                                                if (s.equals(name)) {
-                                                                    can = false;
+                                                                for (String s : config.getKeys(false)) {
+                                                                    if (s.equals(name)) {
+                                                                        can = false;
+                                                                    }
                                                                 }
                                                             }
                                                         }
                                                     }
-                                                }
 
-                                                if (can && !Long) {
-                                                    if (CreationCost.useCost(p)) {
-                                                        if (finalChest != null && ShopLimits.fromLocation(finalChest.getLocation()) == null) {
+                                                    if (can && !Long) {
+                                                        if (CreationCost.useCost(p)) {
+
                                                             new AddShop(e.getPlayer(), finalChest, name);
                                                             e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
 
@@ -235,8 +237,11 @@ public class ShopCreate implements Listener {
                                                                     }
                                                                 }
                                                             }
-                                                        } else {
-                                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop at this chest's location already exists");
+
+                                                        }
+                                                    } else {
+                                                        if (Long) {
+                                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 16 Characters)");
                                                             e.setLine(0, " ");
                                                             e.setLine(1, " ");
                                                             e.setLine(2, " ");
@@ -244,110 +249,108 @@ public class ShopCreate implements Listener {
                                                             if (Core.isAboveEight() && Config.useTitles()) {
 
                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                                Core.getTitleManager().sendSubTitle(p, "§cSorry");
-                                                                Core.getTitleManager().sendSubTitle(p, "§cA shop at this chest's location already exists");
+                                                                Core.getTitleManager().sendTitle(p, "§cName Too Long");
+
+                                                            }
+                                                        }
+
+                                                        if (!can) {
+                                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
+                                                            e.setLine(0, " ");
+                                                            e.setLine(1, " ");
+                                                            e.setLine(2, " ");
+                                                            e.setLine(3, " ");
+                                                            if (Core.isAboveEight() && Config.useTitles()) {
+
+
+                                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                                Core.getTitleManager().sendTitle(p, "§cName Already Exists");
 
                                                             }
                                                         }
                                                     }
+
                                                 } else {
-                                                    if (Long) {
-                                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 16 Characters)");
-                                                        e.setLine(0, " ");
-                                                        e.setLine(1, " ");
-                                                        e.setLine(2, " ");
-                                                        e.setLine(3, " ");
-                                                        if (Core.isAboveEight() && Config.useTitles()) {
+                                                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cNot an acceptable name.");
+                                                    e.setLine(0, " ");
+                                                    e.setLine(1, " ");
+                                                    e.setLine(2, " ");
+                                                    e.setLine(3, " ");
+                                                    if (Core.isAboveEight() && Config.useTitles()) {
 
-                                                            Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, "§cName Too Long");
 
-                                                        }
+                                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                        Core.getTitleManager().sendSubTitle(p, "§cNot an acceptable name.");
+
+
                                                     }
-
-                                                    if (!can) {
-                                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
-                                                        e.setLine(0, " ");
-                                                        e.setLine(1, " ");
-                                                        e.setLine(2, " ");
-                                                        e.setLine(3, " ");
-                                                        if (Core.isAboveEight() && Config.useTitles()) {
-
-
-                                                            Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, "§cName Already Exists");
-
-                                                        }
-                                                    }
+                                                    e.setCancelled(true);
                                                 }
-
-                                            } else {
-                                                e.getPlayer().sendMessage(Messages.getPrefix() + "§cNot an acceptable name.");
-                                                e.setLine(0, " ");
-                                                e.setLine(1, " ");
-                                                e.setLine(2, " ");
-                                                e.setLine(3, " ");
-                                                if (Core.isAboveEight() && Config.useTitles()) {
-
-
-                                                    Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                    Core.getTitleManager().sendSubTitle(p, "§cNot an acceptable name.");
-
-
-                                                }
-                                                e.setCancelled(true);
                                             }
+                                        } else {
+                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
+                                            e.setLine(0, " ");
+                                            e.setLine(1, " ");
+                                            e.setLine(2, " ");
+                                            e.setLine(3, " ");
+                                            if (Core.isAboveEight() && Config.useTitles()) {
+
+
+                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                Core.getTitleManager().sendTitle(p, "§4Error");
+                                                Core.getTitleManager().sendSubTitle(p, "§cMalfunction with Shop Name Creating, is the plugin updated?");
+
+
+                                            }
+                                            e.setCancelled(true);
                                         }
                                     } else {
-                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
+                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cShop creation cancelled");
                                         e.setLine(0, " ");
                                         e.setLine(1, " ");
                                         e.setLine(2, " ");
                                         e.setLine(3, " ");
                                         if (Core.isAboveEight() && Config.useTitles()) {
 
-
                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                            Core.getTitleManager().sendTitle(p, "§4Error");
-                                            Core.getTitleManager().sendSubTitle(p, "§cMalfunction with Shop Name Creating, is the plugin updated?");
-
+                                            Core.getTitleManager().sendTitle(p, "§cShop creation cancelled");
 
                                         }
-                                        e.setCancelled(true);
                                     }
                                 } else {
-                                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cShop creation cancelled");
-                                    e.setLine(0, " ");
-                                    e.setLine(1, " ");
-                                    e.setLine(2, " ");
-                                    e.setLine(3, " ");
-                                    if (Core.isAboveEight() && Config.useTitles()) {
-
-                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                        Core.getTitleManager().sendTitle(p, "§cShop creation cancelled");
-
-                                    }
+                                    ev.setWillClose(false);
+                                    ev.setWillDestroy(false);
                                 }
-                            } else {
-                                ev.setWillClose(false);
-                                ev.setWillDestroy(false);
                             }
-                        }
-                    });
+                        });
 
-                    ItemStack it = new ItemStack(Material.PAPER);
-                    ItemMeta meta = it.getItemMeta();
-                    meta.setDisplayName("Enter Name");
-                    it.setItemMeta(meta);
+                        ItemStack it = new ItemStack(Material.PAPER);
+                        ItemMeta meta = it.getItemMeta();
+                        meta.setDisplayName("Enter Name");
+                        it.setItemMeta(meta);
 
-                    gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
+                        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
 
-                    gui.open();
+                        gui.open();
+                    } else {
+                        ChatMessages.shopCreate.put(p, finalChest);
+                        ChatMessages.shopCreate2.put(p, e.getBlock());
+                        p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+
+                    }
                 } else {
-                    ChatMessages.shopCreate.put(p, finalChest);
-                    ChatMessages.shopCreate2.put(p, e.getBlock());
-                    p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop at this chest's location already exists");
+                    e.setLine(0, " ");
+                    e.setLine(1, " ");
+                    e.setLine(2, " ");
+                    e.setLine(3, " ");
+                    if (Core.isAboveEight() && Config.useTitles()) {
 
+                        Core.getTitleManager().setTimes(p, 20, 40, 20);
+                        Core.getTitleManager().sendSubTitle(p, "§cSorry");
+                        Core.getTitleManager().sendSubTitle(p, "§cA shop at this chest's location already exists");
+
+                    }
                 }
             } else {
                 p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());

@@ -65,6 +65,11 @@ public class AmountChooser implements Listener {
         confirmMeta.setDisplayName(Checkout.getString("Confirm"));
         confirm.setItemMeta(confirmMeta);
 
+        ItemStack cancel = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+        ItemMeta cancelMeta = cancel.getItemMeta();
+        cancelMeta.setDisplayName(Checkout.getString("Cancel"));
+        cancel.setItemMeta(cancelMeta);
+
         ItemStack addOne = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
         ItemMeta addOneMeta = addOne.getItemMeta();
         addOneMeta.setDisplayName(Checkout.getString("AddOne"));
@@ -85,6 +90,7 @@ public class AmountChooser implements Listener {
         removeSFMeta.setDisplayName(Checkout.getString("RemoveStack"));
         removeSF.setItemMeta(removeSFMeta);
 
+        inv.setItem(0, cancel);
         inv.setItem(4, item);
         inv.setItem(22, totals);
         inv.setItem(37, addOne);
@@ -120,6 +126,18 @@ public class AmountChooser implements Listener {
                             final int total = Integer.parseInt(e.getInventory().getItem(22).getItemMeta().getDisplayName().substring(19));
 
                             if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {
+
+                                if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("Cancel"))) {
+                                    if (!shop.isOpen()) {
+                                        if (shop.getOwner() == p) {
+                                            OpenShop.openShopItems(e.getInventory(), p, shop, 1);
+                                        } else {
+                                            p.sendMessage(Messages.getPrefix() + "§cShop is closed.");
+                                        }
+                                    } else {
+                                        OpenShop.openShopItems(e.getInventory(), p, shop, 1);
+                                    }
+                                }
 
                                 if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("Confirm"))) {
                                     CheckoutMenu.addToCart(p, shop, e.getInventory().getItem(4), total);

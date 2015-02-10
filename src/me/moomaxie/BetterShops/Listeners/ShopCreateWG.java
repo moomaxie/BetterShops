@@ -113,6 +113,8 @@ public class ShopCreateWG implements Listener {
 
                 final Chest finalChest = chest;
 
+                if (finalChest != null && ShopLimits.fromLocation(finalChest.getLocation()) == null) {
+
                 if (Config.useAnvil()) {
 
                     AnvilGUI gui = Core.getAnvilGUI();
@@ -155,7 +157,7 @@ public class ShopCreateWG implements Listener {
 
                                                 if (can && !Long) {
                                                     if (CreationCost.useCost(p)) {
-                                                        if (finalChest != null && ShopLimits.fromLocation(finalChest.getLocation()) == null) {
+
                                                             new AddShop(e.getPlayer(), finalChest, name);
                                                             e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
 
@@ -257,20 +259,7 @@ public class ShopCreateWG implements Listener {
                                                                     }
                                                                 }
                                                             }
-                                                        } else {
-                                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop at this chest's location already exists");
-                                                            e.setLine(0, " ");
-                                                            e.setLine(1, " ");
-                                                            e.setLine(2, " ");
-                                                            e.setLine(3, " ");
-                                                            if (Core.isAboveEight() && Config.useTitles()) {
 
-                                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                                Core.getTitleManager().sendSubTitle(p, "§cSorry");
-                                                                Core.getTitleManager().sendSubTitle(p, "§cA shop at this chest's location already exists");
-
-                                                            }
-                                                        }
                                                     }
                                                 } else {
                                                     if (Long) {
@@ -385,6 +374,20 @@ public class ShopCreateWG implements Listener {
                     ChatMessages.shopCreate2.put(p, e.getBlock());
                     p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
 
+                }
+                } else {
+                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop at this chest's location already exists");
+                    e.setLine(0, " ");
+                    e.setLine(1, " ");
+                    e.setLine(2, " ");
+                    e.setLine(3, " ");
+                    if (Core.isAboveEight() && Config.useTitles()) {
+
+                        Core.getTitleManager().setTimes(p, 20, 40, 20);
+                        Core.getTitleManager().sendSubTitle(p, "§cSorry");
+                        Core.getTitleManager().sendSubTitle(p, "§cA shop at this chest's location already exists");
+
+                    }
                 }
             } else {
                 p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());

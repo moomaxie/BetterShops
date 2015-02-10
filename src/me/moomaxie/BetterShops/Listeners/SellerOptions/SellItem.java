@@ -205,6 +205,19 @@ public class SellItem implements Listener {
                     if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("SellItem"))) {
                         ItemStack item = e.getInventory().getItem(4);
 
+                        for (String s : item.getItemMeta().getLore()){
+                            if (s.contains(MainGUI.getString("AskingPrice"))){
+                                double pr = Double.parseDouble(s.substring(MainGUI.getString("AskingPrice").length() + 3));
+
+                                if (pr != shop.getPrice(item,true)){
+                                    p.closeInventory();
+                                    p.sendMessage(Messages.getPrefix() + "§cThe price of this item has just been changed. You have exited the shop to avoid fraud.");
+
+                                    return;
+                                }
+                            }
+                        }
+
                         int price = shop.getAmount(item, true);
 
                         double pr = shop.getPrice(item, true);

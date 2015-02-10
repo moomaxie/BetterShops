@@ -6,8 +6,8 @@
 #These messages are what appear in the "Shop Settings" section of shops
 #
 #     Lines starting with # are comments and will be ignored.
-#
-Version: 1.5.0 Beta 14
+
+Version: 1.5.0 Beta 15
 
 NotificationsOn: '&a&lNotifications &7- &aOn'
 NotificationsOff: '&a&lNotifications &7- &cOff'
