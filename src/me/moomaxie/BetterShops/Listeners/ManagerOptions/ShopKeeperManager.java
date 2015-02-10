@@ -158,10 +158,21 @@ public class ShopKeeperManager implements Listener {
                                             if (ev.getCurrentItem().hasItemMeta()) {
                                                 if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
                                                     String name = ev.getCurrentItem().getItemMeta().getDisplayName();
+                                                    OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+                                                    if (player.hasPlayedBefore()) {
 
-                                                    shop.addManager(Bukkit.getOfflinePlayer(name));
-                                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Added shop keeper");
-                                                    openKeeperManager((Player) e.getWhoClicked(), shop);
+                                                        if (!shop.getManagers().contains(player)){
+                                                            shop.addManager(player);
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Added shop keeper");
+                                                            openKeeperManager((Player) e.getWhoClicked(), shop);
+                                                        } else {
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cAlready a shop keeper");
+                                                            openKeeperManager((Player) e.getWhoClicked(), shop);
+                                                        }
+                                                    } else {
+                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cNot a valid player or this player has not logged on to this server before.");
+                                                        openKeeperManager((Player) e.getWhoClicked(), shop);
+                                                    }
                                                 }
                                             }
                                         }
@@ -176,7 +187,7 @@ public class ShopKeeperManager implements Listener {
 
                             ItemStack it = new ItemStack(Material.PAPER);
                             ItemMeta meta = it.getItemMeta();
-                            meta.setDisplayName("Type Name Here");
+                            meta.setDisplayName("Type Name");
                             it.setItemMeta(meta);
 
                             gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -203,7 +214,8 @@ public class ShopKeeperManager implements Listener {
                                                 if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
                                                     String name = ev.getCurrentItem().getItemMeta().getDisplayName();
 
-                                                    if (shop.getManagers().contains(Bukkit.getOfflinePlayer(name))) {
+                                                    OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+                                                    if (shop.getManagers().contains(player) && player.hasPlayedBefore()) {
 
                                                         shop.removeManager(Bukkit.getOfflinePlayer(name));
                                                         ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Removed shop keeper");
@@ -224,7 +236,7 @@ public class ShopKeeperManager implements Listener {
 
                             ItemStack it = new ItemStack(Material.PAPER);
                             ItemMeta meta = it.getItemMeta();
-                            meta.setDisplayName("Type Name Here");
+                            meta.setDisplayName("Type Name");
                             it.setItemMeta(meta);
 
                             gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);

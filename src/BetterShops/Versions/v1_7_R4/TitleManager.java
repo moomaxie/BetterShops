@@ -18,13 +18,13 @@ import org.spigotmc.ProtocolInjector;
 public class TitleManager implements me.moomaxie.BetterShops.Configurations.TitleManager{
 
     public void sendTitle(Player p, String message){
-        ProtocolInjector.PacketTitle title = new ProtocolInjector.PacketTitle(ProtocolInjector.PacketTitle.Action.TITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes('§', message)));
+        ProtocolInjector.PacketTitle title = new ProtocolInjector.PacketTitle(ProtocolInjector.PacketTitle.Action.TITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes("§".toCharArray()[0] , message)));
 
         ((CraftPlayer) p).getHandle().playerConnection.sendPacket(title);
     }
 
     public void sendSubTitle(Player p, String message){
-        ProtocolInjector.PacketTitle subtitle = new ProtocolInjector.PacketTitle(ProtocolInjector.PacketTitle.Action.SUBTITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes('§', message)));
+        ProtocolInjector.PacketTitle subtitle = new ProtocolInjector.PacketTitle(ProtocolInjector.PacketTitle.Action.SUBTITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes("§".toCharArray()[0] , message)));
 
         ((CraftPlayer) p).getHandle().playerConnection.sendPacket(subtitle);
     }

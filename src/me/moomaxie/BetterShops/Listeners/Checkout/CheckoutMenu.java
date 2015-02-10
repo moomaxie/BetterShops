@@ -6,6 +6,7 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.Checkout;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.WordsCapitalizer;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Shops.Shop;
@@ -22,6 +23,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -160,8 +163,8 @@ public class CheckoutMenu implements Listener {
 
                                 ItemMeta meta = it.getItemMeta();
                                 List<String> lore;
-                                if (shop.getLore(it, false) != null) {
-                                    lore = shop.getLore(it, false);
+                                if (shop.getLore(it) != null) {
+                                    lore = shop.getLore(it);
                                 } else {
                                     lore = new ArrayList<>();
                                 }
@@ -176,9 +179,13 @@ public class CheckoutMenu implements Listener {
                                         lore.add(MainGUI.getString("Amount")+ " §71");
                                     }
                                     if (ie.get(i) != null) {
-                                        lore.add(MainGUI.getString("Price")+ " §7" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * ie.get(i));
+                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * ie.get(i));
+                                        bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                        lore.add(MainGUI.getString("Price")+ " §7" + bd.doubleValue());
                                     } else {
-                                        lore.add(MainGUI.getString("Price")+ " §7" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * 1);
+                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * 1);
+                                        bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                        lore.add(MainGUI.getString("Price")+ " §7" + bd.doubleValue());
                                     }
                                     lore.add(" ");
                                     lore.add(Checkout.getString("ClickToRemove"));
@@ -187,9 +194,15 @@ public class CheckoutMenu implements Listener {
                                 }
                                 inv.setItem(inv.firstEmpty(), ite);
 
-                                priceMeta.setLore(Arrays.asList(Checkout.getString("TotalPrice") + " §7" + total,
+                                BigDecimal bd = new BigDecimal(total);
+                                bd = bd.setScale(2,BigDecimal.ROUND_UP);
+
+                                BigDecimal bd2 = new BigDecimal((Core.getEconomy().getBalance(p) - Double.parseDouble(new DecimalFormat("#.00").format(total))));
+                                bd2 = bd2.setScale(2,BigDecimal.ROUND_HALF_UP);
+
+                                priceMeta.setLore(Arrays.asList(Checkout.getString("TotalPrice") + " §7" + bd.doubleValue(),
                                         Checkout.getString("Balance") + " §7" + Core.getEconomy().getBalance(p),
-                                        Checkout.getString("NewBalance") + " §7" + (Core.getEconomy().getBalance(p) - total)));
+                                        Checkout.getString("NewBalance") + " §7" + bd2.doubleValue()));
                                 price.setItemMeta(priceMeta);
                                 inv.setItem(4, price);
 
@@ -265,8 +278,8 @@ public class CheckoutMenu implements Listener {
                                             for (ItemStack it : i.keySet()) {
                                                 ItemMeta meta = it.getItemMeta();
                                                 List<String> lore;
-                                                if (shop.getLore(it, false) != null) {
-                                                    lore = shop.getLore(it, false);
+                                                if (shop.getLore(it) != null) {
+                                                    lore = shop.getLore(it);
                                                 } else {
                                                     lore = new ArrayList<>();
                                                 }
@@ -281,9 +294,13 @@ public class CheckoutMenu implements Listener {
                                                             lore.add(MainGUI.getString("Amount")+ " §71");
                                                         }
                                                         if (ie.get(i) != null) {
-                                                            lore.add(MainGUI.getString("Price")+ " §7" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * ie.get(i));
+                                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * ie.get(i));
+                                                            bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                                            lore.add(MainGUI.getString("Price")+ " §7" + bd.doubleValue());
                                                         } else {
-                                                            lore.add(MainGUI.getString("Price")+ " §7" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * 1);
+                                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * 1);
+                                                            bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                                            lore.add(MainGUI.getString("Price")+ " §7" + bd.doubleValue());
                                                         }
                                                         lore.add(" ");
                                                         lore.add(Checkout.getString("ClickToRemove"));
@@ -335,8 +352,8 @@ public class CheckoutMenu implements Listener {
                         for (ItemStack it : i.keySet()) {
                             ItemMeta meta = it.getItemMeta();
                             List<String> lore;
-                            if (shop.getLore(it, false) != null) {
-                                lore = shop.getLore(it, false);
+                            if (shop.getLore(it) != null) {
+                                lore = shop.getLore(it);
                             } else {
                                 lore = new ArrayList<>();
                             }
@@ -370,27 +387,35 @@ public class CheckoutMenu implements Listener {
                             if (shop.getStock(ite, false) >= amt) {
                                 if (Core.getEconomy().getBalance(p) >= shop.getPrice(it, false) * amt) {
                                     if (!shop.isServerShop()) {
-                                        Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
-                                        Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
-                                        t = t + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt;
+
+
+                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                        bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+                                        Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
+                                        Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), bd.doubleValue());
+                                        t = t + bd.doubleValue();
+
+
                                         if (shop.isNotify()) {
                                             if (shop.getOwner() != null && shop.getOwner().isOnline()) {
                                                 shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt));
+                                                shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
 
                                                 if (Core.isAboveEight() && Config.useTitles()) {
 
                                                     Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
                                                     Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                    Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt));
+                                                    Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
 
 
                                                 }
                                             }
                                         }
                                     } else {
-                                        Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
-                                        t = t + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt;
+                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                        bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+                                        Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
+                                        t = t + bd.doubleValue();
                                     }
 
                                     for (int o = 0; o < amt; o++) {
@@ -405,7 +430,7 @@ public class CheckoutMenu implements Listener {
                                     if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
                                         p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + ite.getItemMeta().getDisplayName());
                                     } else {
-                                        p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + ite.getType().name().replaceAll("_", " "));
+                                        p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                     }
                                     p.closeInventory();
                                     return;
@@ -414,27 +439,31 @@ public class CheckoutMenu implements Listener {
                                 if (shop.getStock(ite, false) > 0 || shop.getStock(ite, false) <= 0 && shop.isInfinite(ite, false)) {
                                     if (Core.getEconomy().getBalance(p) >= shop.getPrice(it, false) * shop.getStock(ite, false)) {
                                         if (!shop.isServerShop()) {
-                                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
-                                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
-                                            t = t + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt;
+                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                            bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+                                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
+                                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), bd.doubleValue());
+                                            t = t + bd.doubleValue();
                                             if (shop.isNotify()) {
                                                 if (shop.getOwner() != null && shop.getOwner().isOnline()) {
                                                     shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt));
+                                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
 
                                                     if (Core.isAboveEight() && Config.useTitles()) {
 
                                                         Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
                                                         Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                        Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt));
+                                                        Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
 
 
                                                     }
                                                 }
                                             }
                                         } else {
-                                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
-                                            t = t + (shop.getPrice(it, false) / shop.getAmount(it, false)) * amt;
+                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                            bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+                                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
+                                            t = t + bd.doubleValue();
                                         }
 
                                         for (int o = 0; o < amt; o++) {
@@ -465,7 +494,7 @@ public class CheckoutMenu implements Listener {
                                         if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
                                             p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + ite.getItemMeta().getDisplayName());
                                         } else {
-                                            p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + ite.getType().name().replaceAll("_", " "));
+                                            p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                         }
                                         p.closeInventory();
                                         return;
@@ -475,7 +504,7 @@ public class CheckoutMenu implements Listener {
                                     if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
                                         p.sendMessage(Messages.getPrefix() + "§cRan out of stock for §d" + ite.getItemMeta().getDisplayName());
                                     } else {
-                                        p.sendMessage(Messages.getPrefix() + "§cRan out of stock for §d" + ite.getType().name().replaceAll("_", " "));
+                                        p.sendMessage(Messages.getPrefix() + "§cRan out of stock for §d" + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                     }
                                     p.closeInventory();
                                     return;

@@ -162,19 +162,28 @@ public class ItemManager implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onSettingsClick(final InventoryClickEvent e) {
         final Player p = (Player) e.getWhoClicked();
-                    if (e.getInventory().getName().contains("§7[Shop]")) {
-                        e.setCancelled(true);
+        if (e.getInventory().getName().contains("§7[Shop]")) {
+            e.setCancelled(true);
 
-                        if (e.getInventory().getType() == InventoryType.CHEST) {
-                            if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
-                                String name = e.getInventory().getName();
-                                name = name.substring(11);
+            if (e.getInventory().getType() == InventoryType.CHEST) {
+                if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
+                    String name = e.getInventory().getName();
+                    name = name.substring(11);
 
-                                final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopLimits.fromString(p, name);
 
                     final ItemStack ite = e.getInventory().getItem(4);
 
+                    boolean sell = false;
+                    if (e.getInventory().getItem(4).getItemMeta().getDisplayName() != null && e.getInventory().getItem(4).getItemMeta().getDisplayName().equals(SearchEngine.getString("SearchSellItems"))) {
+                        sell = true;
+                    }
+
                     if (e.getInventory().getSize() > 9) {
+
+
+
+
 
                         if (e.getInventory().getItem(4) != null && e.getInventory().getItem(4).getType() != Material.AIR && e.getInventory().getItem(4).hasItemMeta() && e.getInventory().getItem(4).getItemMeta().getLore() != null && e.getInventory().getItem(4).getItemMeta().getLore().contains(MainGUI.getString("ManageItem")) || e.getInventory().getItem(4).getItemMeta().getLore() != null && e.getInventory().getItem(4).getItemMeta().getLore().contains(MainGUI.getString("ShopKeeperManage"))
                                 && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("BackArrow"))) {
@@ -194,16 +203,24 @@ public class ItemManager implements Listener {
                             if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("TurnOffServerShop"))) {
                                 shop.setServerShop(false);
                                 shop.setOpen(b);
-                                OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(),p,shop,1);
+                                OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, 1);
 
                             }
                         }
 
                         if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
                             if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(History.getString("OpenHistory"))) {
-                                HistoryGUI.openHistoryGUI(p,shop,1);
-
+                                HistoryGUI.openHistoryGUI(p, shop, 1);
                             }
+                        }
+
+                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(SearchEngine.getString("ReturnLore"))) {
+                            if (sell){
+                                OpenShop.openShopItems(e.getInventory(),p,shop,1);
+                            } else{
+                                OpenSellShop.openSellerShop(e.getInventory(),p,shop,1);
+                            }
+
                         }
 
                         if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(ItemTexts.getString("PriceDisplayName"))) {
@@ -216,7 +233,6 @@ public class ItemManager implements Listener {
                                             ev.setWillClose(true);
                                             ev.setWillDestroy(true);
 
-
                                             if (ev.getCurrentItem().getType() == Material.PAPER) {
                                                 if (ev.getCurrentItem().hasItemMeta()) {
                                                     if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
@@ -226,6 +242,7 @@ public class ItemManager implements Listener {
                                                         double amt = 0.0;
                                                         try {
                                                             amt = Double.parseDouble(name);
+
                                                             can = true;
                                                         } catch (Exception ex) {
                                                             ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
@@ -233,8 +250,20 @@ public class ItemManager implements Listener {
                                                         }
 
                                                         if (can) {
-                                                            shop.setPrice(ite, amt, false);
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                                                            if (amt > 0) {
+                                                                if (amt <= Config.getMaxPrice()) {
+                                                                    shop.setPrice(ite, amt, false);
+                                                                    p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                                                                } else {
+                                                                    if (String.valueOf(Config.getMaxPrice()).contains("E")) {
+                                                                        p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPriceAsString() + ")");
+                                                                    } else {
+                                                                        p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPrice() + ")");
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                p.sendMessage(Messages.getPrefix() + "§cMust be greater than 0");
+                                                            }
                                                         }
                                                         OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
                                                     }
@@ -293,10 +322,13 @@ public class ItemManager implements Listener {
 
                                                         if (can) {
 
-                                                            shop.setAmount(ite, amt, false);
+                                                            if (amt > 0 && amt <= 2304) {
+                                                                shop.setAmount(ite, amt, false);
 
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
-
+                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                                                            } else {
+                                                                p.sendMessage(Messages.getPrefix() + "§cMust be between 0 and 2034");
+                                                            }
                                                         }
                                                         OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
                                                     }
@@ -457,12 +489,12 @@ public class ItemManager implements Listener {
                             if (ite.getType() == Material.SKULL_ITEM) {
                                 SkullMeta meta = (SkullMeta) ite.getItemMeta();
 
-                                meta.setLore(shop.getLore(ite, false));
+                                meta.setLore(shop.getLore(ite));
                                 ite.setItemMeta(meta);
                             } else {
                                 ItemMeta meta = ite.getItemMeta();
 
-                                meta.setLore(shop.getLore(ite, false));
+                                meta.setLore(shop.getLore(ite));
                                 ite.setItemMeta(meta);
                             }
 
@@ -471,12 +503,12 @@ public class ItemManager implements Listener {
                                 if (it.getType() == Material.SKULL_ITEM) {
                                     SkullMeta meta = (SkullMeta) it.getItemMeta();
 
-                                    meta.setLore(shop.getLore(it, false));
+                                    meta.setLore(shop.getLore(it));
                                     it.setItemMeta(meta);
                                 } else {
                                     ItemMeta meta = it.getItemMeta();
 
-                                    meta.setLore(shop.getLore(it, false));
+                                    meta.setLore(shop.getLore(it));
                                     it.setItemMeta(meta);
                                 }
 
@@ -489,7 +521,7 @@ public class ItemManager implements Listener {
 
                             if (item != null) {
                                 if (shop.getStock(item, false) > 0) {
-                                    Stocks.removeAllOfDeletedItem(item,shop,p,false);
+                                    Stocks.removeAllOfDeletedItem(item, shop, p, false);
                                 }
                                 shop.deleteItem(ite, false);
 
@@ -511,15 +543,11 @@ public class ItemManager implements Listener {
                                 ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInfiniteStock().replaceAll("<Value>", "§aOn"));
                             }
 
-                            openItemManager(e.getInventory(),(Player) e.getWhoClicked(), shop, ite);
+                            openItemManager(e.getInventory(), (Player) e.getWhoClicked(), shop, ite);
                         }
                     }
 
-                    boolean sell = false;
 
-                    if (e.getInventory().getItem(4).getItemMeta().getDisplayName() != null && e.getInventory().getItem(4).getItemMeta().getDisplayName().equals(SearchEngine.getString("SearchSellItems"))) {
-                        sell = true;
-                    }
 
                     if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(SearchEngine.getString("SearchMaterials"))) {
                         if (Config.useAnvil()) {
@@ -575,7 +603,7 @@ public class ItemManager implements Listener {
                     }
 
                     if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("BackArrow")) && e.getInventory().getItem(4).getItemMeta().getDisplayName() != null && e.getInventory().getItem(4).getItemMeta().getDisplayName().equals(SearchEngine.getString("SearchSellItems"))) {
-                        OpenSellShop.openSellerShop(e.getInventory(),p, shop, 1);
+                        OpenSellShop.openSellerShop(e.getInventory(), p, shop, 1);
                     }
 
 
@@ -583,4 +611,6 @@ public class ItemManager implements Listener {
             }
         }
     }
+
+
 }

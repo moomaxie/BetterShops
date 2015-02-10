@@ -1,5 +1,6 @@
 package me.moomaxie.BetterShops.Listeners.Misc;
 
+import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
@@ -37,7 +38,7 @@ public class OpeningChests implements Listener {
 
                 Player p = e.getPlayer();
 
-                Shop shop = ShopLimits.fromString(b.getLocation());
+                Shop shop = ShopLimits.fromLocation(b.getLocation());
 
                 if (shop != null) {
 
@@ -66,7 +67,7 @@ public class OpeningChests implements Listener {
 
                     Block face = e.getClickedBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
                     if (face.getType() == Material.CHEST){
-                        Shop shop = ShopLimits.fromString(face.getLocation());
+                        Shop shop = ShopLimits.fromLocation(face.getLocation());
                         if (shop != null){
                             if (shop.getOwner() != null) {
                                 if (shop.isOpen()) {
@@ -74,14 +75,22 @@ public class OpeningChests implements Listener {
                                         if (shop.getShopContents(false).size() >= shop.getShopContents(true).size()) {
                                             OpenShop.openShopItems(null, p, shop, 1);
                                         } else {
-                                            OpenSellShop.openSellerShop(null, p, shop, 1);
+                                            if (Config.useSellingShop()) {
+                                                OpenSellShop.openSellerShop(null, p, shop, 1);
+                                            } else {
+                                                OpenShop.openShopItems(null, p, shop, 1);
+                                            }
                                         }
                                         p.sendMessage(Messages.getPrefix() + Messages.getOpenShopMessage());
                                     } else if (shop.getOwner().getUniqueId().equals(p.getUniqueId())|| shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
                                         if (shop.getShopContents(false).size() >= shop.getShopContents(true).size()) {
                                             OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
                                         } else {
-                                            OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                                            if (Config.useSellingShop()) {
+                                                OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                                            } else {
+                                                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                            }
                                         }
                                     }
                                 } else {
@@ -92,13 +101,21 @@ public class OpeningChests implements Listener {
                                             if (shop.getShopContents(false).size() >= shop.getShopContents(true).size()) {
                                                 OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
                                             } else {
-                                                OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                                                if (Config.useSellingShop()) {
+                                                    OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                                                } else {
+                                                    OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                                }
                                             }
                                         } else {
                                             if (shop.getShopContents(false).size() >= shop.getShopContents(true).size()) {
                                                 OpenShop.openShopItems(null, p, shop, 1);
                                             } else {
-                                                OpenSellShop.openSellerShop(null, p, shop, 1);
+                                                if (Config.useSellingShop()) {
+                                                    OpenSellShop.openSellerShop(null, p, shop, 1);
+                                                } else {
+                                                    OpenShop.openShopItems(null, p, shop, 1);
+                                                }
                                             }
                                         }
                                     }

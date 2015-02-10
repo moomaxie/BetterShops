@@ -106,7 +106,7 @@ public class CreateNPCWG {
     public static void allowMobs(Location l) {
         com.sk89q.worldguard.protection.ApplicableRegionSet set = Core.getRegionSet(l);
 
-        for (com.sk89q.worldguard.protection.regions.ProtectedRegion r : set.getRegions()) {
+        for (com.sk89q.worldguard.protection.regions.ProtectedRegion r : set) {
             r.setFlag(com.sk89q.worldguard.protection.flags.DefaultFlag.MOB_SPAWNING, com.sk89q.worldguard.protection.flags.StateFlag.State.ALLOW);
         }
     }
@@ -114,7 +114,7 @@ public class CreateNPCWG {
     public static void denyMobs(Location l) {
         com.sk89q.worldguard.protection.ApplicableRegionSet set = Core.getRegionSet(l);
 
-        for (com.sk89q.worldguard.protection.regions.ProtectedRegion r : set.getRegions()) {
+        for (com.sk89q.worldguard.protection.regions.ProtectedRegion r : set) {
             r.setFlag(com.sk89q.worldguard.protection.flags.DefaultFlag.MOB_SPAWNING, com.sk89q.worldguard.protection.flags.StateFlag.State.DENY);
         }
     }

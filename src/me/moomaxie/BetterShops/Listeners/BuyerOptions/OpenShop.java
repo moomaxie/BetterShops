@@ -44,7 +44,7 @@ public class OpenShop implements Listener {
 //                                    if (face.getState() instanceof Chest) {
 //                                        Chest chest = (Chest) face.getState();
 //
-//                                        Shop shop = ShopLimits.fromString(chest.getLocation());
+//                                        Shop shop = ShopLimits.fromLocation(chest.getLocation());
 //
 //                                        if (shop != null) {
 //
@@ -77,7 +77,7 @@ public class OpenShop implements Listener {
 //                                    if (face.getState() instanceof Chest) {
 //                                        Chest chest = (Chest) face.getState();
 //
-//                                        Shop shop = ShopLimits.fromString(chest.getLocation());
+//                                        Shop shop = ShopLimits.fromLocation(chest.getLocation());
 //
 //                                        if (shop.getOwner() != p) {
 //                                            p.sendMessage(Messages.getPrefix() + "Shop Is §cClosed");
@@ -242,8 +242,8 @@ public class OpenShop implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = shop.getLore(it,false);
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
@@ -254,7 +254,7 @@ public class OpenShop implements Listener {
                         lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                     }
                     lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
-                    lore.add(MainGUI.getString("Price") + " §7" + shop.getPrice(it, false));
+                    lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
                     lore.add(MainGUI.getString("LeftClickToBuy"));
                     lore.add(MainGUI.getString("AddToCart"));
 
@@ -271,8 +271,8 @@ public class OpenShop implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = shop.getLore(it,false);
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
@@ -283,7 +283,7 @@ public class OpenShop implements Listener {
                         lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                     }
                     lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
-                    lore.add(MainGUI.getString("Price") + " §7" + shop.getPrice(it, false));
+                    lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
                     lore.add(MainGUI.getString("LeftClickToBuy"));
                     lore.add(MainGUI.getString("AddToCart"));
 
@@ -302,8 +302,8 @@ public class OpenShop implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = shop.getLore(it,false);
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
@@ -314,7 +314,7 @@ public class OpenShop implements Listener {
                         lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                     }
                     lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
-                    lore.add(MainGUI.getString("Price") + " §7" + shop.getPrice(it, false));
+                    lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
                     lore.add(MainGUI.getString("LeftClickToBuy"));
                     lore.add(MainGUI.getString("AddToCart"));
 

@@ -27,6 +27,8 @@ public class ShopLimits {
     private static HashMap<UUID, Integer> limit = new HashMap<UUID, Integer>();
     public static List<Shop> shops = new ArrayList<>();
 
+
+
     public static int loadShops() {
 
         limit.clear();
@@ -100,7 +102,7 @@ public class ShopLimits {
         return null;
     }
 
-    public static Shop fromString(Location name){
+    public static Shop fromLocation(Location name){
         for (Shop shop : shops){
 
             if (shop.getLocation().equals(name) || shop.getLocation().toString().equals(name.toString()) || shop.getLocation() == name){

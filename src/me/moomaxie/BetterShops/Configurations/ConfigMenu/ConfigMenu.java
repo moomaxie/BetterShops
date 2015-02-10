@@ -160,15 +160,15 @@ public class ConfigMenu {
             metrics = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
             metricsMeta.setDisplayName("§eMetrics §7- §cFalse");
         }
-        metricsMeta.setLore(Arrays.asList("§7Toggle Server Metrics", "§3Requires a restart to take effect","§e§lClick §7to toggle"));
+        metricsMeta.setLore(Arrays.asList("§7Toggle Server Metrics","§e§lClick §7to toggle"));
         metrics.setItemMeta(metricsMeta);
 
         inv.setItem(10,general);
         inv.setItem(11,autoAdd);
         inv.setItem(12,permissions);
-        inv.setItem(13,useOnClose);
-        inv.setItem(14,titles);
-        inv.setItem(15,deleteOnBreak);
+        inv.setItem(13,anvil);
+        inv.setItem(14,useOnClose);
+        inv.setItem(15,titles);
         inv.setItem(16,metrics);
 
         // Shop Creation
@@ -227,6 +227,54 @@ public class ConfigMenu {
         inv.setItem(22,costOnShops);
         inv.setItem(23,costAmount);
 
+        
+        // Shop Options
+
+        ItemStack shopOptions = new ItemStack(Material.MAP);
+        ItemMeta shopOptionsMeta = shopCreation.getItemMeta();
+        shopOptionsMeta.setDisplayName("§eShop Options");
+        shopOptions.setItemMeta(shopOptionsMeta);
+
+        ItemStack sellingShop = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 5);
+        ItemMeta sellingShopMeta = sellingShop.getItemMeta();
+        if (Config.useSellingShop()) {
+
+            sellingShopMeta.setDisplayName("§eSelling Shop §7- §aOn");
+        } else {
+            MaterialData data = sellingShop.getData();
+            data.setData((byte) 14);
+            sellingShop.setData(data);
+            sellingShop = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 14);
+            sellingShopMeta.setDisplayName("§eSelling Shop §7- §cFalse");
+        }
+        sellingShopMeta.setLore(Arrays.asList("§7Toggle the use of selling shops","§e§lClick §7to toggle"));
+        sellingShop.setItemMeta(sellingShopMeta);
+
+        ItemStack defaultPrice = new ItemStack(Material.NAME_TAG);
+        ItemMeta defaultPriceMeta = defaultPrice.getItemMeta();
+        if (String.valueOf(Config.getDefaultPrice()).contains("E")) {
+            defaultPriceMeta.setDisplayName("§eDefault Price: §d" + Config.getDefaultPriceAsString());
+        } else {
+            defaultPriceMeta.setDisplayName("§eDefault Price: §d" + Config.getDefaultPrice());
+        }
+        defaultPriceMeta.setLore(Arrays.asList("§7Set Default Price", "§e§lClick §7to change"));
+        defaultPrice.setItemMeta(defaultPriceMeta);
+
+        ItemStack maxPrice = new ItemStack(Material.NAME_TAG);
+        ItemMeta maxPriceMeta = maxPrice.getItemMeta();
+        if (String.valueOf(Config.getMaxPrice()).contains("E")) {
+            maxPriceMeta.setDisplayName("§eMaximum Price: §d" + Config.getMaxPriceAsString());
+        } else {
+            maxPriceMeta.setDisplayName("§eMaximum Price: §d" + Config.getMaxPrice());
+        }
+        maxPriceMeta.setLore(Arrays.asList("§7Set Max Price", "§e§lClick §7to change"));
+        maxPrice.setItemMeta(maxPriceMeta);
+
+        inv.setItem(46,shopOptions);
+        inv.setItem(47,sellingShop);
+        inv.setItem(48,defaultPrice);
+        inv.setItem(49,deleteOnBreak);
+        inv.setItem(50,maxPrice);
         
         // NPC Options
 

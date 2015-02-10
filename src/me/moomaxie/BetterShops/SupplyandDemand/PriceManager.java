@@ -1,5 +1,8 @@
 package me.moomaxie.BetterShops.SupplyandDemand;
 
+import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
+
 /**
  * ***********************************************************************
  * Copyright Max Hubbard (c) 2014. All Rights Reserved.
@@ -26,4 +29,29 @@ package me.moomaxie.BetterShops.SupplyandDemand;
     // Amount needed to double
 
 public class PriceManager {
+
+    private Shop shop;
+    private static double globalInflationRate = 1.0;
+    private ShopItem item;
+
+    public PriceManager(ShopItem item){
+        this.item = item;
+        this.shop = item.getShop();
+    }
+
+    public static double getGlobalInflationRate(){
+        return globalInflationRate;
+    }
+
+    public static void setGlobalInflationRate(double amt){
+        globalInflationRate = amt;
+    }
+
+    public Shop getShop(){
+        return shop;
+    }
+
+    public ShopItem getItem(){
+        return item;
+    }
 }

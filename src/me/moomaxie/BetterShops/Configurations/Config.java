@@ -7,9 +7,12 @@ import org.bukkit.entity.EntityType;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.jar.JarFile;
 
 /**
  * ***********************************************************************
@@ -45,6 +48,20 @@ public class Config {
 
     public static void setPermissions(boolean b) {
         config.set("Permissions", b);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean useSellingShop() {
+        return config.isBoolean("SellingShops") && config.getBoolean("SellingShops");
+    }
+
+    public static void setUseSellingShops(boolean b) {
+        config.set("SellingShops", b);
 
         try {
             config.save(file);
@@ -214,6 +231,42 @@ public class Config {
         config = YamlConfiguration.loadConfiguration(file);
     }
 
+    public static String getDefaultPriceAsString() {
+        return (new BigDecimal(getDefaultPrice()).toPlainString());
+    }
+
+    public static String getMaxPriceAsString() {
+        return (new BigDecimal(getMaxPrice()).toPlainString());
+    }
+
+    public static double getMaxPrice() {
+        if (config.isDouble("MaxPrice")) {
+            return config.getDouble("MaxPrice");
+        } else {
+            if (config.getString("MaxPrice").contains(",")) {
+
+                return Double.parseDouble(new DecimalFormat("#.00").format(Double.parseDouble(config.getString("MaxPrice").replaceFirst(",", ".").replaceAll(",", ""))));
+
+            } else {
+                return 1000000000.00;
+            }
+        }
+
+    }
+
+    public static void setMaxPrice(double b) {
+        config.set("MaxPrice", b);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "config.yml");
+
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+
     public static double getCreationCost() {
         if (config.isDouble("CostForShops") || config.isInt("CostForShops")) {
             return config.getDouble("CostForShops");
@@ -222,13 +275,44 @@ public class Config {
         }
     }
 
-    public static boolean useNPC(EntityType type){
-        return config.getConfigurationSection("NPC").isBoolean(WordsCapitalizer.capitalizeEveryWord(type.name().replaceAll("_", " ")))
-                && config.getConfigurationSection("NPC").getBoolean(WordsCapitalizer.capitalizeEveryWord(type.name().replaceAll("_"," ")));
+    public static double getDefaultPrice() {
+        if (config.isDouble("DefaultPrice")) {
+            return config.getDouble("DefaultPrice");
+        } else {
+            if (config.getString("DefaultPrice").contains(",")) {
+                return Double.parseDouble(new DecimalFormat("#.00").format(Double.parseDouble(config.getString("DefaultPrice").replaceFirst(",", ".").replaceAll(",", ""))));
+            } else {
+                return 5.00;
+            }
+        }
     }
 
-    public static void setUseNPC(EntityType type, boolean b){
-        config.getConfigurationSection("NPC").set(WordsCapitalizer.capitalizeEveryWord(type.name().replaceAll("_"," ")),b);
+    public static void setDefaultPrice(double b) {
+        config.set("DefaultPrice", b);
+
+
+        try {
+            config.save(file);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "config.yml");
+
+        config = YamlConfiguration.loadConfiguration(file);
+
+
+    }
+
+
+    public static boolean useNPC(EntityType type) {
+        return config.getConfigurationSection("NPC").isBoolean(WordsCapitalizer.capitalizeEveryWord(type.name().replaceAll("_", " ")))
+                && config.getConfigurationSection("NPC").getBoolean(WordsCapitalizer.capitalizeEveryWord(type.name().replaceAll("_", " ")));
+    }
+
+    public static void setUseNPC(EntityType type, boolean b) {
+        config.getConfigurationSection("NPC").set(WordsCapitalizer.capitalizeEveryWord(type.name().replaceAll("_", " ")), b);
 
         try {
             config.save(file);
@@ -294,7 +378,7 @@ public class Config {
 
             File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
 
-            java.util.jar.JarFile jar = null;
+            JarFile jar = null;
             try {
                 jar = new java.util.jar.JarFile(fil);
             } catch (IOException e) {
@@ -331,7 +415,8 @@ public class Config {
                 HashMap<String, Object> hash = new HashMap<>();
 
                 for (String s : config.getKeys(true)) {
-                    hash.put(s, config.get(s));
+                    if (!s.contains("Version"))
+                        hash.put(s, config.get(s));
                 }
 
                 if (config.isString("Version")) {
@@ -341,7 +426,7 @@ public class Config {
                         if (file.delete()) {
                             File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
 
-                            java.util.jar.JarFile jar = null;
+                            JarFile jar = null;
                             try {
                                 jar = new java.util.jar.JarFile(fil);
                             } catch (IOException e) {
@@ -383,7 +468,7 @@ public class Config {
 
                     File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
 
-                    java.util.jar.JarFile jar = null;
+                    JarFile jar = null;
                     try {
                         jar = new java.util.jar.JarFile(fil);
                     } catch (IOException e) {
@@ -417,10 +502,26 @@ public class Config {
 
 
                 }
+                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "config.yml");
+
+                config = YamlConfiguration.loadConfiguration(file);
+                for (String s : hash.keySet()) {
+                    config.set(s, hash.get(s));
+                    try {
+                        config.save(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "config.yml");
 
         config = YamlConfiguration.loadConfiguration(file);
+
+        config.options().copyHeader(true);
+        config.options().copyDefaults(true);
+
+
     }
 }

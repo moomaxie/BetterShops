@@ -1,5 +1,7 @@
 package me.moomaxie.BetterShops.Listeners.SearchEngine;
 
+import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -92,88 +94,95 @@ public class MaterialCheck {
 
         optionsMeta.setDisplayName("§a§l" + shop.getName());
 
-        optionsMeta.setLore(Arrays.asList("§7" + shop.getDescription(), " ", "§e§lOwner: §a" + shop.getOwner().getName(),
-                "§eKeepers: §7" + shop.getManagers().size()));
+        optionsMeta.setLore(Arrays.asList("§7" + shop.getDescription(), " ", MainGUI.getString("Owner") + " §a" + shop.getOwner().getName(),
+                MainGUI.getString("Keepers") + " §7" + shop.getManagers().size()));
         options.setItemMeta(optionsMeta);
 
         ItemStack info = new ItemStack(Material.SIGN);
         ItemMeta infoMeta = info.getItemMeta();
         if (sell) {
-            infoMeta.setDisplayName("§e§lSelling");
+            infoMeta.setDisplayName(MainGUI.getString("Selling"));
         } else {
-            infoMeta.setDisplayName("§e§lBuying");
+            infoMeta.setDisplayName(MainGUI.getString("Buying"));
         }
-        infoMeta.setLore(Arrays.asList("§e§lRight Click §7to toggle §aBuying/Selling", "§e§lLeft Click §7to open §aSearch Options"));
+        infoMeta.setLore(Arrays.asList(MainGUI.getString("ToggleShop"), MainGUI.getString("SearchOptions")));
         info.setItemMeta(infoMeta);
+
+        ItemStack returnShop = new ItemStack(Material.ARROW);
+        ItemMeta returnShopMeta = returnShop.getItemMeta();
+        returnShopMeta.setDisplayName(SearchEngine.getString("Return"));
+        returnShopMeta.setLore(Arrays.asList(SearchEngine.getString("ReturnLore")));
+        returnShop.setItemMeta(returnShopMeta);
 
         ItemStack arrow = new ItemStack(Material.ARROW);
         ItemMeta arrowMeta = arrow.getItemMeta();
-        arrowMeta.setDisplayName("§e§lNext Page");
+        arrowMeta.setDisplayName(MainGUI.getString("NextPage"));
         arrow.setItemMeta(arrowMeta);
 
         ItemStack barrow = new ItemStack(Material.ARROW);
         ItemMeta barrowMeta = barrow.getItemMeta();
-        barrowMeta.setDisplayName("§e§lPrevious Page");
+        barrowMeta.setDisplayName(MainGUI.getString("PreviousPage"));
         barrow.setItemMeta(barrowMeta);
 
         ItemStack pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
         ItemMeta pg1Meta = pg1.getItemMeta();
-        pg1Meta.setDisplayName("§dPage 1");
+        pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
         pg1.setItemMeta(pg1Meta);
 
         ItemStack pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
         ItemMeta pg2Meta = pg2.getItemMeta();
-        pg2Meta.setDisplayName("§dPage 2");
+        pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
         pg2.setItemMeta(pg2Meta);
 
         ItemStack pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
         ItemMeta pg3Meta = pg3.getItemMeta();
-        pg3Meta.setDisplayName("§dPage 3");
+        pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
         pg3.setItemMeta(pg3Meta);
 
-        if (page == 1){
+        if (page == 1) {
             inv.setItem(8, arrow);
         }
 
         if (page == 2) {
             pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
             pg1Meta = pg1.getItemMeta();
-            pg1Meta.setDisplayName("§dPage 1");
+            pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
             pg1.setItemMeta(pg1Meta);
 
             pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
             pg2Meta = pg2.getItemMeta();
-            pg2Meta.setDisplayName("§dPage 2");
+            pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
             pg2.setItemMeta(pg2Meta);
 
             pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
             pg3Meta = pg3.getItemMeta();
-            pg3Meta.setDisplayName("§dPage 3");
+            pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
             pg3.setItemMeta(pg3Meta);
 
-            inv.setItem(0,barrow);
+            inv.setItem(0, barrow);
             inv.setItem(8, arrow);
         }
 
         if (page == 3) {
             pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
             pg1Meta = pg1.getItemMeta();
-            pg1Meta.setDisplayName("§dPage 1");
+            pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
             pg1.setItemMeta(pg1Meta);
 
             pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
             pg2Meta = pg2.getItemMeta();
-            pg2Meta.setDisplayName("§dPage 2");
+            pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
             pg2.setItemMeta(pg2Meta);
 
             pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
             pg3Meta = pg3.getItemMeta();
-            pg3Meta.setDisplayName("§dPage 3");
+            pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
             pg3.setItemMeta(pg3Meta);
 
-            inv.setItem(0,barrow);
+            inv.setItem(0, barrow);
         }
 
+        inv.setItem(1,returnShop);
         inv.setItem(3, info);
         inv.setItem(5, options);
 
@@ -189,33 +198,33 @@ public class MaterialCheck {
                     if (inv.firstEmpty() > 0) {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
-                        if (meta.getLore() != null) {
-                            lore = meta.getLore();
+                        if (shop.getLore(it)!= null) {
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
 
                         if (sell) {
 
-                            lore.add("§eAsking Amount: §7" + shop.getAmount(it, true));
-                            lore.add("§eAsking Price: §7" + shop.getPrice(it, true));
+                            lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
+                            lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                             lore.add(" ");
-                            lore.add("§e§lLeft Click §7to sell");
+                            lore.add(MainGUI.getString("SellItem"));
                             meta.setLore(lore);
                             it.setItemMeta(meta);
                         } else {
                             if (shop.isInfinite(it, false)) {
-                                lore.add("§eStock: §7-");
+                                lore.add(MainGUI.getString("Stock") + " §7-");
                             } else {
-                                lore.add("§eStock: §7" + shop.getStock(it, false));
+                                lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                             }
-                            lore.add("§eAmount: §7" + shop.getAmount(it, false));
-                            lore.add("§ePrice: §7" + shop.getPrice(it, false));
-                            lore.add(" ");
-                            lore.add("§e§lLeft Click §7to buy");
+                            lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
+                            lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
+                            lore.add(MainGUI.getString("LeftClickToBuy"));
+                            lore.add(MainGUI.getString("AddToCart"));
 
                             if (shop.getManagers().contains(p)) {
-                                lore.add("§e§lRight Click §7to manage");
+                                lore.add(MainGUI.getString("ShopKeeperManage"));
                             }
                             meta.setLore(lore);
                             it.setItemMeta(meta);
@@ -227,39 +236,37 @@ public class MaterialCheck {
                     if (inv.firstEmpty() > 0) {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
-                        if (meta.getLore() != null) {
-                            lore = meta.getLore();
+                        if (shop.getLore(it) != null) {
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
 
                         if (sell) {
 
-                            lore.add("§eAsking Amount: §7" + shop.getAmount(it, true));
-                            lore.add("§eAsking Price: §7" + shop.getPrice(it, true));
+                            lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
+                            lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                             lore.add(" ");
-                            lore.add("§e§lLeft Click §7to sell");
+                            lore.add(MainGUI.getString("SellItem"));
                             meta.setLore(lore);
                             it.setItemMeta(meta);
                         } else {
                             if (shop.isInfinite(it, false)) {
-                                lore.add("§eStock: §7-");
+                                lore.add(MainGUI.getString("Stock") + " §7-");
                             } else {
-                                lore.add("§eStock: §7" + shop.getStock(it, false));
+                                lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                             }
-                            lore.add("§eAmount: §7" + shop.getAmount(it, false));
-                            lore.add("§ePrice: §7" + shop.getPrice(it, false));
-                            lore.add(" ");
-                            lore.add("§e§lLeft Click §7to buy");
+                            lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
+                            lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
+                            lore.add(MainGUI.getString("LeftClickToBuy"));
+                            lore.add(MainGUI.getString("AddToCart"));
 
                             if (shop.getManagers().contains(p)) {
-                                lore.add("§e§lRight Click §7to manage");
+                                lore.add(MainGUI.getString("ShopKeeperManage"));
                             }
-
                             meta.setLore(lore);
                             it.setItemMeta(meta);
                         }
-
 
                         inv.setItem(inv.firstEmpty(), it);
                     }
@@ -267,38 +274,37 @@ public class MaterialCheck {
                     if (inv.firstEmpty() > 0) {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
-                        if (meta.getLore() != null) {
-                            lore = meta.getLore();
+                        if (shop.getLore(it) != null) {
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
 
                         if (sell) {
 
-                            lore.add("§eAsking Amount: §7" + shop.getAmount(it, true));
-                            lore.add("§eAsking Price: §7" + shop.getPrice(it, true));
+                            lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
+                            lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                             lore.add(" ");
-                            lore.add("§e§lLeft Click §7to sell");
+                            lore.add(MainGUI.getString("SellItem"));
                             meta.setLore(lore);
                             it.setItemMeta(meta);
                         } else {
                             if (shop.isInfinite(it, false)) {
-                                lore.add("§eStock: §7-");
+                                lore.add(MainGUI.getString("Stock") + " §7-");
                             } else {
-                                lore.add("§eStock: §7" + shop.getStock(it, false));
+                                lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                             }
-                            lore.add("§eAmount: §7" + shop.getAmount(it, false));
-                            lore.add("§ePrice: §7" + shop.getPrice(it, false));
-                            lore.add(" ");
-                            lore.add("§e§lLeft Click §7to buy");
+                            lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
+                            lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
+                            lore.add(MainGUI.getString("LeftClickToBuy"));
+                            lore.add(MainGUI.getString("AddToCart"));
 
                             if (shop.getManagers().contains(p)) {
-                                lore.add("§e§lRight Click §7to manage");
+                                lore.add(MainGUI.getString("ShopKeeperManage"));
                             }
                             meta.setLore(lore);
                             it.setItemMeta(meta);
                         }
-
 
                         inv.setItem(inv.firstEmpty(), it);
                     }

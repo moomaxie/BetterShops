@@ -21,115 +21,15 @@ import java.util.List;
  */
 public class Stocks {
 
-
     //Collect Stock
 
     public static void collectStock(ItemStack ite, int amt, Player p, Shop shop) {
-
-        List<String> lore = shop.getLore(ite, true);
 
         if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
 
             if (amt > 0) {
 
                 if (shop.getStock(ite,true) != amt) {
-
-//                    if (ite != null) {
-//                        if (ite.getType() != Material.SKULL_ITEM) {
-//                            ItemMeta meta = ite.getItemMeta();
-//
-//                            meta.setLore(lore);
-//                            ite.setItemMeta(meta);
-//                        } else {
-//                            SkullMeta meta = (SkullMeta) ite.getItemMeta();
-//                            meta.setLore(lore);
-//                            ite.setItemMeta(meta);
-//                        }
-//
-//
-//                        if (shop.getStock(ite, true) >= amt) {
-//
-//                            int orig = amt;
-//
-//                            for (int i = 0; i < p.getInventory().getContents().length; i++) {
-//                                if (amt > 0) {
-//                                    ItemStack it = p.getInventory().getItem(i);
-//
-//                                    if (it != null && it.getType() != Material.AIR) {
-//
-//                                        boolean can;
-//
-//                                        int amr = it.getAmount();
-//                                        it.setAmount(1);
-//                                        if (ite.equals(it) || ite.toString().equals(it.toString())) {
-//                                            it.setAmount(amr);
-//                                            can = true;
-//                                        } else {
-//                                            it.setAmount(amr);
-//                                            can = false;
-//                                        }
-//
-//                                        if (can) {
-//                                            if (ite.getMaxStackSize() - it.getAmount() <= amt) {
-//
-//                                                int newAmt = amt;
-//
-//                                                amt = amt - (ite.getMaxStackSize() - it.getAmount());
-//                                                it.setAmount(it.getAmount() + newAmt);
-//
-//                                                p.getInventory().setItem(i, it);
-//
-//                                            }
-//                                        }
-//                                    }
-//                                } else {
-//                                    break;
-//                                }
-//                            }
-//
-//                            if (amt > 0) {
-//                                int stacks = amt / ite.getMaxStackSize();
-//
-//                                for (int i = 0; i < stacks; i++) {
-//                                    if (amt > 0) {
-//                                        if (p.getInventory().firstEmpty() != -1) {
-//                                            ItemStack it = ite.clone();
-//                                            it.setAmount(ite.getMaxStackSize());
-//                                            p.getInventory().addItem(it);
-//                                            amt = amt - ite.getMaxStackSize();
-//                                        } else {
-//                                            ItemStack it = ite.clone();
-//                                            it.setAmount(ite.getMaxStackSize());
-//                                            amt = amt - ite.getMaxStackSize();
-//                                            p.getWorld().dropItem(p.getLocation(), it);
-//                                        }
-//                                    } else {
-//                                        break;
-//                                    }
-//                                }
-//                            }
-//
-//                            if (amt > 0) {
-//                                if (p.getInventory().firstEmpty() != -1) {
-//                                    ItemStack it = ite.clone();
-//                                    it.setAmount(amt);
-//                                    p.getInventory().addItem(it);
-//                                } else {
-//                                    ItemStack it = ite.clone();
-//                                    it.setAmount(amt);
-//                                    p.getWorld().dropItem(p.getLocation(), it);
-//                                }
-//                            }
-//
-//
-//                            p.sendMessage(Messages.getPrefix() + Messages.getChangeStock());
-//                            shop.setStock(ite, shop.getStock(ite, true) - orig, true);
-//
-//                        } else {
-//                            p.sendMessage(Messages.getPrefix() + Messages.getLowStock());
-//                        }
-//
-//                    }
 
                     int left = shop.getStock(ite,true) - amt;
 
@@ -157,13 +57,13 @@ public class Stocks {
         if (ite.getType() != Material.SKULL_ITEM) {
             ItemMeta meta = ite.getItemMeta();
 
-            List<String> lore = shop.getLore(ite,false);
+            List<String> lore = shop.getLore(ite);
 
             meta.setLore(lore);
             ite.setItemMeta(meta);
         } else {
             SkullMeta meta = (SkullMeta) ite.getItemMeta();
-            List<String> lore = shop.getLore(ite,false);
+            List<String> lore = shop.getLore(ite);
             meta.setLore(lore);
             ite.setItemMeta(meta);
         }
@@ -194,13 +94,13 @@ public class Stocks {
             if (ite.getType() != Material.SKULL_ITEM) {
                 ItemMeta meta = ite.getItemMeta();
 
-                List<String> lore = shop.getLore(ite,false);
+                List<String> lore = shop.getLore(ite);
 
                 meta.setLore(lore);
                 ite.setItemMeta(meta);
             } else {
                 SkullMeta meta = (SkullMeta) ite.getItemMeta();
-                List<String> lore = shop.getLore(ite,false);
+                List<String> lore = shop.getLore(ite);
                 meta.setLore(lore);
                 ite.setItemMeta(meta);
             }
@@ -422,13 +322,13 @@ public class Stocks {
         if (ite.getType() != Material.SKULL_ITEM) {
             ItemMeta meta = ite.getItemMeta();
 
-            List<String> lore = shop.getLore(ite,false);
+            List<String> lore = shop.getLore(ite);
 
             meta.setLore(lore);
             ite.setItemMeta(meta);
         } else {
             SkullMeta meta = (SkullMeta) ite.getItemMeta();
-            List<String> lore = shop.getLore(ite,false);
+            List<String> lore = shop.getLore(ite);
             meta.setLore(lore);
             ite.setItemMeta(meta);
         }

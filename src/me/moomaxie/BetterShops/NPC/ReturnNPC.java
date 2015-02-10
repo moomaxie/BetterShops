@@ -25,11 +25,14 @@ public class ReturnNPC {
 
                 npcs = NPCs.getNPCs();
 
-                for (ShopsNPC npc : npcs) {
+                for (int i = 0; i < npcs.size(); i++) {
 
+                    ShopsNPC npc = npcs.get(i);
                     if (npc.getShop() != null && npc.getShop().isNPCShop()) {
 
                         npc.returnNPC();
+                    } else {
+                        NPCs.removeNPC(npc);
                     }
                 }
 

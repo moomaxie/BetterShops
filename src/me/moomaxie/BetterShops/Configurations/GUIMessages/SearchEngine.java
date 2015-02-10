@@ -22,16 +22,16 @@ public class SearchEngine {
     private static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/SearchEngine.yml");
     public static YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-    public static String getString(String name){
-        if (config.isString(name)){
+    public static String getString(String name) {
+        if (config.isString(name)) {
             return config.getString(name).replaceAll("&", "§");
         } else {
             return "";
         }
     }
 
-    public static void setString(String name, String msg){
-        config.set(name,msg);
+    public static void setString(String name, String msg) {
+        config.set(name, msg);
         try {
             config.save(file);
         } catch (IOException e) {
@@ -83,7 +83,7 @@ public class SearchEngine {
                         f.mkdir();
                         continue;
                     } else {
-                        if (!f.exists()){
+                        if (!f.exists()) {
                             if (f.getParentFile().mkdirs()) {
                                 try {
                                     f.createNewFile();
@@ -113,7 +113,8 @@ public class SearchEngine {
                 HashMap<String, Object> hash = new HashMap<>();
 
                 for (String s : config.getKeys(true)) {
-                    hash.put(s, config.get(s));
+                    if (!s.contains("Version"))
+                        hash.put(s, config.get(s));
                 }
 
                 if (config.isString("Version")) {
@@ -144,7 +145,7 @@ public class SearchEngine {
                                         f.mkdir();
                                         continue;
                                     } else {
-                                        if (!f.exists()){
+                                        if (!f.exists()) {
                                             if (f.getParentFile().mkdirs()) {
                                                 try {
                                                     f.createNewFile();
@@ -198,7 +199,7 @@ public class SearchEngine {
                                 f.mkdir();
                                 continue;
                             } else {
-                                if (!f.exists()){
+                                if (!f.exists()) {
                                     if (f.getParentFile().mkdirs()) {
                                         try {
                                             f.createNewFile();
@@ -221,6 +222,17 @@ public class SearchEngine {
                             } catch (Exception ignored) {
                             }
                         }
+                    }
+                }
+                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/SearchEngine.yml");
+
+                config = YamlConfiguration.loadConfiguration(file);
+                for (String s : hash.keySet()) {
+                    config.set(s, hash.get(s));
+                    try {
+                        config.save(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }

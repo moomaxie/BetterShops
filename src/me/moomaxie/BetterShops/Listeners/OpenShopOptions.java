@@ -27,47 +27,6 @@ import java.util.List;
  */
 public class OpenShopOptions implements Listener {
 
-//    @EventHandler
-//    public void onShopOptions(PlayerInteractEvent e) {
-//        Player p = e.getPlayer();
-//
-//        if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-//            if (e.getClickedBlock().getState() instanceof Sign) {
-//                Sign sign = (Sign) e.getClickedBlock().getState();
-//                if (sign.getLine(0).contains("§b§k**********")) {
-//                    if (sign.getLine(3).contains("§b§k**********")) {
-//                        if (sign.getLine(1).contains("§aShop")) {
-//                            if (sign.getLine(2).contains("§cClosed") || sign.getLine(2).contains("§aOpen")) {
-//
-//                                Block face = e.getClickedBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
-//
-//
-//                                if (face.getType() == Material.CHEST) {
-//                                    if (face.getState() instanceof Chest) {
-//                                        Chest chest = (Chest) face.getState();
-//
-//                                        Shop shop = ShopLimits.fromString(chest.getLocation());
-//
-//                                        if (shop.getOwner() != null && shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop() || shop.getOwner() != null && shop.getOwner().getUniqueId() == p.getUniqueId() && !shop.isServerShop()) {
-//                                            if (shop.getShopContents(false).size() >= shop.getShopContents(true).size()) {
-//                                                openShopOwnerOptionsInventory(null,p, shop, 1);
-//                                            } else {
-//                                                OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
-//                                            }
-//                                        } else {
-//                                            if (shop.getOwner() != null && shop.getOwner().getUniqueId().equals(p.getUniqueId()) || shop.getOwner() != null && shop.getOwner().getUniqueId() == p.getUniqueId() && shop.isServerShop()) {
-//                                                OpenShop.openShopItems(null,p, shop, 1);
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     public static void openShopOwnerOptionsInventory(Inventory inv, Player p, Shop shop, int page) {
 
@@ -208,7 +167,7 @@ public class OpenShopOptions implements Listener {
                             ItemMeta meta = it.getItemMeta();
                             List<String> lore;
                             if (meta.getLore() != null) {
-                                lore = shop.getLore(it,false);
+                                lore = shop.getLore(it);
                             } else {
                                 lore = new ArrayList<String>();
                             }
@@ -219,7 +178,7 @@ public class OpenShopOptions implements Listener {
                                 lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                             }
                             lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
-                            lore.add(MainGUI.getString("Price") + " §7" + shop.getPrice(it, false));
+                            lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
                             lore.add(" ");
                             lore.add(MainGUI.getString("ManageItem"));
                             meta.setLore(lore);
@@ -235,7 +194,7 @@ public class OpenShopOptions implements Listener {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
                         if (meta.getLore() != null) {
-                            lore = shop.getLore(it,false);
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
@@ -246,7 +205,7 @@ public class OpenShopOptions implements Listener {
                             lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                         }
                         lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
-                        lore.add(MainGUI.getString("Price") + " §7" + shop.getPrice(it, false));
+                        lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
                         lore.add(" ");
                         lore.add(MainGUI.getString("ManageItem"));
                         meta.setLore(lore);
@@ -264,7 +223,7 @@ public class OpenShopOptions implements Listener {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
                         if (meta.getLore() != null) {
-                            lore = shop.getLore(it,false);
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
@@ -275,7 +234,7 @@ public class OpenShopOptions implements Listener {
                             lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, false));
                         }
                         lore.add(MainGUI.getString("Amount") + " §7" + shop.getAmount(it, false));
-                        lore.add(MainGUI.getString("Price") + " §7" + shop.getPrice(it, false));
+                        lore.add(MainGUI.getString("Price") + " §7" + shop.getPriceAsString(it, false));
                         lore.add(" ");
                         lore.add(MainGUI.getString("ManageItem"));
                         meta.setLore(lore);

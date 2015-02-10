@@ -18,6 +18,7 @@ import me.moomaxie.BetterShops.Shops.AddShop;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -104,8 +105,7 @@ public class ChatMessages implements Listener {
                 for (Shop s : addSellItem.get(p).keySet()) {
                     shp = s;
                 }
-                
-                
+
 
                 final Shop shop = shp;
                 Inventory inv = addSellItem.get(p).get(shop);
@@ -271,6 +271,19 @@ public class ChatMessages implements Listener {
         }
     }
 
+    public boolean isAlphaNumeric(String str) {
+        if (str.trim().length() < 1) {
+            return false;
+        }
+        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 ";
+        for (int i = 0; i < str.length(); i++) {
+            if (!acceptable.contains(str.substring(i, i + 1).toLowerCase())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @EventHandler
     public void onCreate(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
@@ -281,151 +294,183 @@ public class ChatMessages implements Listener {
                 final Chest finalChest = shopCreate.get(p);
                 Block b = shopCreate2.get(p);
 
-                boolean can = true;
-                boolean Long = false;
+                if (isAlphaNumeric(name)) {
 
-                if (name.length() > 21) {
-                    Long = true;
-                }
 
-                if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
+                    boolean can = true;
+                    boolean Long = false;
 
-                    for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
-                        if (file.getName().contains(".yml")) {
-                            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                    if (name.length() > 16) {
+                        Long = true;
+                    }
 
-                            for (String s : config.getKeys(false)) {
-                                if (s.equals(name)) {
-                                    can = false;
+                    if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
+
+                        for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
+                            if (file.getName().contains(".yml")) {
+                                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+                                for (String s : config.getKeys(false)) {
+                                    if (s.equals(name)) {
+                                        can = false;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if (can && !Long) {
+                    if (can && !Long) {
 
-                    new AddShop(e.getPlayer(), finalChest, name);
-                    e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
+                        if (b.getType() == Material.WALL_SIGN) {
 
-                    shopCreate.remove(p);
-                    shopCreate2.remove(p);
-                    e.setCancelled(true);
+                            new AddShop(e.getPlayer(), finalChest, name);
+                            e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
+
+                            shopCreate.remove(p);
+                            shopCreate2.remove(p);
+                            e.setCancelled(true);
 
 
-                    Sign s = (Sign) b.getState();
+                            Sign s = (Sign) b.getState();
 
-                    s.setLine(0, MainGUI.getString("SignLine1"));
-                    s.setLine(1, MainGUI.getString("SignLine2"));
-                    s.setLine(2, MainGUI.getString("SignLine3Closed"));
-                    s.setLine(3, MainGUI.getString("SignLine4"));
+                            s.setLine(0, MainGUI.getString("SignLine1"));
+                            s.setLine(1, MainGUI.getString("SignLine2"));
+                            s.setLine(2, MainGUI.getString("SignLine3Closed"));
+                            s.setLine(3, MainGUI.getString("SignLine4"));
 
-                    s.update();
+                            s.update();
 
-                    if (Core.isAboveEight() && Config.useTitles()) {
+                            if (Core.isAboveEight() && Config.useTitles()) {
 
-                            Core.getTitleManager().setTimes(p, 20, 40, 20);
-                            Core.getTitleManager().sendTitle(p, Messages.getCreateShop());
+                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                Core.getTitleManager().sendTitle(p, Messages.getCreateShop());
 
-                    }
+                            }
 
-                    ShopLimits.loadShops();
+                            ShopLimits.loadShops();
 
-                    if (Config.autoAddItems()) {
+                            if (Config.autoAddItems()) {
 
-                        if (finalChest != null && finalChest.getBlockInventory() != null) {
-                            Shop shop = ShopLimits.fromString(finalChest.getLocation());
-                            int i = 18;
-                            for (final ItemStack items : finalChest.getBlockInventory().getContents()) {
-                                if (items != null && items.getType() != Material.AIR) {
+                                if (finalChest != null && finalChest.getBlockInventory() != null) {
+                                    Shop shop = ShopLimits.fromLocation(finalChest.getLocation());
+                                    int i = 18;
+                                    for (final ItemStack items : finalChest.getBlockInventory().getContents()) {
+                                        if (items != null && items.getType() != Material.AIR) {
 
-                                    int am = items.getAmount();
+                                            int am = items.getAmount();
 
-                                    items.setAmount(1);
+                                            items.setAmount(1);
 
-                                    if (!shop.getShopContents(false).containsKey(items)) {
-                                        if (i < 53) {
-                                            shop.addItem(items, i, false);
-                                            i++;
-                                        } else {
-                                            if (i == 53) {
-                                                shop.addItem(items, i, false);
-                                                i = 72;
+                                            if (!shop.getShopContents(false).containsKey(items)) {
+                                                if (i < 53) {
+                                                    shop.addItem(items, i, false);
+                                                    i++;
+                                                } else {
+                                                    if (i == 53) {
+                                                        shop.addItem(items, i, false);
+                                                        i = 72;
+                                                    } else {
+                                                        shop.addItem(items, i, false);
+                                                        i++;
+                                                    }
+                                                }
                                             } else {
                                                 shop.addItem(items, i, false);
-                                                i++;
+                                            }
+
+                                            items.setAmount(am);
+
+                                            if (items.getAmount() > 1) {
+                                                int amt = items.getAmount();
+
+                                                shop.setStock(items, ((shop.getStock(items, false) + amt) - 1), false);
+
+                                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                                    public void run() {
+                                                        for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
+                                                            if (finalChest.getBlockInventory().getItem(in) != null) {
+
+                                                                if (finalChest.getBlockInventory().getItem(in).equals(items)) {
+                                                                    finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
+                                                                }
+                                                            }
+                                                        }
+
+                                                    }
+                                                }, 5L);
+
+                                            } else {
+                                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                                    public void run() {
+                                                        for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
+                                                            if (finalChest.getBlockInventory().getItem(in) != null) {
+
+                                                                if (finalChest.getBlockInventory().getItem(in).equals(items)) {
+                                                                    finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
+                                                                }
+                                                            }
+                                                        }
+
+                                                    }
+                                                }, 5L);
                                             }
                                         }
-                                    } else {
-                                        shop.addItem(items, i, false);
-                                    }
-
-                                    items.setAmount(am);
-
-                                    if (items.getAmount() > 1) {
-                                        int amt = items.getAmount();
-
-                                        shop.setStock(items, ((shop.getStock(items, false) + amt) - 1), false);
-
-                                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-                                            public void run() {
-                                                for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
-                                                    if (finalChest.getBlockInventory().getItem(in) != null) {
-
-                                                        if (finalChest.getBlockInventory().getItem(in).equals(items)) {
-                                                            finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
-                                                        }
-                                                    }
-                                                }
-
-                                            }
-                                        }, 5L);
-
-                                    } else {
-                                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-                                            public void run() {
-                                                for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
-                                                    if (finalChest.getBlockInventory().getItem(in) != null) {
-
-                                                        if (finalChest.getBlockInventory().getItem(in).equals(items)) {
-                                                            finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
-                                                        }
-                                                    }
-                                                }
-
-                                            }
-                                        }, 5L);
                                     }
                                 }
                             }
-                        }
-                    }
-                } else {
-                    shopCreate.remove(p);
-                    shopCreate2.remove(p);
-                    e.setCancelled(true);
-                    if (Long) {
-                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 21 Characters)");
+                        } else {
+                            shopCreate.remove(p);
+                            shopCreate2.remove(p);
+                            e.setCancelled(true);
+                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cThe sign has been removed. Please recreate the shop.");
 
-                        if (Core.isAboveEight() && Config.useTitles()) {
+                            if (Core.isAboveEight() && Config.useTitles()) {
+
+                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                Core.getTitleManager().sendTitle(p, "§cThe sign has been removed.");
+                                Core.getTitleManager().sendSubTitle(p, "§cPlease recreate the shop.");
+
+
+                            }
+
+                        }
+                    } else {
+                        shopCreate.remove(p);
+                        shopCreate2.remove(p);
+                        e.setCancelled(true);
+                        if (Long) {
+                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 16 Characters)");
+
+                            if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                 Core.getTitleManager().sendTitle(p, "§cName Too Long");
 
 
+                            }
                         }
-                    }
 
-                    if (!can) {
-                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
+                        if (!can) {
+                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
 
-                        if (Core.isAboveEight() && Config.useTitles()) {
+                            if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                 Core.getTitleManager().sendTitle(p, "§cName Already Exists");
 
 
+                            }
                         }
+                    }
+                } else {
+                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cNot an acceptable name.");
+
+                    if (Core.isAboveEight() && Config.useTitles()) {
+
+                        Core.getTitleManager().setTimes(p, 20, 40, 20);
+                        Core.getTitleManager().sendTitle(p, "§cNot an acceptable name.");
+
+
                     }
                 }
             } else {
@@ -469,7 +514,7 @@ public class ChatMessages implements Listener {
                 if (can) {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         public void run() {
-                            MaterialCheck.searchByMaterial(null,p, shop, name, sell);
+                            MaterialCheck.searchByMaterial(null, p, shop, name, sell);
                         }
                     }, 1L);
 
@@ -511,7 +556,7 @@ public class ChatMessages implements Listener {
                     final int carl = amt;
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         public void run() {
-                            IdCheck.searchById(null,p, shop, carl, sell);
+                            IdCheck.searchById(null, p, shop, carl, sell);
                         }
                     }, 1L);
 
@@ -553,7 +598,7 @@ public class ChatMessages implements Listener {
                     final int carl = amt;
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         public void run() {
-                            PriceCheck.searchByPrice(null,p, shop, carl, sell);
+                            PriceCheck.searchByPrice(null, p, shop, carl, sell);
                         }
                     }, 1L);
 
@@ -593,7 +638,7 @@ public class ChatMessages implements Listener {
                 if (can) {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         public void run() {
-                            DisplayNameCheck.searchByName(null,p, shop, name, sell);
+                            DisplayNameCheck.searchByName(null, p, shop, name, sell);
                         }
                     }, 1L);
 
@@ -633,12 +678,12 @@ public class ChatMessages implements Listener {
                 try {
                     amt = Integer.parseInt(name);
                 } catch (Exception ex) {
-                    if (name.equalsIgnoreCase("all")){
+                    if (name.equalsIgnoreCase("all")) {
                         Stocks.collectAll(ite, shop, p);
                         return;
                     } else {
                         p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
-                        OpenSellingOptions.openShopSellingOptions(null,p,shop,1);
+                        OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
                         return;
                     }
                 }
@@ -680,12 +725,12 @@ public class ChatMessages implements Listener {
                 try {
                     amt = Integer.parseInt(name);
                 } catch (Exception ex) {
-                    if (name.equalsIgnoreCase("all")){
-                        Stocks.addAll(ite,shop,p);
+                    if (name.equalsIgnoreCase("all")) {
+                        Stocks.addAll(ite, shop, p);
                         return;
                     } else {
                         p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
-                        OpenShopOptions.openShopOwnerOptionsInventory(null,p, shop, 1);
+                        OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
                         return;
                     }
                 }
@@ -728,12 +773,12 @@ public class ChatMessages implements Listener {
                 try {
                     amt = Integer.parseInt(name);
                 } catch (Exception ex) {
-                    if (name.equalsIgnoreCase("all")){
-                        Stocks.removeAll(ite,shop,p);
+                    if (name.equalsIgnoreCase("all")) {
+                        Stocks.removeAll(ite, shop, p);
                         return;
                     } else {
                         p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
-                        OpenShopOptions.openShopOwnerOptionsInventory(null,p, shop, 1);
+                        OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
                         return;
                     }
                 }
@@ -780,10 +825,23 @@ public class ChatMessages implements Listener {
                 }
 
                 if (can) {
-                    shop.setPrice(ite, amt, false);
-                    p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                    if (amt > 0) {
+                        if (amt <= Config.getMaxPrice()) {
+                            assert shop != null;
+                            shop.setPrice(ite, amt, false);
+                            p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                        } else {
+                            if (String.valueOf(Config.getMaxPrice()).contains("E")) {
+                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPriceAsString() + ")");
+                            } else {
+                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPrice() + ")");
+                            }
+                        }
+                    } else {
+                        p.sendMessage(Messages.getPrefix() + "§cMust be greater than 0");
+                    }
                 }
-                OpenShopOptions.openShopOwnerOptionsInventory(null,p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");
             }
@@ -822,11 +880,24 @@ public class ChatMessages implements Listener {
                 }
 
                 if (can) {
-                    shop.setPrice(ite, amt, true);
-                    p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                    if (amt > 0) {
+                        if (amt <= Config.getMaxPrice()) {
+                            assert shop != null;
+                            shop.setPrice(ite, amt, true);
+                            p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                        } else {
+                            if (String.valueOf(Config.getMaxPrice()).contains("E")) {
+                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPriceAsString() + ")");
+                            } else {
+                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPrice() + ")");
+                            }
+                        }
+                    } else {
+                        p.sendMessage(Messages.getPrefix() + "§cMust be greater than 0");
+                    }
                 }
 
-                OpenShopOptions.openShopOwnerOptionsInventory(null,p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");
             }
@@ -864,10 +935,15 @@ public class ChatMessages implements Listener {
                 }
 
                 if (can) {
-                    shop.setAmount(ite, amt, false);
-                    p.sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                    if (amt > 0 && amt <= 2304) {
+                        assert shop != null;
+                        shop.setAmount(ite, amt, false);
+                        p.sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                    } else {
+                        p.sendMessage(Messages.getPrefix() + "§cMust be between 0 and 2034");
+                    }
                 }
-                OpenShopOptions.openShopOwnerOptionsInventory(null,p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");
             }
@@ -905,11 +981,16 @@ public class ChatMessages implements Listener {
                 }
 
                 if (can) {
-                    shop.setAmount(ite, amt, true);
-                    p.sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                    if (amt > 0 && amt <= 2304) {
+                        assert shop != null;
+                        shop.setAmount(ite, amt, true);
+                        p.sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                    } else {
+                        p.sendMessage(Messages.getPrefix() + "§cMust be between 0 and 2034");
+                    }
                 }
 
-                OpenShopOptions.openShopOwnerOptionsInventory(null,p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");
             }
@@ -949,6 +1030,7 @@ public class ChatMessages implements Listener {
 
                 if (can) {
 
+                    assert shop != null;
                     int am = shop.getAmount(ite, true);
                     double price = shop.getPrice(ite, true);
 
@@ -968,7 +1050,7 @@ public class ChatMessages implements Listener {
                     p.sendMessage(Messages.getPrefix() + Messages.getChangeData());
 
                 }
-                OpenSellingOptions.openShopSellingOptions(null,p, shop, 1);
+                OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");
             }
@@ -987,11 +1069,32 @@ public class ChatMessages implements Listener {
 
                 Shop shop = description.get(p);
 
-                shop.setDescription(name);
+                if (isAlphaNumeric(name)) {
+                    if (name.length() <= 26) {
 
-                p.sendMessage(Messages.getPrefix() + "Changed Shop Description!");
-                p.closeInventory();
-                ShopSettings.openShopManager(null,p, shop);
+                        shop.setDescription(name);
+
+                        p.sendMessage(Messages.getPrefix() + "Changed Shop Description!");
+                        p.closeInventory();
+                        ShopSettings.openShopManager(null, p, shop);
+                    } else {
+                        p.sendMessage(Messages.getPrefix() + "§cThat description is too long. §7(Max: 26 Characters)");
+                        p.closeInventory();
+                        ShopSettings.openShopManager(null, p, shop);
+                    }
+                } else {
+                    p.sendMessage(Messages.getPrefix() + "§cNot an acceptable description.");
+
+                    if (Core.isAboveEight() && Config.useTitles()) {
+
+                        p.closeInventory();
+                        Core.getTitleManager().setTimes(p, 20, 40, 20);
+                        Core.getTitleManager().sendSubTitle(p, "§cNot an acceptable description.");
+
+
+                    }
+                    e.setCancelled(true);
+                }
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");
             }
@@ -1011,9 +1114,16 @@ public class ChatMessages implements Listener {
 
                 Shop shop = addKeeper.get(p);
 
-                shop.addManager(Bukkit.getOfflinePlayer(name));
-                p.sendMessage(Messages.getPrefix() + "Added shop keeper");
-                ShopKeeperManager.openKeeperManager(p, shop);
+                OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+                if (player.hasPlayedBefore()) {
+
+                    shop.addManager(player);
+                    p.sendMessage(Messages.getPrefix() + "Added shop keeper");
+                    ShopKeeperManager.openKeeperManager(p, shop);
+                } else {
+                    p.sendMessage(Messages.getPrefix() + "§cNot a valid player or this player has not logged on to this server before.");
+                    ShopKeeperManager.openKeeperManager(p, shop);
+                }
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");
             }
@@ -1033,8 +1143,14 @@ public class ChatMessages implements Listener {
 
                 Shop shop = removeKeeper.get(p);
 
-                shop.removeManager(Bukkit.getOfflinePlayer(name));
-                p.sendMessage(Messages.getPrefix() + "Removed shop keeper");
+                OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+                if (shop.getManagers().contains(player) && player.hasPlayedBefore()) {
+
+                    shop.removeManager(player);
+                    p.sendMessage(Messages.getPrefix() + "Removed shop keeper");
+                } else {
+                    p.sendMessage(Messages.getPrefix() + "§cNot A Valid Keeper");
+                }
                 ShopKeeperManager.openKeeperManager(p, shop);
             } else {
                 p.sendMessage(Messages.getPrefix() + "§cCanceled");

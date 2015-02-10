@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.0
+Version: 1.5.0 Beta 14
 
 SearchBuyItems: '&a&lSearch Buying Items'
 SearchSellItems: '&a&lSearch Selling Items'
@@ -23,3 +23,6 @@ SearchIdLore: '&e&lLeft Click &7to &aSearch &7by &dItem Id'
 
 SearchPrice: '&a&lSearch Price'
 SearchPriceLore: '&e&lLeft Click &7to &aSearch &7by &dItem Price'
+
+Return: '&e&lReturn to Shop'
+ReturnLore: '&e&lClick &7to return'

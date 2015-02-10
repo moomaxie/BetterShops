@@ -57,36 +57,34 @@ public class ShopCreate implements Listener {
             }
 
 
-
             if (can) {
 
 
-                    if (e.getBlock().getType() == Material.WALL_SIGN) {
+                if (e.getBlock().getType() == Material.WALL_SIGN) {
 
-                        org.bukkit.block.Sign sign = (org.bukkit.block.Sign) e.getBlock().getState();
+                    org.bukkit.block.Sign sign = (org.bukkit.block.Sign) e.getBlock().getState();
 
-                        Block face = e.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
+                    Block face = e.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
 
-                        if (face.getType() == Material.CHEST) {
-                            if (face.getState() instanceof Chest) {
-                                chest = (Chest) face.getState();
-                            }
-
-                        } else {
-                            p.sendMessage(Messages.getPrefix() + "§cMust be attached to a chest!");
-                            e.setLine(0, " ");
-                            e.setLine(1, " ");
-                            e.setLine(2, " ");
-                            e.setLine(3, " ");
-                            e.setCancelled(true);
-                            return;
+                    if (face.getType() == Material.CHEST) {
+                        if (face.getState() instanceof Chest) {
+                            chest = (Chest) face.getState();
                         }
 
                     } else {
+                        p.sendMessage(Messages.getPrefix() + "§cMust be attached to a chest!");
+                        e.setLine(0, " ");
+                        e.setLine(1, " ");
+                        e.setLine(2, " ");
+                        e.setLine(3, " ");
+                        e.setCancelled(true);
                         return;
                     }
 
+                } else {
+                    return;
+                }
 
 
                 final Chest finalChest = chest;
@@ -108,182 +106,197 @@ public class ShopCreate implements Listener {
                                         if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
                                             String name = ev.getCurrentItem().getItemMeta().getDisplayName();
 
-                                            boolean can = true;
-                                            boolean Long = false;
+                                            if (isAlphaNumeric(name)) {
+                                                boolean can = true;
+                                                boolean Long = false;
 
-                                            if (name.length() > 21) {
-                                                Long = true;
-                                            }
-
-                                            if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
-
-                                                for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
-                                                    if (file.getName().contains(".yml")) {
-                                                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-                                                        for (String s : config.getKeys(false)) {
-                                                            if (s.equals(name)) {
-                                                                can = false;
-                                                            }
-                                                        }
-                                                    }
+                                                if (name.length() > 16) {
+                                                    Long = true;
                                                 }
-                                            }
 
-                                            if (can && !Long) {
-                                                if (CreationCost.useCost(p)) {
-                                                    new AddShop(e.getPlayer(), finalChest, name);
-                                                    e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
+                                                if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
 
-                                                    e.setLine(0, MainGUI.getString("SignLine1"));
-                                                    e.setLine(1, MainGUI.getString("SignLine2"));
-                                                    e.setLine(2, MainGUI.getString("SignLine3Closed"));
-                                                    e.setLine(3, MainGUI.getString("SignLine4"));
+                                                    for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
+                                                        if (file.getName().contains(".yml")) {
+                                                            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-                                                    Sign s = (Sign) e.getBlock().getState();
-
-                                                    s.setLine(0, MainGUI.getString("SignLine1"));
-                                                    s.setLine(1, MainGUI.getString("SignLine2"));
-                                                    s.setLine(2, MainGUI.getString("SignLine3Closed"));
-                                                    s.setLine(3, MainGUI.getString("SignLine4"));
-
-                                                    s.update();
-
-                                                    if (Core.isAboveEight() && Config.useTitles()) {
-
-
-                                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                        Core.getTitleManager().sendTitle(p, Messages.getCreateShop());
-
-
-                                                    }
-
-                                                    if (finalChest != null) {
-                                                        ShopCreateEvent e = new ShopCreateEvent(ShopLimits.fromString(finalChest.getLocation()));
-
-                                                        Bukkit.getPluginManager().callEvent(e);
-                                                    }
-
-//                                                    ShopLimits.loadShops();
-
-                                                    if (Config.autoAddItems()) {
-
-                                                        if (finalChest != null && finalChest.getBlockInventory() != null) {
-                                                            Shop shop = ShopLimits.fromString(finalChest.getLocation());
-                                                            int i = 18;
-                                                            for (final ItemStack items : finalChest.getBlockInventory().getContents()) {
-                                                                if (items != null && items.getType() != Material.AIR) {
-
-                                                                    int am = items.getAmount();
-
-                                                                    items.setAmount(1);
-
-                                                                    if (!shop.getShopContents(false).containsKey(items)) {
-                                                                        if (i < 53) {
-                                                                            shop.addItem(items, i, false);
-                                                                            i++;
-                                                                        } else {
-                                                                            if (i == 53) {
-                                                                                shop.addItem(items, i, false);
-                                                                                i = 72;
-                                                                            } else {
-                                                                                shop.addItem(items, i, false);
-                                                                                i++;
-                                                                            }
-                                                                        }
-                                                                    } else {
-                                                                        shop.addItem(items, i, false);
-                                                                    }
-
-                                                                    items.setAmount(am);
-
-                                                                    if (items.getAmount() > 1) {
-                                                                        int amt = items.getAmount();
-
-                                                                        shop.setStock(items, ((shop.getStock(items, false) + amt) - 1), false);
-
-                                                                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-                                                                            public void run() {
-                                                                                for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
-                                                                                    if (finalChest.getBlockInventory().getItem(in) != null) {
-
-                                                                                        if (finalChest.getBlockInventory().getItem(in).equals(items)) {
-                                                                                            finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
-                                                                                        }
-                                                                                    }
-                                                                                }
-
-                                                                            }
-                                                                        }, 5L);
-
-                                                                    } else {
-                                                                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-                                                                            public void run() {
-                                                                                for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
-                                                                                    if (finalChest.getBlockInventory().getItem(in) != null) {
-
-                                                                                        if (finalChest.getBlockInventory().getItem(in).equals(items)) {
-                                                                                            finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
-                                                                                        }
-                                                                                    }
-                                                                                }
-
-                                                                            }
-                                                                        }, 5L);
-                                                                    }
+                                                            for (String s : config.getKeys(false)) {
+                                                                if (s.equals(name)) {
+                                                                    can = false;
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 }
+
+                                                if (can && !Long) {
+                                                    if (CreationCost.useCost(p)) {
+                                                        if (finalChest != null && ShopLimits.fromLocation(finalChest.getLocation()) == null) {
+                                                            new AddShop(e.getPlayer(), finalChest, name);
+                                                            e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
+
+                                                            e.setLine(0, MainGUI.getString("SignLine1"));
+                                                            e.setLine(1, MainGUI.getString("SignLine2"));
+                                                            e.setLine(2, MainGUI.getString("SignLine3Closed"));
+                                                            e.setLine(3, MainGUI.getString("SignLine4"));
+
+                                                            Sign s = (Sign) e.getBlock().getState();
+
+                                                            s.setLine(0, MainGUI.getString("SignLine1"));
+                                                            s.setLine(1, MainGUI.getString("SignLine2"));
+                                                            s.setLine(2, MainGUI.getString("SignLine3Closed"));
+                                                            s.setLine(3, MainGUI.getString("SignLine4"));
+
+                                                            s.update();
+
+                                                            if (Core.isAboveEight() && Config.useTitles()) {
+
+
+                                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                                Core.getTitleManager().sendTitle(p, Messages.getCreateShop());
+
+
+                                                            }
+
+
+                                                            ShopCreateEvent e = new ShopCreateEvent(ShopLimits.fromLocation(finalChest.getLocation()));
+
+                                                            Bukkit.getPluginManager().callEvent(e);
+
+
+//                                                    ShopLimits.loadShops();
+
+                                                            if (Config.autoAddItems()) {
+
+                                                                if (finalChest.getBlockInventory() != null) {
+                                                                    Shop shop = ShopLimits.fromLocation(finalChest.getLocation());
+                                                                    int i = 18;
+                                                                    for (final ItemStack items : finalChest.getBlockInventory().getContents()) {
+                                                                        if (items != null && items.getType() != Material.AIR) {
+
+                                                                            int am = items.getAmount();
+
+                                                                            items.setAmount(1);
+
+                                                                            if (!shop.getShopContents(false).containsKey(items)) {
+                                                                                if (i < 53) {
+                                                                                    shop.addItem(items, i, false);
+                                                                                    i++;
+                                                                                } else {
+                                                                                    if (i == 53) {
+                                                                                        shop.addItem(items, i, false);
+                                                                                        i = 72;
+                                                                                    } else {
+                                                                                        shop.addItem(items, i, false);
+                                                                                        i++;
+                                                                                    }
+                                                                                }
+                                                                            } else {
+                                                                                shop.addItem(items, i, false);
+                                                                            }
+
+                                                                            items.setAmount(am);
+
+                                                                            if (items.getAmount() > 1) {
+                                                                                int amt = items.getAmount();
+
+                                                                                shop.setStock(items, ((shop.getStock(items, false) + amt) - 1), false);
+
+                                                                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                                                                    public void run() {
+                                                                                        for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
+                                                                                            if (finalChest.getBlockInventory().getItem(in) != null) {
+
+                                                                                                if (finalChest.getBlockInventory().getItem(in).equals(items)) {
+                                                                                                    finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
+                                                                                                }
+                                                                                            }
+                                                                                        }
+
+                                                                                    }
+                                                                                }, 5L);
+
+                                                                            } else {
+                                                                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                                                                    public void run() {
+                                                                                        for (int in = 0; in < finalChest.getBlockInventory().getSize(); in++) {
+                                                                                            if (finalChest.getBlockInventory().getItem(in) != null) {
+
+                                                                                                if (finalChest.getBlockInventory().getItem(in).equals(items)) {
+                                                                                                    finalChest.getBlockInventory().setItem(in, new ItemStack(Material.AIR));
+                                                                                                }
+                                                                                            }
+                                                                                        }
+
+                                                                                    }
+                                                                                }, 5L);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else {
+                                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop at this chest's location already exists");
+                                                            e.setLine(0, " ");
+                                                            e.setLine(1, " ");
+                                                            e.setLine(2, " ");
+                                                            e.setLine(3, " ");
+                                                            if (Core.isAboveEight() && Config.useTitles()) {
+
+                                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                                Core.getTitleManager().sendSubTitle(p, "§cSorry");
+                                                                Core.getTitleManager().sendSubTitle(p, "§cA shop at this chest's location already exists");
+
+                                                            }
+                                                        }
+                                                    }
+                                                } else {
+                                                    if (Long) {
+                                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 16 Characters)");
+                                                        e.setLine(0, " ");
+                                                        e.setLine(1, " ");
+                                                        e.setLine(2, " ");
+                                                        e.setLine(3, " ");
+                                                        if (Core.isAboveEight() && Config.useTitles()) {
+
+                                                            Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                            Core.getTitleManager().sendTitle(p, "§cName Too Long");
+
+                                                        }
+                                                    }
+
+                                                    if (!can) {
+                                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
+                                                        e.setLine(0, " ");
+                                                        e.setLine(1, " ");
+                                                        e.setLine(2, " ");
+                                                        e.setLine(3, " ");
+                                                        if (Core.isAboveEight() && Config.useTitles()) {
+
+
+                                                            Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                            Core.getTitleManager().sendTitle(p, "§cName Already Exists");
+
+                                                        }
+                                                    }
+                                                }
+
                                             } else {
-                                                if (Long) {
-                                                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 21 Characters)");
-                                                    e.setLine(0, " ");
-                                                    e.setLine(1, " ");
-                                                    e.setLine(2, " ");
-                                                    e.setLine(3, " ");
-                                                    if (Core.isAboveEight() && Config.useTitles()) {
+                                                e.getPlayer().sendMessage(Messages.getPrefix() + "§cNot an acceptable name.");
+                                                e.setLine(0, " ");
+                                                e.setLine(1, " ");
+                                                e.setLine(2, " ");
+                                                e.setLine(3, " ");
+                                                if (Core.isAboveEight() && Config.useTitles()) {
 
-                                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                        Core.getTitleManager().sendTitle(p, "§cName Too Long");
 
-                                                    }
+                                                    Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                    Core.getTitleManager().sendSubTitle(p, "§cNot an acceptable name.");
+
+
                                                 }
-
-                                                if (!can) {
-                                                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
-                                                    e.setLine(0, " ");
-                                                    e.setLine(1, " ");
-                                                    e.setLine(2, " ");
-                                                    e.setLine(3, " ");
-                                                    if (Core.isAboveEight() && Config.useTitles()) {
-
-
-                                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                        Core.getTitleManager().sendTitle(p, "§cName Already Exists");
-
-                                                    }
-                                                }
+                                                e.setCancelled(true);
                                             }
-
-
-                                        } else {
-                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
-                                            e.setLine(0, " ");
-                                            e.setLine(1, " ");
-                                            e.setLine(2, " ");
-                                            e.setLine(3, " ");
-                                            if (Core.isAboveEight() && Config.useTitles()) {
-
-
-                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                Core.getTitleManager().sendTitle(p, "§4Error");
-                                                Core.getTitleManager().sendSubTitle(p, "§cMalfunction with Shop Name Creating, is the plugin updated?");
-
-
-                                            }
-                                            e.setCancelled(true);
                                         }
                                     } else {
                                         e.getPlayer().sendMessage(Messages.getPrefix() + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
@@ -352,5 +365,18 @@ public class ShopCreate implements Listener {
                 }
             }
         }
+    }
+
+    public boolean isAlphaNumeric(String str) {
+        if (str.trim().length() < 1) {
+            return false;
+        }
+        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 ";
+        for (int i = 0; i < str.length(); i++) {
+            if (!acceptable.contains(str.substring(i, i + 1).toLowerCase())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

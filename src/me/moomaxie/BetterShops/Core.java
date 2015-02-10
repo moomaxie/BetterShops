@@ -1,8 +1,6 @@
 package me.moomaxie.BetterShops;
 
-import BetterShops.Dev.API.BetterShopsAPI;
 import BetterShops.Dev.API.Events.ShopDeleteEvent;
-import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import me.moomaxie.BetterShops.Configurations.*;
@@ -65,23 +63,29 @@ import java.io.IOException;
 public class Core extends JavaPlugin {
 
 
-    //TODO: Manager Admins
-    //TODO: Villager/skeleton/sizes/ types - 1.8 animals
-    //TODO: Add more types of shops: Holographic, Sign, Floating Item
+    //TODO: Manager Admins - maybe
+    //TODO: Villager/skeleton/sizes/ types - 1.8 animals - 1.6.0
+    //TODO: Add more types of shops: Holographic, Sign, Floating Item - 1.6.0
+    //TODO: Shop connections - maybe
+    //TODO: Claiming un-owned shops - maybe
+    //TODO: Messages/Language Files changing and saving
+    //TODO: Change Chat messages in-game
+
+    //Change WG message when changing versions
+
+    //Removed API
 
 
     private static Core instance;
-    private static Metrics metrics;
+    public static Metrics metrics;
     private static Economy economy;
     private static AnvilGUI gui;
     private static TitleManager manager;
     private static boolean aboveEight = false;
     private static boolean wg = false;
-    private static BetterShopsAPI api;
 
     //Beta versions
     private static boolean beta = true;
-    private static String betaVersion = "4";
 
 
     @Override
@@ -101,11 +105,8 @@ public class Core extends JavaPlugin {
 
             try {
 
-                if (beta) {
-                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aEnabling BetterShops §e" + getDescription().getVersion() + " Beta " + betaVersion);
-                } else {
-                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aEnabling BetterShops §e" + getDescription().getVersion());
-                }
+
+                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aEnabling BetterShops §e" + getDescription().getVersion());
 
                 instance = this;
 
@@ -168,7 +169,6 @@ public class Core extends JavaPlugin {
                         }
                     }
                 }
-
 
                 if (!found2) {
 
@@ -271,8 +271,8 @@ public class Core extends JavaPlugin {
                         wg = true;
                         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for §eWorldGuard");
                     } else {
-                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eWorldGuard §ais detected, but the version §cmust be 6.0 or higher§a. Current version is not supported.");
-                        wg =false;
+                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eWorldGuard §ais detected, but the version §cmust be 5.9 or Lower§a. Current version is not supported.");
+                        wg = false;
                     }
                 }
 
@@ -300,9 +300,6 @@ public class Core extends JavaPlugin {
 
                 //Start NPC Return Policy
                 ReturnNPC.startReturnNPC();
-
-                //Get API
-                api = new BetterShopsAPI();
 
                 //Register WG Listeners
                 if (useWorldGuard()) {
@@ -380,16 +377,13 @@ public class Core extends JavaPlugin {
                 Player p = (Player) sender;
                 if (args.length == 1) {
 
-                    if (args[0].equalsIgnoreCase("info")){
-                        if (beta) {
-                            p.sendMessage(Messages.getPrefix() + "You are running version: §e" + getDescription().getVersion() + " Beta " + betaVersion);
-                        } else {
-                            p.sendMessage(Messages.getPrefix() + "You are running version: §e" + getDescription().getVersion());
-                        }
-                        p.sendMessage(Messages.getPrefix() + "Total Shops: §e" + ShopLimits.getAllShops().size());
-                    } else
+                    if (args[0].equalsIgnoreCase("info")) {
 
-                    if (args[0].equalsIgnoreCase("config")) {
+                        p.sendMessage(Messages.getPrefix() + "You are running version: §e" + getDescription().getVersion());
+
+                        p.sendMessage(Messages.getPrefix() + "Total Shops: §e" + ShopLimits.getAllShops().size());
+                        p.sendMessage(Messages.getPrefix() + "Total NPC Shops: §e" + NPCs.getNPCs().size());
+                    } else if (args[0].equalsIgnoreCase("config")) {
                         if (Permissions.hasConfigGUIPerm(p)) {
                             ConfigMenu.openConfigMenu(null, p);
                         } else {
@@ -404,6 +398,7 @@ public class Core extends JavaPlugin {
 
                     } else {
                         p.sendMessage("§d<-Better Shops Help->");
+                        p.sendMessage("    §a/bs info");
                         p.sendMessage("    §a/bs config");
                         p.sendMessage("    §a/bs language");
                         p.sendMessage("    §a/bs open <Shop>");
@@ -421,15 +416,19 @@ public class Core extends JavaPlugin {
 
                             Shop shop = ShopLimits.fromString(p, name);
 
-                            if (shop.getOwner() != null) {
-                                if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-                                    if (shop.isServerShop()) {
-                                        OpenShop.openShopItems(null, p, shop, 1);
+                            if (shop != null) {
+                                if (shop.getOwner() != null) {
+                                    if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
+                                        if (shop.isServerShop()) {
+                                            OpenShop.openShopItems(null, p, shop, 1);
+                                        } else {
+                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                        }
                                     } else {
-                                        OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                        OpenShop.openShopItems(null, p, shop, 1);
                                     }
                                 } else {
-                                    OpenShop.openShopItems(null, p, shop, 1);
+                                    p.sendMessage(Messages.getPrefix() + "§cThis shop doesn't exist!");
                                 }
                             } else {
                                 p.sendMessage(Messages.getPrefix() + "§cThis shop doesn't exist!");
@@ -439,6 +438,7 @@ public class Core extends JavaPlugin {
                         }
                     } else {
                         p.sendMessage("§d<-Better Shops Help->");
+                        p.sendMessage("    §a/bs info");
                         p.sendMessage("    §a/bs config");
                         p.sendMessage("    §a/bs language");
                         p.sendMessage("    §a/bs open <Shop>");
@@ -448,6 +448,7 @@ public class Core extends JavaPlugin {
 
                 } else {
                     p.sendMessage("§d<-Better Shops Help->");
+                    p.sendMessage("    §a/bs info");
                     p.sendMessage("    §a/bs config");
                     p.sendMessage("    §a/bs language");
                     p.sendMessage("    §a/bs open <Shop>");
@@ -477,98 +478,204 @@ public class Core extends JavaPlugin {
 
                     Shop shop = ShopLimits.fromString(p, name);
 
-                    if (shop.getOwner() != null) {
-                        if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) || p.isOp() || Config.usePerms() && Permissions.hasBreakPerm(p)) {
+                    if (shop != null) {
+
+                        if (shop.getOwner() != null) {
+                            if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) || p.isOp() || Config.usePerms() && Permissions.hasBreakPerm(p)) {
 
 
-                            if (!shop.isNPCShop()) {
-                                File file = new File(this.getDataFolder(), "Shops/" + shop.getOwner().getUniqueId() + ".yml");
+                                if (!shop.isNPCShop()) {
+                                    File file = new File(this.getDataFolder(), "Shops/" + shop.getOwner().getUniqueId() + ".yml");
 
-                                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-
-                                String l = config.getConfigurationSection(name).getString("Location");
-
-                                if (l != null) {
-
-                                    String[] locs = l.split(" ");
-
-                                    World w = Bukkit.getWorld(locs[0]);
-
-                                    double x = Double.parseDouble(locs[1]);
-                                    double y = Double.parseDouble(locs[2]);
-                                    double z = Double.parseDouble(locs[3]);
-
-                                    Location loc = new Location(w, x, y, z);
-
-                                    Block b = loc.getBlock();
-
-                                    if (b.getState() instanceof Chest) {
-                                        Chest chest = (Chest) b.getState();
-
-                                        for (Chunk c : w.getLoadedChunks()) {
-                                            for (BlockState bs : c.getTileEntities()) {
-                                                if (bs instanceof Sign) {
-                                                    Sign sign = (Sign) bs;
-
-                                                    Block face = sign.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
+                                    YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
 
-                                                    if (face.getType() == Material.CHEST) {
-                                                        if (face.getState() instanceof Chest) {
-                                                            Chest ch = (Chest) face.getState();
+                                    String l = config.getConfigurationSection(name).getString("Location");
 
-                                                            if (ch.getLocation().equals(loc)) {
-                                                                sign.getBlock().setType(Material.AIR);
-                                                                sign.getWorld().dropItem(loc, new ItemStack(Material.SIGN));
+                                    if (l != null) {
+
+                                        String[] locs = l.split(" ");
+
+                                        World w = Bukkit.getWorld(locs[0]);
+
+                                        double x = Double.parseDouble(locs[1]);
+                                        double y = Double.parseDouble(locs[2]);
+                                        double z = Double.parseDouble(locs[3]);
+
+                                        Location loc = new Location(w, x, y, z);
+
+                                        Block b = loc.getBlock();
+
+                                        if (b.getState() instanceof Chest) {
+                                            Chest chest = (Chest) b.getState();
+
+                                            for (Chunk c : w.getLoadedChunks()) {
+                                                for (BlockState bs : c.getTileEntities()) {
+                                                    if (bs instanceof Sign) {
+                                                        Sign sign = (Sign) bs;
+
+                                                        Block face = sign.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
+
+
+                                                        if (face.getType() == Material.CHEST) {
+                                                            if (face.getState() instanceof Chest) {
+                                                                Chest ch = (Chest) face.getState();
+
+                                                                if (ch.getLocation().equals(loc)) {
+                                                                    sign.getBlock().setType(Material.AIR);
+                                                                    sign.getWorld().dropItem(loc, new ItemStack(Material.SIGN));
+                                                                }
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
 
-                                        p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
+                                            p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
 
-                                        ShopDeleteEvent e = new ShopDeleteEvent(shop);
+                                            ShopDeleteEvent e = new ShopDeleteEvent(shop);
 
-                                        Bukkit.getPluginManager().callEvent(e);
+                                            Bukkit.getPluginManager().callEvent(e);
 
 
-                                        for (ItemStack item : shop.getShopContents(false).keySet()) {
-                                            if (chest.getInventory().firstEmpty() >= 0) {
-                                                if (item.getType() != Material.AIR) {
-                                                    item.setAmount(shop.getStock(item, false));
-                                                    chest.getInventory().addItem(item);
-                                                }
-                                            } else {
-                                                if (item.getType() != Material.AIR) {
-                                                    item.setAmount(shop.getStock(item, false));
-
-                                                    chest.getWorld().dropItem(chest.getLocation(), item);
-                                                }
-                                            }
-                                        }
-
-                                        for (ItemStack item : shop.getShopContents(true).keySet()) {
-                                            if (chest.getInventory().firstEmpty() >= 0) {
-                                                if (shop.getStock(item, true) > 0) {
+                                            for (ItemStack item : shop.getShopContents(false).keySet()) {
+                                                if (chest.getInventory().firstEmpty() >= 0) {
                                                     if (item.getType() != Material.AIR) {
-                                                        item.setAmount(shop.getStock(item, true));
+                                                        item.setAmount(shop.getStock(item, false));
                                                         chest.getInventory().addItem(item);
                                                     }
-                                                }
-                                            } else {
-                                                if (shop.getStock(item, true) > 0) {
+                                                } else {
                                                     if (item.getType() != Material.AIR) {
-                                                        item.setAmount(shop.getStock(item, true));
+                                                        item.setAmount(shop.getStock(item, false));
+
                                                         chest.getWorld().dropItem(chest.getLocation(), item);
                                                     }
                                                 }
                                             }
+
+                                            for (ItemStack item : shop.getShopContents(true).keySet()) {
+                                                if (chest.getInventory().firstEmpty() >= 0) {
+                                                    if (shop.getStock(item, true) > 0) {
+                                                        if (item.getType() != Material.AIR) {
+                                                            item.setAmount(shop.getStock(item, true));
+                                                            chest.getInventory().addItem(item);
+                                                        }
+                                                    }
+                                                } else {
+                                                    if (shop.getStock(item, true) > 0) {
+                                                        if (item.getType() != Material.AIR) {
+                                                            item.setAmount(shop.getStock(item, true));
+                                                            chest.getWorld().dropItem(chest.getLocation(), item);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+
+                                            config.set(name, null);
+                                            try {
+                                                config.save(file);
+                                            } catch (IOException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            ShopLimits.loadShops();
+
+                                            if (Core.isAboveEight() && Config.useTitles()) {
+
+
+                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                Core.getTitleManager().sendTitle(p, Messages.getRemoveShop());
+
+
+                                            }
+                                        } else {
+                                            p.sendMessage(Messages.getPrefix() + "§4ERROR: §cShop is non-existant, please tell a server operator of this problem");
                                         }
 
+                                    } else {
+                                        p.sendMessage(Messages.getPrefix() + "§4ERROR: §cCannot find location of shop, please tell a server operator of this problem");
+                                    }
+                                } else {
+                                    File file = new File(this.getDataFolder(), "Shops/" + shop.getOwner().getUniqueId() + ".yml");
 
+                                    boolean can = false;
+
+                                    YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                                    for (LivingEntity e : shop.getLocation().getWorld().getLivingEntities()) {
+
+
+                                        if (e.getCustomName() != null && e.getCustomName().equals("§a§l" + shop.getName())) {
+
+                                            for (ShopsNPC npc : NPCs.getNPCs()) {
+                                                if (npc.getShop().getName().equals(shop.getName())) {
+                                                    NPCs.removeNPC(npc);
+                                                    e.remove();
+                                                    for (ItemStack item : shop.getShopContents(false).keySet()) {
+
+                                                        if (item.getType() != Material.AIR) {
+                                                            item.setAmount(shop.getStock(item, false));
+
+                                                            shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
+                                                        }
+
+                                                    }
+
+                                                    for (ItemStack item : shop.getShopContents(true).keySet()) {
+
+                                                        if (item.getType() != Material.AIR) {
+                                                            item.setAmount(shop.getStock(item, true));
+
+                                                            shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
+                                                        }
+
+                                                    }
+
+                                                    p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
+                                                    config.set(name, null);
+                                                    try {
+                                                        config.save(file);
+                                                    } catch (IOException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+                                                    ShopLimits.loadShops();
+
+                                                    can = true;
+
+                                                    if (Core.isAboveEight() && Config.useTitles()) {
+
+                                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                        Core.getTitleManager().sendTitle(p, Messages.getRemoveShop());
+
+
+                                                    }
+                                                    break;
+                                                }
+
+                                            }
+                                        }
+                                    }
+
+                                    if (!can) {
+                                        for (ItemStack item : shop.getShopContents(false).keySet()) {
+
+                                            if (item.getType() != Material.AIR) {
+                                                item.setAmount(shop.getStock(item, false));
+
+                                                shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
+                                            }
+
+                                        }
+
+                                        for (ItemStack item : shop.getShopContents(true).keySet()) {
+
+                                            if (item.getType() != Material.AIR) {
+                                                item.setAmount(shop.getStock(item, true));
+
+                                                shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
+                                            }
+
+                                        }
+                                        p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
                                         config.set(name, null);
                                         try {
                                             config.save(file);
@@ -576,122 +683,21 @@ public class Core extends JavaPlugin {
                                             e1.printStackTrace();
                                         }
                                         ShopLimits.loadShops();
-
                                         if (Core.isAboveEight() && Config.useTitles()) {
-
 
                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
                                             Core.getTitleManager().sendTitle(p, Messages.getRemoveShop());
 
 
                                         }
-                                    } else {
-                                        p.sendMessage(Messages.getPrefix() + "§4ERROR: §cShop is non-existant, please tell a server operator of this problem");
-                                    }
 
-                                } else {
-                                    p.sendMessage(Messages.getPrefix() + "§4ERROR: §cCannot find location of shop, please tell a server operator of this problem");
+                                    }
                                 }
                             } else {
-                                File file = new File(this.getDataFolder(), "Shops/" + shop.getOwner().getUniqueId() + ".yml");
-
-                                boolean can = false;
-
-                                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-                                for (LivingEntity e : shop.getLocation().getWorld().getLivingEntities()) {
-
-
-                                    if (e.getCustomName() != null && e.getCustomName().equals("§a§l" + shop.getName())) {
-
-                                        for (ShopsNPC npc : NPCs.getNPCs()) {
-                                            if (npc.getShop().getName().equals(shop.getName())) {
-                                                NPCs.removeNPC(npc);
-                                                e.remove();
-                                                for (ItemStack item : shop.getShopContents(false).keySet()) {
-
-                                                    if (item.getType() != Material.AIR) {
-                                                        item.setAmount(shop.getStock(item, false));
-
-                                                        shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
-                                                    }
-
-                                                }
-
-                                                for (ItemStack item : shop.getShopContents(true).keySet()) {
-
-                                                    if (item.getType() != Material.AIR) {
-                                                        item.setAmount(shop.getStock(item, true));
-
-                                                        shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
-                                                    }
-
-                                                }
-
-                                                p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
-                                                config.set(name, null);
-                                                try {
-                                                    config.save(file);
-                                                } catch (IOException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                ShopLimits.loadShops();
-
-                                                can = true;
-
-                                                if (Core.isAboveEight() && Config.useTitles()) {
-
-                                                    Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                    Core.getTitleManager().sendTitle(p, Messages.getRemoveShop());
-
-
-                                                }
-                                                break;
-                                            }
-
-                                        }
-                                    }
-                                }
-
-                                if (!can) {
-                                    for (ItemStack item : shop.getShopContents(false).keySet()) {
-
-                                        if (item.getType() != Material.AIR) {
-                                            item.setAmount(shop.getStock(item, false));
-
-                                            shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
-                                        }
-
-                                    }
-
-                                    for (ItemStack item : shop.getShopContents(true).keySet()) {
-
-                                        if (item.getType() != Material.AIR) {
-                                            item.setAmount(shop.getStock(item, true));
-
-                                            shop.getLocation().getWorld().dropItem(shop.getLocation(), item);
-                                        }
-
-                                    }
-                                    p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
-                                    config.set(name, null);
-                                    try {
-                                        config.save(file);
-                                    } catch (IOException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                    ShopLimits.loadShops();
-                                    if (Core.isAboveEight() && Config.useTitles()) {
-
-                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                        Core.getTitleManager().sendTitle(p, Messages.getRemoveShop());
-
-
-                                    }
-
-                                }
+                                p.sendMessage(Messages.getPrefix() + Messages.getDenyRemoveShop());
                             }
                         } else {
-                            p.sendMessage(Messages.getPrefix() + Messages.getDenyRemoveShop());
+                            p.sendMessage(Messages.getPrefix() + "§cThis shop doesn't exist!");
                         }
                     } else {
                         p.sendMessage(Messages.getPrefix() + "§cThis shop doesn't exist!");
@@ -738,23 +744,17 @@ public class Core extends JavaPlugin {
         return plugin;
     }
 
-    //Get Region Set (WG 6.0+)
+    //Get Region Set
     public static ApplicableRegionSet getRegionSet(Location location) {
-
         if (getWorldGuard() != null) {
             if (getWorldGuard().getDescription().getVersion().startsWith("\"6") || getWorldGuard().getDescription().getVersion().startsWith("6")) {
-                return WGBukkit.getRegionManager(location.getWorld()).getApplicableRegions(location);
+                return getWorldGuard().getRegionManager(location.getWorld()).getApplicableRegions(location);
             } else {
                 return getWorldGuard().getRegionManager(location.getWorld()).getApplicableRegions(location);
             }
         } else {
             return null;
         }
-    }
-
-    //Get API
-    public BetterShopsAPI getAPI() {
-        return api;
     }
 
     //Public version of get WG
@@ -777,7 +777,6 @@ public class Core extends JavaPlugin {
         if (plugin == null) {
             return null; // Maybe you want throw an exception instead
         }
-
         return plugin;
     }
 
@@ -785,11 +784,45 @@ public class Core extends JavaPlugin {
     public void setUpMetrics() {
         Metrics.Graph shops = metrics.createGraph("Number of Shops per Server");
 
-        shops.addPlotter(new Metrics.Plotter() {
+        shops.addPlotter(new Metrics.Plotter("" + ShopLimits.getAllShops().size()) {
             @Override
             public int getValue() {
-                return ShopLimits.getAllShops().size();
+                return 1;
             }
         });
+
+        Metrics.Graph npcshops = metrics.createGraph("Number of NPC Shops per Server");
+
+        npcshops.addPlotter(new Metrics.Plotter("" + NPCs.getNPCs().size()) {
+            @Override
+            public int getValue() {
+                return 1;
+            }
+        });
+
+
+        if (beta) {
+
+            Metrics.Graph beta = metrics.createGraph("Beta users");
+
+            beta.addPlotter(new Metrics.Plotter(getDescription().getVersion()) {
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+        }
+
+        if (useWorldGuard()) {
+            Metrics.Graph wg = metrics.createGraph("WorldGuard users");
+
+            wg.addPlotter(new Metrics.Plotter(Core.getWorldGuard().getDescription().getVersion()) {
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+
+        }
     }
 }

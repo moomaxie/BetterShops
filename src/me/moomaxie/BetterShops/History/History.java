@@ -4,9 +4,8 @@ import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  * ***********************************************************************
@@ -19,9 +18,9 @@ import java.util.List;
  */
 public class History {
 
-    private List<Transaction> Buytransactions = new ArrayList<>();
-    private List<Transaction> transactions = new ArrayList<>();
-    private List<Transaction> Selltransactions = new ArrayList<>();
+    private LinkedList<Transaction> Buytransactions = new LinkedList<>();
+    private LinkedList<Transaction> transactions = new LinkedList<>();
+    private LinkedList<Transaction> Selltransactions = new LinkedList<>();
 
     private Shop shop;
 
@@ -46,13 +45,13 @@ public class History {
         }
     }
 
-    public List<Transaction> getBuyingTransactions(){
+    public LinkedList<Transaction> getBuyingTransactions(){
         return Buytransactions;
     }
-    public List<Transaction> getSellingTransactions(){
+    public LinkedList<Transaction> getSellingTransactions(){
         return Selltransactions;
     }
-    public List<Transaction> getAllTransactions(){
+    public LinkedList<Transaction> getAllTransactions(){
         return transactions;
     }
 

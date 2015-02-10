@@ -53,7 +53,7 @@ public class SellingItemManager implements Listener {
 
                     if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
                         if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("SellOptions"))) {
-                            openItemManager(e.getInventory(),p, shop, e.getCurrentItem());
+                            openItemManager(e.getInventory(), p, shop, e.getCurrentItem());
                         }
                     }
                 }
@@ -182,8 +182,20 @@ public class SellingItemManager implements Listener {
                                                         }
 
                                                         if (can) {
-                                                            shop.setPrice(ite, amt, true);
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                                                            if (amt > 0) {
+                                                                if (amt <= Config.getMaxPrice()) {
+                                                                    shop.setPrice(ite, amt, true);
+                                                                    p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                                                                } else {
+                                                                    if (String.valueOf(Config.getMaxPrice()).contains("E")) {
+                                                                        p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPriceAsString() + ")");
+                                                                    } else {
+                                                                        p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPrice() + ")");
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                p.sendMessage(Messages.getPrefix() + "§cMust be greater than 0");
+                                                            }
                                                         }
                                                         OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
                                                     }
@@ -240,10 +252,12 @@ public class SellingItemManager implements Listener {
                                                         }
 
                                                         if (can) {
-
-                                                            shop.setAmount(ite, amt, true);
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
-
+                                                            if (amt > 0 && amt < 2304) {
+                                                                shop.setAmount(ite, amt, true);
+                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                                                            } else {
+                                                                p.sendMessage(Messages.getPrefix() + "§cMust be between 0 and 2034");
+                                                            }
                                                         }
                                                         OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
                                                     }
@@ -350,7 +364,7 @@ public class SellingItemManager implements Listener {
 
                             if (item != null) {
                                 if (shop.getStock(item, true) > 0) {
-                                    Stocks.removeAllOfDeletedItem(item,shop,p,true);
+                                    Stocks.removeAllOfDeletedItem(item, shop, p, true);
                                     shop.deleteItem(ite, true);
                                     OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
                                     ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getRemoveItem());

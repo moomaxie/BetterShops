@@ -1,9 +1,12 @@
 package me.moomaxie.BetterShops.Listeners.LayoutArrangement;
 
+import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
+import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.OpenSellingOptions;
+import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -53,9 +56,9 @@ public class ShopRearranger implements Listener {
         ItemStack info = new ItemStack(Material.SIGN);
         ItemMeta infoMeta = info.getItemMeta();
         if (sell) {
-            infoMeta.setDisplayName(MainGUI.getString("Selling"));
+            infoMeta.setDisplayName(MainGUI.getString("ArrangeSelling"));
         } else {
-            infoMeta.setDisplayName(MainGUI.getString("Buying"));
+            infoMeta.setDisplayName(MainGUI.getString("ArrangeBuying"));
         }
         info.setItemMeta(infoMeta);
 
@@ -134,8 +137,8 @@ public class ShopRearranger implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = meta.getLore();
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
@@ -152,8 +155,8 @@ public class ShopRearranger implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = meta.getLore();
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
@@ -172,8 +175,8 @@ public class ShopRearranger implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = meta.getLore();
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
@@ -213,7 +216,9 @@ public class ShopRearranger implements Listener {
                     Shop shop = ShopLimits.fromString(p, name);
 
                     if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains("§e§lShift Click §7to start §aArrangement Mode") && e.isShiftClick()) {
+
+                        //Enter Arrangement Mode
+                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("ArrangementMode")) && e.isShiftClick()) {
                             ItemStack it = e.getInventory().getItem(3);
                             if (it != null && it.getItemMeta().getDisplayName() != null) {
                                 String n = it.getItemMeta().getDisplayName();
@@ -240,12 +245,31 @@ public class ShopRearranger implements Listener {
                                     }
                                 }
                             }
+                            //Leave Arrangement Mode
                         } else {
-                            if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains("§e§lClick §7to leave §aArrangement Mode")) {
-                                if (shop.isServerShop()){
-                                    OpenShop.openShopItems(null,p,shop,1);
-                                } else {
-                                    OpenShopOptions.openShopOwnerOptionsInventory(null,p,shop,1);
+                            if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("ArrangementLore"))) {
+                                ItemStack it = e.getInventory().getItem(3);
+                                if (it != null && it.getItemMeta().getDisplayName() != null) {
+                                    String n = it.getItemMeta().getDisplayName();
+                                    if (n.contains(MainGUI.getString("ArrangeBuying"))) {
+                                        if (shop.isServerShop()) {
+                                            OpenShop.openShopItems(null, p, shop, 1);
+                                        } else {
+                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                        }
+                                    } else if (Config.useSellingShop()){
+                                        if (shop.isServerShop()) {
+                                            OpenSellShop.openSellerShop(null, p, shop, 1);
+                                        } else {
+                                            OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                                        }
+                                    } else {
+                                        if (shop.isServerShop()) {
+                                            OpenShop.openShopItems(null, p, shop, 1);
+                                        } else {
+                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -272,7 +296,7 @@ public class ShopRearranger implements Listener {
 
                 if (!arrange.containsKey(p.getUniqueId())) {
                     if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
-                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains("§e§lLeft Click §7to arrange")) {
+                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("Arrange"))) {
 
                             Map<Shop, ItemStack> map = new HashMap<>();
 
@@ -312,34 +336,18 @@ public class ShopRearranger implements Listener {
                                         ItemStack it = e.getInventory().getItem(3);
                                         if (it != null && it.getItemMeta().getDisplayName() != null) {
                                             String n = it.getItemMeta().getDisplayName();
-                                            if (n.contains(MainGUI.getString("Buying"))) {
+                                            if (n.contains(MainGUI.getString("ArrangeBuying"))) {
                                                 int slot = e.getSlot();
                                                 int old = shop.getSlotForItem(ite, false);
 
                                                 shop.exchangeItems(ite, old, e.getCurrentItem(), slot, false);
-//                                                if (e.getInventory().getItem(12) != null && e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-//                                                    openShopArranger(e.getInventory(), p, shop, 1, false);
-//                                                }
-//                                                if (e.getInventory().getItem(13) != null && e.getInventory().getItem(13).getData().getData() == (byte) 10) {
-//                                                    openShopArranger(e.getInventory(), p, shop, 2, false);
-//                                                }
-//                                                if (e.getInventory().getItem(14) != null && e.getInventory().getItem(14).getData().getData() == (byte) 10) {
-//                                                    openShopArranger(e.getInventory(), p, shop, 3, false);
-//                                                }
+//
                                                 openShopArranger(e.getInventory(), p, shop, 1, false);
                                             } else {
                                                 int slot = e.getSlot();
                                                 int old = shop.getSlotForItem(ite, true);
                                                 shop.exchangeItems(ite, old, e.getCurrentItem(), slot, true);
-//                                                if (e.getInventory().getItem(12) != null && e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-//                                                    openShopArranger(e.getInventory(), p, shop, 1, true);
-//                                                }
-//                                                if (e.getInventory().getItem(13) != null && e.getInventory().getItem(13).getData().getData() == (byte) 10) {
-//                                                    openShopArranger(e.getInventory(), p, shop, 2, true);
-//                                                }
-//                                                if (e.getInventory().getItem(14) != null && e.getInventory().getItem(14).getData().getData() == (byte) 10) {
-//                                                    openShopArranger(e.getInventory(), p, shop, 3, true);
-//                                                }
+//
                                                 openShopArranger(e.getInventory(), p, shop, 1, true);
                                             }
                                             arrange.remove(p.getUniqueId());
@@ -364,29 +372,14 @@ public class ShopRearranger implements Listener {
                                 if (it != null && it.getItemMeta().getDisplayName() != null) {
                                     String n = it.getItemMeta().getDisplayName();
 
-                                    if (n.contains(MainGUI.getString("Buying"))) {
+                                    if (n.contains(MainGUI.getString("ArrangeBuying"))) {
                                         shop.changePlaces(ite, e.getSlot(), false);
-//                                        if (e.getInventory().getItem(12) != null && e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-//                                            openShopArranger(e.getInventory(), p, shop, 1, false);
-//                                        }
-//                                        if (e.getInventory().getItem(13) != null && e.getInventory().getItem(13).getData().getData() == (byte) 10) {
-//                                            openShopArranger(e.getInventory(), p, shop, 2, false);
-//                                        }
-//                                        if (e.getInventory().getItem(14) != null && e.getInventory().getItem(14).getData().getData() == (byte) 10) {
-//                                            openShopArranger(e.getInventory(), p, shop, 3, false);
-//                                        }
+//
                                         openShopArranger(e.getInventory(), p, shop, 1, false);
                                     } else {
                                         shop.changePlaces(ite, e.getSlot(), true);
-//                                        if (e.getInventory().getItem(12) != null && e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-//                                            openShopArranger(e.getInventory(), p, shop, 1, true);
-//                                        }
-//                                        if (e.getInventory().getItem(13) != null && e.getInventory().getItem(13).getData().getData() == (byte) 10) {
-//                                            openShopArranger(e.getInventory(), p, shop, 2, true);
-//                                        }
-//                                        if (e.getInventory().getItem(14) != null && e.getInventory().getItem(14).getData().getData() == (byte) 10) {
-//                                            openShopArranger(e.getInventory(), p, shop, 3, true);
-//                                        }
+
+//
                                         openShopArranger(e.getInventory(), p, shop, 1, true);
                                     }
 

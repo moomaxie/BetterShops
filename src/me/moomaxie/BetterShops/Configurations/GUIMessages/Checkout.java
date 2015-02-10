@@ -112,6 +112,7 @@ public class Checkout {
                 HashMap<String, Object> hash = new HashMap<>();
 
                 for (String s : config.getKeys(true)) {
+                    if (!s.contains("Version"))
                     hash.put(s, config.get(s));
                 }
 
@@ -220,6 +221,17 @@ public class Checkout {
                             } catch (Exception ignored) {
                             }
                         }
+                    }
+                }
+                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");
+
+                config = YamlConfiguration.loadConfiguration(file);
+                for (String s : hash.keySet()) {
+                    config.set(s, hash.get(s));
+                    try {
+                        config.save(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }

@@ -4,6 +4,7 @@ import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Core;
+import me.moomaxie.BetterShops.Metrics.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,6 +13,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
 
 /**
  * ***********************************************************************
@@ -55,6 +59,22 @@ public class ConfigMenuListener implements Listener{
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eMetrics §7-")){
                     Config.setMetrics(!Config.useMetrics());
+
+                    if (!Config.useMetrics()) {
+                        try {
+                            Core.getMetrics().disable();
+                        } catch (IOException e1) {
+                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §4Error: §cCould not disable §eMetrics");
+                        }
+                    } else {
+                        try {
+                            Core.metrics = new Metrics(Core.getCore());
+                            Core.getCore().setUpMetrics();
+                            Core.getMetrics().start();
+                        } catch (Exception ie){
+                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §4Error: §cCould not enable §eMetrics");
+                        }
+                    }
                     ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eCreation Limit §7-")){
@@ -85,6 +105,17 @@ public class ConfigMenuListener implements Listener{
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eNPC Override §7-")){
                     Config.setNPCOverride(!Config.useNPCOverride());
                     ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                }
+
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eSelling Shop §7-")){
+                    Config.setUseSellingShops(!Config.useSellingShop());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                }
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eDefault Price:")){
+                    setDefaultPrice((Player) e.getWhoClicked());
+                }
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eMaximum Price:")){
+                    setMaxPrice((Player) e.getWhoClicked());
                 }
             }
         }
@@ -144,6 +175,130 @@ public class ConfigMenuListener implements Listener{
         ItemStack it = new ItemStack(Material.PAPER);
         ItemMeta meta = it.getItemMeta();
         meta.setDisplayName("Type Limit");
+        it.setItemMeta(meta);
+
+        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
+
+        gui.open();
+    }
+
+    public void setDefaultPrice(final Player p){
+        AnvilGUI gui = Core.getAnvilGUI();
+        gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {
+            @Override
+            public void onAnvilClick(AnvilGUI.AnvilClickEvent ev) {
+                if (ev.getSlot() == 2) {
+                    ev.setWillClose(true);
+                    ev.setWillDestroy(true);
+
+
+                    if (ev.getCurrentItem().getType() == Material.PAPER) {
+                        if (ev.getCurrentItem().hasItemMeta()) {
+                            if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                                final String name = ev.getCurrentItem().getItemMeta().getDisplayName();
+
+                                double amt = 0;
+                                boolean can = true;
+                                try {
+                                    amt = Double.parseDouble(name);
+                                    amt = Double.valueOf(new DecimalFormat("#.00").format(amt));
+                                    can = false;
+
+
+                                } catch (Exception ex) {
+                                }
+
+                                if (!can) {
+                                    Config.setDefaultPrice(amt);
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                        public void run() {
+                                            ConfigMenu.openConfigMenu(null,p);
+                                        }
+                                    }, 1L);
+                                } else {
+                                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                        public void run() {
+                                            ConfigMenu.openConfigMenu(null,p);
+                                        }
+                                    }, 1L);
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    ev.setWillClose(true);
+                    ev.setWillDestroy(true);
+                }
+            }
+        });
+
+        ItemStack it = new ItemStack(Material.PAPER);
+        ItemMeta meta = it.getItemMeta();
+        meta.setDisplayName("Type Price");
+        it.setItemMeta(meta);
+
+        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
+
+        gui.open();
+    }
+
+    public void setMaxPrice(final Player p){
+        AnvilGUI gui = Core.getAnvilGUI();
+        gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {
+            @Override
+            public void onAnvilClick(AnvilGUI.AnvilClickEvent ev) {
+                if (ev.getSlot() == 2) {
+                    ev.setWillClose(true);
+                    ev.setWillDestroy(true);
+
+
+                    if (ev.getCurrentItem().getType() == Material.PAPER) {
+                        if (ev.getCurrentItem().hasItemMeta()) {
+                            if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                                final String name = ev.getCurrentItem().getItemMeta().getDisplayName();
+
+                                double amt = 0;
+                                boolean can = true;
+                                try {
+                                    amt = Double.parseDouble(name);
+                                    amt = Double.valueOf(new DecimalFormat("#.00").format(amt));
+                                    can = false;
+
+
+                                } catch (Exception ex) {
+                                }
+
+                                if (!can) {
+                                    Config.setMaxPrice(amt);
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                        public void run() {
+                                            ConfigMenu.openConfigMenu(null,p);
+                                        }
+                                    }, 1L);
+                                } else {
+                                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                        public void run() {
+                                            ConfigMenu.openConfigMenu(null,p);
+                                        }
+                                    }, 1L);
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    ev.setWillClose(true);
+                    ev.setWillDestroy(true);
+                }
+            }
+        });
+
+        ItemStack it = new ItemStack(Material.PAPER);
+        ItemMeta meta = it.getItemMeta();
+        meta.setDisplayName("Type Price");
         it.setItemMeta(meta);
 
         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);

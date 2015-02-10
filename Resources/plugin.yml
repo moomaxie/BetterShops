@@ -1,6 +1,6 @@
 name: BetterShops
 main: me.moomaxie.BetterShops.Core
-version: 1.5.0
+version: 1.5.0 Beta 14
 author: moomaxie
 softdepend: [WorldGuard, Vault]
 description: >
@@ -59,6 +59,8 @@ permissions:
             bettershops.command.language: true
             bettershops.command.open: true
             bettershops.command.remove: true
+            bettershops.command.claim: true
+            bettershops.command.unclaim: true
     bettershops.command.config:
         description: Allows ability to use the Config GUI
         default: op

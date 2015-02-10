@@ -57,7 +57,8 @@ public class AmountChooser implements Listener {
         ItemStack totals = new ItemStack(Material.EMERALD);
         ItemMeta totalsMeta = totals.getItemMeta();
         totalsMeta.setDisplayName(Checkout.getString("AmountToBuy") + " §7" + total);
-                totals.setItemMeta(totalsMeta);
+        totals.setItemMeta(totalsMeta);
+        totals.setAmount(total);
 
         ItemStack confirm = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 4);
         ItemMeta confirmMeta = confirm.getItemMeta();
@@ -114,25 +115,25 @@ public class AmountChooser implements Listener {
 
                     if (e.getInventory().getItem(22) != null) {
 
-                        if (e.getInventory().getItem(22).getItemMeta().getDisplayName() != null && e.getInventory().getItem(22).getItemMeta().getDisplayName().contains("§eAmount to buy: §7")) {
+                        if (e.getInventory().getItem(22).getItemMeta().getDisplayName() != null && e.getInventory().getItem(22).getItemMeta().getDisplayName().contains(Checkout.getString("AmountToBuy"))) {
 
                             final int total = Integer.parseInt(e.getInventory().getItem(22).getItemMeta().getDisplayName().substring(19));
 
                             if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {
 
                                 if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("Confirm"))) {
-                                    CheckoutMenu.addToCart(p,shop,e.getInventory().getItem(4),total);
+                                    CheckoutMenu.addToCart(p, shop, e.getInventory().getItem(4), total);
 
                                     p.sendMessage(Messages.getPrefix() + "§eAdded Item to §aCart");
 
-                                    OpenShop.openShopItems(e.getInventory(),p,shop,1);
+                                    OpenShop.openShopItems(e.getInventory(), p, shop, 1);
 
                                 } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("AddOne"))) {
-                                    if (shop.getStock(e.getInventory().getItem(4), false) >= total + 1 || shop.isInfinite(e.getInventory().getItem(4),false)) {
+                                    if (shop.getStock(e.getInventory().getItem(4), false) >= total + 1 || shop.isInfinite(e.getInventory().getItem(4), false)) {
                                         openAmountChooser(total + 1, e.getInventory().getItem(4), p, shop, e.getInventory());
                                     }
                                 } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("AddStack"))) {
-                                    if (shop.getStock(e.getInventory().getItem(4), false) >= total + e.getInventory().getItem(4).getMaxStackSize() || shop.isInfinite(e.getInventory().getItem(4),false)) {
+                                    if (shop.getStock(e.getInventory().getItem(4), false) >= total + e.getInventory().getItem(4).getMaxStackSize() || shop.isInfinite(e.getInventory().getItem(4), false)) {
                                         openAmountChooser(total + e.getInventory().getItem(4).getMaxStackSize(), e.getInventory().getItem(4), p, shop, e.getInventory());
                                     } else {
                                         openAmountChooser(shop.getStock(e.getInventory().getItem(4), false), e.getInventory().getItem(4), p, shop, e.getInventory());

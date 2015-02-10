@@ -71,24 +71,6 @@ public class ShopsNPC {
         }
 
 
-//        entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
-//        entity.setCustomName("§a§l" + s.getName());
-//        entity.setCustomNameVisible(true);
-//        entity.setRemoveWhenFarAway(false);
-//        entity.setCanPickupItems(false);
-//
-//        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 9999));
-//        entity.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 9999999, 9999));
-//        entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 9999999, 9999));
-//
-//        entity.getEquipment().setItemInHand(null);
-//
-//        if (entity instanceof Monster){
-//            ((Monster) entity).setTarget(null);
-//
-//        }
-
-
     }
 
     public ShopsNPC(EntityType e, Shop s, Skeleton.SkeletonType skType) {
@@ -114,11 +96,11 @@ public class ShopsNPC {
             ((Monster) entity).setTarget(null);
 
         }
-
-
     }
 
-    public ShopsNPC(EntityType e, Shop s,  Ocelot.Type type) {
+
+
+    public ShopsNPC(EntityType e, Shop s, boolean baby, Ocelot.Type type) {
         shop = s;
         l = shop.getLocation();
         entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
@@ -135,6 +117,9 @@ public class ShopsNPC {
 
         if (entity instanceof Ocelot){
             ((Ocelot) entity).setCatType(type);
+            if (baby) {
+                ((Ocelot) entity).setBaby();
+            }
         }
 
         if (entity instanceof Monster){
@@ -166,6 +151,7 @@ public class ShopsNPC {
 
         if (entity instanceof MagmaCube){
             ((MagmaCube) entity).setSize(size);
+
         }
 
         if (entity instanceof Monster){
@@ -176,7 +162,130 @@ public class ShopsNPC {
 
     }
 
-    public ShopsNPC(EntityType e, Shop s, boolean sheared, DyeColor color) {
+
+
+    public ShopsNPC(EntityType e, Shop s, boolean baby, boolean villagerZombie) {
+        shop = s;
+        l = shop.getLocation();
+        entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
+        entity.setCustomName("§a§l" + s.getName());
+        entity.setCustomNameVisible(true);
+        entity.setRemoveWhenFarAway(false);
+        entity.setCanPickupItems(false);
+
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 9999));
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 9999999, 9999));
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 9999999, 9999));
+
+        entity.getEquipment().setItemInHand(null);
+
+        if (entity instanceof Zombie){
+            ((Zombie) entity).setVillager(villagerZombie);
+            ((Zombie) entity).setBaby(baby);
+        }
+
+        if (entity instanceof Chicken && baby){
+            ((Chicken) entity).setBaby();
+        }
+
+        if (entity instanceof Cow && baby){
+            ((Cow) entity).setBaby();
+        }
+
+        if (entity instanceof Horse && baby){
+            ((Horse) entity).setBaby();
+
+        }
+
+        if (entity instanceof Monster){
+            ((Monster) entity).setTarget(null);
+
+        }
+
+
+    }
+
+    public ShopsNPC(EntityType e, Shop s, boolean baby) {
+        shop = s;
+        l = shop.getLocation();
+        entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
+        entity.setCustomName("§a§l" + s.getName());
+        entity.setCustomNameVisible(true);
+        entity.setRemoveWhenFarAway(false);
+        entity.setCanPickupItems(false);
+
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 9999));
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 9999999, 9999));
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 9999999, 9999));
+
+        entity.getEquipment().setItemInHand(null);
+
+        if (entity instanceof Zombie){
+            ((Zombie) entity).setBaby(baby);
+        }
+
+        if (entity instanceof Chicken && baby){
+            ((Chicken) entity).setBaby();
+        }
+
+        if (entity instanceof Pig && baby){
+            ((Pig) entity).setBaby();
+        }
+
+        if (entity instanceof PigZombie){
+            ((PigZombie) entity).setBaby(baby);
+        }
+
+        if (entity instanceof Cow && baby){
+            ((Cow) entity).setBaby();
+        }
+
+        if (entity instanceof Horse && baby){
+            ((Horse) entity).setBaby();
+        }
+
+        if (entity instanceof Monster){
+            ((Monster) entity).setTarget(null);
+
+        }
+
+
+    }
+
+    public ShopsNPC(EntityType e, Shop s, boolean baby, Horse.Variant variant, Horse.Color color, boolean chest, Horse.Style style) {
+        shop = s;
+        l = shop.getLocation();
+        entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
+        entity.setCustomName("§a§l" + s.getName());
+        entity.setCustomNameVisible(true);
+        entity.setRemoveWhenFarAway(false);
+        entity.setCanPickupItems(false);
+
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 9999));
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 9999999, 9999));
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 9999999, 9999));
+
+        entity.getEquipment().setItemInHand(null);
+
+
+
+        if (entity instanceof Horse && baby){
+            ((Horse) entity).setBaby();
+            ((Horse) entity).setVariant(variant);
+            ((Horse) entity).setColor(color);
+            ((Horse) entity).setCarryingChest(chest);
+            ((Horse) entity).setStyle(style);
+        }
+
+        if (entity instanceof Monster){
+            ((Monster) entity).setTarget(null);
+
+        }
+
+
+    }
+
+    public ShopsNPC(EntityType e, Shop s, boolean sheared, boolean baby, DyeColor color) {
         shop = s;
         l = shop.getLocation();
         entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
@@ -194,6 +303,10 @@ public class ShopsNPC {
         if (entity instanceof Sheep){
             ((Sheep) entity).setColor(color);
             ((Sheep) entity).setSheared(sheared);
+
+            if (baby){
+                ((Sheep) entity).setBaby();
+            }
         }
 
         if (entity instanceof Monster){
@@ -204,7 +317,7 @@ public class ShopsNPC {
 
     }
 
-    public ShopsNPC(EntityType e, Shop s, DyeColor color) {
+    public ShopsNPC(EntityType e, Shop s, boolean baby, DyeColor color) {
         shop = s;
         l = shop.getLocation();
         entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
@@ -221,12 +334,17 @@ public class ShopsNPC {
 
         if (entity instanceof Sheep){
             ((Sheep) entity).setColor(color);
+            if (baby){
+                ((Sheep) entity).setBaby();
+            }
         }
 
         if (entity instanceof Wolf){
             ((Wolf) entity).setCollarColor(color);
+            if (baby){
+                ((Wolf) entity).setBaby();
+            }
         }
-
 
 
         if (entity instanceof Monster){
@@ -237,7 +355,7 @@ public class ShopsNPC {
 
     }
 
-    public ShopsNPC(EntityType e, Shop s, Villager.Profession pro) {
+    public ShopsNPC(EntityType e, Shop s, boolean baby, Villager.Profession pro) {
         shop = s;
         l = shop.getLocation();
         entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
@@ -254,6 +372,10 @@ public class ShopsNPC {
 
         if (entity instanceof Villager){
             ((Villager) entity).setProfession(pro);
+
+            if (baby){
+                ((Villager) entity).setBaby();
+            }
         }
 
 
@@ -278,27 +400,19 @@ public class ShopsNPC {
                     }
                 }
 
-                entity = (LivingEntity) shop.getLocation().getWorld().spawnEntity(shop.getLocation(), entity.getType());
+                NPCs.removeNPC(this);
 
-                entity.setCustomName("§a§l" + shop.getName());
-                entity.setCustomNameVisible(true);
-                entity.setRemoveWhenFarAway(false);
-
-                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 9999));
-                entity.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 9999999, 9999));
-                entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 9999999, 9999));
-
-                entity.getEquipment().setItemInHand(null);
-
-                if (entity instanceof Monster){
-                    ((Monster) entity).setTarget(null);
-
-
+                if (Core.useWorldGuard()){
+                    CreateNPCWG.createNPC(entity.getType(),shop);
+                } else {
+                    CreateNPC.createNPC(entity.getType(),shop);
                 }
+
 
             } catch (Exception e){
                 addChest(l);
             } finally {
+
                 if (c) {
                     Core.getWorldGuard().getGlobalConfiguration().activityHaltToggle = true;
                 }
@@ -318,7 +432,7 @@ public class ShopsNPC {
             entity.setFireTicks(0);
             entity.setFallDistance(0);
             entity.getEquipment().setItemInHand(null);
-            if (entity.getLocation().distance(l) > .5) {
+            if (entity.getLocation().distance(l) > .75) {
                 entity.teleport(l);
             }
         }

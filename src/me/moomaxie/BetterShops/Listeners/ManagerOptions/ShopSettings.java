@@ -277,11 +277,32 @@ public class ShopSettings implements Listener {
                                                 if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
                                                     String name = ev.getCurrentItem().getItemMeta().getDisplayName();
 
-                                                    shop.setDescription(name);
+                                                    if (isAlphaNumeric(name)) {
+                                                        if (name.length() <= 26) {
 
-                                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Changed Shop Description!");
-                                                    e.getWhoClicked().closeInventory();
-                                                    openShopManager(e.getInventory(), (Player) e.getWhoClicked(), shop);
+                                                            shop.setDescription(name);
+
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Changed Shop Description!");
+                                                            e.getWhoClicked().closeInventory();
+                                                            openShopManager(e.getInventory(), (Player) e.getWhoClicked(), shop);
+                                                        } else {
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cThat description is too long. §7(Max: 26 Characters)");
+                                                            e.getWhoClicked().closeInventory();
+                                                            openShopManager(e.getInventory(), (Player) e.getWhoClicked(), shop);
+                                                        }
+                                                    } else {
+                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cNot an acceptable description.");
+
+                                                        if (Core.isAboveEight() && Config.useTitles()) {
+
+                                                            e.getWhoClicked().closeInventory();
+                                                            Core.getTitleManager().setTimes(((Player) e.getWhoClicked()), 20, 40, 20);
+                                                            Core.getTitleManager().sendSubTitle(((Player) e.getWhoClicked()), "§cNot an acceptable description.");
+
+
+                                                        }
+                                                        e.setCancelled(true);
+                                                    }
                                                 }
                                             }
                                         }
@@ -362,5 +383,18 @@ public class ShopSettings implements Listener {
                 }
             }
         }
+    }
+
+    public boolean isAlphaNumeric(String str) {
+        if (str.trim().length() < 1) {
+            return false;
+        }
+        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 ";
+        for (int i = 0; i < str.length(); i++) {
+            if (!acceptable.contains(str.substring(i, i + 1).toLowerCase())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

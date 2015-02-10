@@ -19,8 +19,25 @@ import java.util.HashMap;
  */
 public class Messages {
 
-    private static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(),"Messages.yml");
+    private static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");
     private static YamlConfiguration config;
+
+    public static String getString(String name) {
+        if (config.isString(name)) {
+            return config.getString(name).replaceAll("&", "§");
+        } else {
+            return "";
+        }
+    }
+
+    public static void setString(String name, String msg) {
+        config.set(name, msg);
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static String getPrefix() {
 
@@ -917,7 +934,7 @@ public class Messages {
         return "Turned <Value> §dNPC Shop Mode";
     }
 
-    public static void changeMessages(){
+    public static void changeMessages() {
         boolean found3 = false;
 
         if (Core.getCore().getDataFolder() != null) {
@@ -975,13 +992,14 @@ public class Messages {
             HashMap<String, Object> hash = new HashMap<>();
 
             for (String s : config.getKeys(true)) {
-                hash.put(s, config.get(s));
+                if (!s.contains("Version"))
+                    hash.put(s, config.get(s));
             }
 
-            if (config.isString("version")) {
-                String d = config.getString("version");
+            if (config.isString("Version")) {
+                String d = config.getString("Version");
 
-                if (!d.equals(Core.getCore().getDescription().getVersion())){
+                if (!d.equals(Core.getCore().getDescription().getVersion())) {
                     file.delete();
                     File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
 
@@ -1016,19 +1034,6 @@ public class Messages {
                             }
                         }
                     }
-
-                    file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(),"Messages.yml");
-
-                    config = YamlConfiguration.loadConfiguration(file);
-
-//                    for (String s : hash.keySet()){
-//                        config.set(s,hash.get(s));
-//                        try {
-//                            config.save(file);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
                 }
 
             } else {
@@ -1069,23 +1074,25 @@ public class Messages {
                     }
                 }
 
-                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(),"Messages.yml");
 
+
+            }
+            file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");
+
+
+            config = YamlConfiguration.loadConfiguration(file);
+
+            for (String s : hash.keySet()) {
+                config.set(s, hash.get(s));
                 try {
-                    config = YamlConfiguration.loadConfiguration(file);
-                } catch (Exception ex){
-
+                    config.save(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-//                for (String s : hash.keySet()){
-//                    config.set(s,hash.get(s));
-//                    try {
-//                        config.save(file);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
             }
         }
+        file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");
+
+        config = YamlConfiguration.loadConfiguration(file);
     }
 }

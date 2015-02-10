@@ -161,14 +161,14 @@ public class OpenSellShop implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = shop.getLore(it,true);
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
 
                     lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPrice(it, true));
+                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                     lore.add(" ");
                     lore.add(MainGUI.getString("SellItem"));
 
@@ -182,14 +182,14 @@ public class OpenSellShop implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = shop.getLore(it,true);
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
 
                     lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPrice(it, true));
+                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                     lore.add(" ");
                     lore.add(MainGUI.getString("SellItem"));
                     meta.setLore(lore);
@@ -204,14 +204,14 @@ public class OpenSellShop implements Listener {
                     it.setAmount(1);
                     ItemMeta meta = it.getItemMeta();
                     List<String> lore;
-                    if (meta.getLore() != null) {
-                        lore = shop.getLore(it,true);
+                    if (shop.getLore(it) != null) {
+                        lore = shop.getLore(it);
                     } else {
                         lore = new ArrayList<String>();
                     }
 
                     lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPrice(it, true));
+                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                     lore.add(" ");
                     lore.add(MainGUI.getString("SellItem"));
                     meta.setLore(lore);

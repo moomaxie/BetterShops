@@ -238,13 +238,13 @@ public class BuyItem implements Listener {
                         if (item.getType() != Material.SKULL_ITEM) {
 
                             ItemMeta meta = item.getItemMeta();
-                            List<String> lore = shop.getLore(item, false);
+                            List<String> lore = shop.getLore(item);
 
                             meta.setLore(lore);
                             item.setItemMeta(meta);
                         } else {
                             SkullMeta meta = (SkullMeta) item.getItemMeta();
-                            List<String> lore = shop.getLore(item, false);
+                            List<String> lore = shop.getLore(item);
 
                             meta.setLore(lore);
                             item.setItemMeta(meta);
@@ -287,14 +287,12 @@ public class BuyItem implements Listener {
 
                         ItemMeta meta = item.getItemMeta();
 
-                        meta.setLore(shop.getLore(item, false));
+                        meta.setLore(shop.getLore(item));
                         item.setItemMeta(meta);
 
                         item.setAmount(amt);
 
                         p.getInventory().addItem(item);
-
-
 
                         shop.removeItem(item, shop.getAmount(item, false), false);
 

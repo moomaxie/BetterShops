@@ -20,14 +20,14 @@ public class TitleManager implements me.moomaxie.BetterShops.Configurations.Titl
 
     public void sendTitle(Player p, String message){
 
-        PacketPlayOutTitle title = new PacketPlayOutTitle(EnumTitleAction.TITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes('§', message)));
+        PacketPlayOutTitle title = new PacketPlayOutTitle(EnumTitleAction.TITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes("§".toCharArray()[0] , message)));
 
         ((CraftPlayer) p).getHandle().playerConnection.sendPacket(title);
     }
 
     public void sendSubTitle(Player p, String message){
 
-        PacketPlayOutTitle subtitle = new PacketPlayOutTitle(EnumTitleAction.SUBTITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes('§', message)));
+        PacketPlayOutTitle subtitle = new PacketPlayOutTitle(EnumTitleAction.SUBTITLE, new ChatComponentText(ChatColor.translateAlternateColorCodes("§".toCharArray()[0] , message)));
 
 
         ((CraftPlayer) p).getHandle().playerConnection.sendPacket(subtitle);

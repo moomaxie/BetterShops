@@ -1,5 +1,6 @@
 package me.moomaxie.BetterShops.NPC.Listeners;
 
+import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
@@ -46,7 +47,11 @@ public class OpenNPCShop implements Listener {
                                     if (npc.getShop().getShopContents(false).size() >= npc.getShop().getShopContents(true).size()) {
                                         OpenShopOptions.openShopOwnerOptionsInventory(null, p, npc.getShop(), 1);
                                     } else {
-                                        OpenSellingOptions.openShopSellingOptions(null, p, npc.getShop(), 1);
+                                        if (Config.useSellingShop()) {
+                                            OpenSellingOptions.openShopSellingOptions(null, p, npc.getShop(), 1);
+                                        } else {
+                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, npc.getShop(), 1);
+                                        }
                                     }
                                 } else {
                                     if (npc.getShop().getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) || npc.getShop().getOwner().getUniqueId().equals(p.getUniqueId())) {
@@ -54,7 +59,11 @@ public class OpenNPCShop implements Listener {
                                         if (npc.getShop().getShopContents(false).size() >= npc.getShop().getShopContents(true).size()) {
                                             OpenShop.openShopItems(null, p, npc.getShop(), 1);
                                         } else {
-                                            OpenSellShop.openSellerShop(null, p, npc.getShop(), 1);
+                                            if (Config.useSellingShop()) {
+                                                OpenSellShop.openSellerShop(null, p, npc.getShop(), 1);
+                                            } else {
+                                                OpenShop.openShopItems(null, p, npc.getShop(), 1);
+                                            }
                                         }
                                     }
                                 }
@@ -65,7 +74,11 @@ public class OpenNPCShop implements Listener {
                                         if (npc.getShop().getShopContents(false).size() >= npc.getShop().getShopContents(true).size()) {
                                             OpenShop.openShopItems(null, p, npc.getShop(), 1);
                                         } else {
-                                            OpenSellShop.openSellerShop(null, p, npc.getShop(), 1);
+                                            if (Config.useSellingShop()) {
+                                                OpenSellShop.openSellerShop(null, p, npc.getShop(), 1);
+                                            } else {
+                                                OpenShop.openShopItems(null, p, npc.getShop(), 1);
+                                            }
                                         }
                                         p.sendMessage(Messages.getPrefix() + Messages.getOpenShopMessage());
                                     } else {

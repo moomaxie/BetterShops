@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.0
+Version: 1.5.0 Beta 14
 
 ShopCreate: '[Shop]'
 
@@ -35,6 +35,9 @@ SearchOptions: '&e&lLeft Click &7to open &aSearch Options'
 
 BuyingShop: '&eBuying Shop'
 SellingShop: '&eSelling Shop'
+
+ArrangeSelling: '&eArranging Selling Shop'
+ArrangeBuying: '&eArranging Buying Shop'
 
 Arrangement: '&a&lArrangement Mode'
 ArrangementLore: '&e&lClick &7to leave &aArrangement Mode'

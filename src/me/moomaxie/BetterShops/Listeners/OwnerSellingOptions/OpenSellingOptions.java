@@ -1,5 +1,6 @@
 package me.moomaxie.BetterShops.Listeners.OwnerSellingOptions;
 
+import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.History;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
@@ -47,22 +48,24 @@ public class OpenSellingOptions implements Listener {
 
                     Shop shop = ShopLimits.fromString(p, name);
 
-                    if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop()) {
+                    if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("ToggleShop"))) {
 
-                        if (e.isRightClick()) {
-                            if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals("§e§lBuying")) {
-                                openShopSellingOptions(e.getInventory(), p, shop, 1);
-                            } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals("§e§lSelling")) {
-                                OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(),p, shop, 1);
+                        if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop()) {
+
+                            if (e.isRightClick()) {
+                                if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("Buying")) && Config.useSellingShop()) {
+                                    openShopSellingOptions(e.getInventory(), p, shop, 1);
+                                } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("Selling"))) {
+                                    OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, 1);
+                                }
                             }
-                        }
-
-                    } else {
-                        if (e.isRightClick()) {
-                            if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals("§e§lBuying")) {
-                                OpenSellShop.openSellerShop(e.getInventory(),p, shop, 1);
-                            } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals("§e§lSelling")) {
-                                OpenShop.openShopItems(e.getInventory(),p, shop, 1);
+                        } else {
+                            if (e.isRightClick()) {
+                                if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("Buying")) && Config.useSellingShop()) {
+                                    OpenSellShop.openSellerShop(e.getInventory(), p, shop, 1);
+                                } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("Selling"))) {
+                                    OpenShop.openShopItems(e.getInventory(), p, shop, 1);
+                                }
                             }
                         }
                     }
@@ -207,7 +210,7 @@ public class OpenSellingOptions implements Listener {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
                         if (meta.getLore() != null) {
-                            lore = shop.getLore(it,true);
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
@@ -215,7 +218,7 @@ public class OpenSellingOptions implements Listener {
                         lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, true));
 
                         lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                        lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPrice(it, true));
+                        lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                         lore.add(" ");
                         lore.add(MainGUI.getString("SellOptions"));
                         meta.setLore(lore);
@@ -230,7 +233,7 @@ public class OpenSellingOptions implements Listener {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
                         if (meta.getLore() != null) {
-                            lore = shop.getLore(it,true);
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
@@ -238,7 +241,7 @@ public class OpenSellingOptions implements Listener {
                         lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, true));
 
                         lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                        lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPrice(it, true));
+                        lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                         lore.add(" ");
                         lore.add(MainGUI.getString("SellOptions"));
                         meta.setLore(lore);
@@ -257,7 +260,7 @@ public class OpenSellingOptions implements Listener {
                         ItemMeta meta = it.getItemMeta();
                         List<String> lore;
                         if (meta.getLore() != null) {
-                            lore = shop.getLore(it,true);
+                            lore = shop.getLore(it);
                         } else {
                             lore = new ArrayList<String>();
                         }
@@ -265,7 +268,7 @@ public class OpenSellingOptions implements Listener {
                         lore.add(MainGUI.getString("Stock") + " §7" + shop.getStock(it, true));
 
                         lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                        lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPrice(it, true));
+                        lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
                         lore.add(" ");
                         lore.add(MainGUI.getString("SellOptions"));
                         meta.setLore(lore);

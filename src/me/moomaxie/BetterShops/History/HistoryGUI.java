@@ -1,7 +1,9 @@
 package me.moomaxie.BetterShops.History;
 
+import com.google.common.collect.Lists;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.History;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
+import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Configurations.WordsCapitalizer;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
@@ -19,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -97,7 +100,7 @@ public class HistoryGUI implements Listener {
         int j = 0;
 
         if (page > 1) {
-            j = 45 * (page - 1);
+            j = 36 * (page - 1);
         }
 
         int k = shop.getHistory().getAllTransactions().size();
@@ -106,11 +109,13 @@ public class HistoryGUI implements Listener {
             k = k - (j + (shop.getHistory().getAllTransactions().size() - 36));
         }
 
-        List<Transaction> list = shop.getHistory().getAllTransactions();
+        LinkedList<Transaction> list = shop.getHistory().getAllTransactions();
+
+        List<Transaction> l = Lists.reverse(list);
 
         if (list.size() > 0) {
-            for (int i = k -1; i > j -1; i--) {
-                Transaction trans = list.get(i);
+            for (int i = j; i < k; i++) {
+                Transaction trans = l.get(i);
                 ItemStack it = new ItemStack(Material.EMERALD);
                 ItemMeta sk = it.getItemMeta();
                 String s = "Buying";
@@ -121,11 +126,9 @@ public class HistoryGUI implements Listener {
 
                 sk.setDisplayName("§a" + trans.getPlayer().getName());
 
-
-
                 if (trans.getItem().getItemMeta().getDisplayName() != null) {
                     sk.setLore(Arrays.asList(History.getString("Date") + " §8" + trans.getDate().toLocaleString(),
-                            History.getString("Item") + " §8" + item.getItemMeta().getDisplayName(),
+                            History.getString("Item") + " §8" + trans.getItem().getItemMeta().getDisplayName(),
                             History.getString("Price") + " §8" + trans.getPrice(),
                             History.getString("Amount") + " §8" + trans.getAmount(),
                             History.getString("Shop") + " §8" + s));
@@ -175,8 +178,12 @@ public class HistoryGUI implements Listener {
                         if (e.getCurrentItem().getItemMeta().getDisplayName() != null
                                 && e.getCurrentItem().getItemMeta().getDisplayName().equals(History.getString("ClearHistory"))) {
 
-                            shop.getHistory().clearHistory();
-                            openHistoryGUI(p, shop, 1);
+                            if (shop.getHistory().getAllTransactions().size() > 2) {
+                                shop.getHistory().clearHistory();
+                                openHistoryGUI(p, shop, 1);
+                            } else {
+                                p.sendMessage(Messages.getPrefix() + "§cPlease wait until more transactions occur in order to Clear History.");
+                            }
                         }
 
                         if (e.getCurrentItem().getItemMeta().getDisplayName() != null

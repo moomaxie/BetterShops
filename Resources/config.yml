@@ -6,7 +6,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 1.5.0
+Version: 1.5.0 Beta 14
 
 ####  General  ####
 
@@ -31,6 +31,16 @@ DeleteByBreak: True
 # Toggle Server Metrics
 Metrics: True
 
+#### Shop Options ####
+
+# Toggle the use of selling shops
+SellingShops: True
+
+# The default price of all items
+DefaultPrice: 5.00
+
+# Maximum Price
+MaxPrice: 1000000000.00
 
 ####  Shop Creation  ####
 
