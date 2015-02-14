@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
  * ************************************************************************
  */
 public class ShopSellItemEvent extends Event {
-
     private static final HandlerList handlers = new HandlerList();
     private Shop shop;
     private ItemStack item;
@@ -33,18 +32,6 @@ public class ShopSellItemEvent extends Event {
 
     public ItemStack getItem(){
         return item;
-    }
-
-    public OfflinePlayer getOwner(){
-        return shop.getOwner();
-    }
-
-    public Location getLocation(){
-        return shop.getLocation();
-    }
-
-    public String getShopName(){
-        return shop.getName();
     }
 
     public HandlerList getHandlers() {
