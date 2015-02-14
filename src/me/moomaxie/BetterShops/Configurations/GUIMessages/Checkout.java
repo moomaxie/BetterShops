@@ -223,7 +223,7 @@ public class Checkout {
                         }
                     }
                 }
-                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");
+                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/Checkout.yml");
 
                 config = YamlConfiguration.loadConfiguration(file);
                 for (String s : hash.keySet()) {

@@ -9,6 +9,7 @@ import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
 import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.OpenSellingOptions;
 import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
 import me.moomaxie.BetterShops.Shops.Shop;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
@@ -28,6 +30,41 @@ import org.bukkit.event.player.PlayerInteractEvent;
  * ************************************************************************
  */
 public class OpeningChests implements Listener {
+
+    @EventHandler
+    public void onDoubleChestPlace(final BlockPlaceEvent e) {
+        Player p = e.getPlayer();
+
+
+        if (e.getBlock().getType() == Material.CHEST) {
+            if (e.getBlock().getLocation().add(1, 0, 0).getBlock().getType() == Material.CHEST ||
+                    e.getBlock().getLocation().add(-1, 0, 0).getBlock().getType() == Material.CHEST ||
+                    e.getBlock().getLocation().add(0, 0, 1).getBlock().getType() == Material.CHEST ||
+                    e.getBlock().getLocation().add(0, 0, -1).getBlock().getType() == Material.CHEST) {
+
+                if (ShopLimits.fromLocation(e.getBlock().getLocation().add(0, 0, -1).getBlock().getLocation()) != null ||
+                        ShopLimits.fromLocation(e.getBlock().getLocation().add(0, 0, 1).getBlock().getLocation()) != null ||
+                        ShopLimits.fromLocation(e.getBlock().getLocation().add(1, 0, 0).getBlock().getLocation()) != null ||
+                        ShopLimits.fromLocation(e.getBlock().getLocation().add(-1, 0, 0).getBlock().getLocation()) != null) {
+
+                    if (Config.getAllowChest()) {
+                        e.setCancelled(false);
+                    } else {
+
+                        e.setCancelled(true);
+                        p.sendMessage(Messages.getPrefix() + "§cCannot place a chest next to a shop.");
+
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                            @Override
+                            public void run() {
+                                e.getBlock().setType(Material.AIR);
+                            }
+                        },2L);
+                    }
+                }
+            }
+        }
+    }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
@@ -86,7 +123,11 @@ public class OpeningChests implements Listener {
                 Player p = e.getPlayer();
                 if (sign.getLine(0).equals("§0" + MainGUI.getString("SignLine1"))
                         && sign.getLine(1).equals("§0" + MainGUI.getString("SignLine2"))
-                        && sign.getLine(3).equals("§0" + MainGUI.getString("SignLine4")) || sign.getLine(0).equals(MainGUI.getString("SignLine1"))
+                        && sign.getLine(3).equals("§0" + MainGUI.getString("SignLine4")) ||
+                        sign.getLine(0).equals("§0§0" + MainGUI.getString("SignLine1"))
+                                && sign.getLine(1).equals("§0§0" + MainGUI.getString("SignLine2"))
+                                && sign.getLine(3).equals("§0§0" + MainGUI.getString("SignLine4")) ||
+                        sign.getLine(0).equals(MainGUI.getString("SignLine1"))
                         && sign.getLine(1).equals(MainGUI.getString("SignLine2"))
                         && sign.getLine(3).equals(MainGUI.getString("SignLine4"))) {
 
@@ -150,7 +191,6 @@ public class OpeningChests implements Listener {
                             }
                         }
                     }
-
                 }
             }
         }

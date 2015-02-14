@@ -68,9 +68,6 @@ public class Core extends JavaPlugin {
     //TODO: Add more types of shops: Holographic, Sign, Floating Item - 1.6.0
     //TODO: Shop connections - maybe
     //TODO: Claiming un-owned shops - maybe
-    //TODO: Change Chat messages in-game - 1.6.0
-
-    //Change WG message when changing versions
 
     private static Core instance;
     public static Metrics metrics;
@@ -81,7 +78,7 @@ public class Core extends JavaPlugin {
     private static boolean wg = false;
 
     //Beta versions
-    private static boolean beta = true;
+    private static boolean beta = false;
 
 
     @Override

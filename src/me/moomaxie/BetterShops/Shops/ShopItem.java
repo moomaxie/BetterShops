@@ -27,6 +27,7 @@ public class ShopItem {
     private Material material;
     private String displayName = null;
     private byte data;
+    private double origAdjustedPrice;
     private short durability;
     private double price = Config.getDefaultPrice();
     private boolean infinite = false;
@@ -37,6 +38,7 @@ public class ShopItem {
     private double adjustedPrice = Config.getDefaultPrice();
     private int maxPrice = 10000000;
     private int shopID = 0;
+    private int amountTo;
 
     public ShopItem(Shop shop, ItemStack item, int shopItemId, int page, int slot, boolean sell) {
         this.shop = shop;
@@ -145,6 +147,10 @@ public class ShopItem {
 
     public void setPrice(double price) {
         this.price = price;
+        if (!liveEco){
+            setAdjustedPrice(price);
+        }
+
         manager.setPrice(price);
     }
 
@@ -165,9 +171,29 @@ public class ShopItem {
         return manager.isLiveEco();
     }
 
-    public void setPriceChangePercent(double percent) {
-        this.priceChangePercent = percent;
-        manager.setPriceChangePercent(percent);
+    public int calculateAmountTo(){
+        amountTo = (int) priceChangePercent / amountToDouble;
+        calculatePricePercent();
+        return amountTo;
+    }
+
+    public void setAmountTo(int amt){
+        amountTo = amt;
+        calculatePricePercent();
+    }
+
+    public int getAmountTo(){
+        return amountTo;
+    }
+
+    public void calculatePricePercent(){
+        priceChangePercent = amountTo / amountToDouble;
+        manager.setPriceChangePercent(priceChangePercent);
+    }
+
+    public void calculatePriceChangePercent() {
+        this.priceChangePercent = adjustedPrice / origAdjustedPrice;
+        manager.setPriceChangePercent(priceChangePercent);
     }
 
     public double getPriceChangePercent() {
@@ -193,7 +219,9 @@ public class ShopItem {
     }
 
     public void setAdjustedPrice(double amt) {
+        origAdjustedPrice = adjustedPrice;
         this.adjustedPrice = amt;
+        calculatePriceChangePercent();
         manager.setAdjustedPrice(amt);
     }
 

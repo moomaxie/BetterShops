@@ -41,7 +41,6 @@ public class OpenNPCShop implements Listener {
                             Player p = e.getPlayer();
 
                             if (npc.getShop().getOwner() != null) {
-
                                 if (npc.getShop().getOwner().getUniqueId().equals(p.getUniqueId()) && !npc.getShop().isServerShop() || npc.getShop().getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) && !npc.getShop().isServerShop() || npc.getShop().getOwner() != null && npc.getShop().getOwner().getUniqueId().equals(p.getUniqueId()) && !npc.getShop().isServerShop()) {
                                     e.setCancelled(true);
                                     if (npc.getShop().getShopContents(false).size() >= npc.getShop().getShopContents(true).size()) {

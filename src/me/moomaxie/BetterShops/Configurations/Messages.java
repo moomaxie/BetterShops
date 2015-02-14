@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class Messages {
 
     private static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");
-    private static YamlConfiguration config;
+    public static YamlConfiguration config;
 
     public static String getString(String name) {
         if (config.isString(name)) {
@@ -1083,12 +1083,14 @@ public class Messages {
             config = YamlConfiguration.loadConfiguration(file);
 
             for (String s : hash.keySet()) {
-                config.set(s, hash.get(s));
-                try {
-                    config.save(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (config.isString(s)) {
+                    config.set(s, hash.get(s));
                 }
+            }
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");

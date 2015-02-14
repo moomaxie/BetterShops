@@ -123,7 +123,7 @@ public class AmountChooser implements Listener {
 
                         if (e.getInventory().getItem(22).getItemMeta().getDisplayName() != null && e.getInventory().getItem(22).getItemMeta().getDisplayName().contains(Checkout.getString("AmountToBuy"))) {
 
-                            final int total = Integer.parseInt(e.getInventory().getItem(22).getItemMeta().getDisplayName().substring(19));
+                            final int total = Integer.parseInt(e.getInventory().getItem(22).getItemMeta().getDisplayName().substring(Checkout.getString("AmountToBuy").length() + 3));
 
                             if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {
 

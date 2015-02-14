@@ -54,4 +54,6 @@ public class PriceManager {
     public ShopItem getItem(){
         return item;
     }
+
+
 }

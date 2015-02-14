@@ -112,9 +112,10 @@ public class MainGUI {
             if (config != null) {
                 HashMap<String, Object> hash = new HashMap<>();
 
-                for (String s : config.getKeys(true)) {
-                    if (!s.contains("Version"))
-                    hash.put(s, config.get(s));
+                for (String s : config.getKeys(false)) {
+                    if (!s.contains("Version")) {
+                        hash.put(s, config.get(s));
+                    }
                 }
 
                 if (config.isString("Version")) {
@@ -224,7 +225,7 @@ public class MainGUI {
                         }
                     }
                 }
-                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Messages.yml");
+                file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/MainGUI.yml");
 
                 config = YamlConfiguration.loadConfiguration(file);
                 for (String s : hash.keySet()) {

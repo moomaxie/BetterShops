@@ -1,9 +1,13 @@
 package me.moomaxie.BetterShops.History;
 
+import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -43,6 +47,7 @@ public class History {
         if (save) {
             shop.saveTransaction(trans, true);
         }
+        saveTransactionToFile(trans);
     }
 
     public LinkedList<Transaction> getBuyingTransactions(){
@@ -71,5 +76,41 @@ public class History {
         Selltransactions.clear();
 
         shop.clearTransactions();
+    }
+
+    public void saveTransactionToFile(Transaction t){
+        File file = new File(Core.getCore().getDataFolder(),"Transactions/" + shop.getName() + ".yml");
+
+        if (!file.exists()){
+            if (!file.getParentFile().exists()){
+                file.getParentFile().mkdirs();
+            }
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        int next = config.getKeys(false).size() + 1;
+
+        config.createSection("" + next);
+
+        config.getConfigurationSection("" + next).set("Shop Owner UUID", shop.getOwner().getUniqueId().toString());
+        config.getConfigurationSection("" + next).set("Shop Owner Name", shop.getOwner().getName());
+        config.getConfigurationSection("" + next).set("Date", t.getDate().toLocaleString());
+        config.getConfigurationSection("" + next).set("Buyer UUID", t.getPlayer().getUniqueId().toString());
+        config.getConfigurationSection("" + next).set("Buyer Name", t.getPlayer().getName());
+        config.getConfigurationSection("" + next).set("Item", t.getItem());
+        config.getConfigurationSection("" + next).set("Price", t.getPrice());
+        config.getConfigurationSection("" + next).set("Amount", t.getAmount());
+        config.getConfigurationSection("" + next).set("Selling Shop", t.isSell());
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

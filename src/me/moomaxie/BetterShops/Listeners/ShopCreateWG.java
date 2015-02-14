@@ -161,19 +161,19 @@ public class ShopCreateWG implements Listener {
                                                             new AddShop(e.getPlayer(), finalChest, name);
                                                             e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
 
-                                                            e.setLine(0, "§b§k**************");
-                                                            e.setLine(1, "§aShop");
-                                                            e.setLine(2, "§cClosed");
-                                                            e.setLine(3, "§b§k**************");
+                                                        e.setLine(0, MainGUI.getString("SignLine1"));
+                                                        e.setLine(1, MainGUI.getString("SignLine2"));
+                                                        e.setLine(2, MainGUI.getString("SignLine3Closed"));
+                                                        e.setLine(3, MainGUI.getString("SignLine4"));
 
-                                                            Sign s = (Sign) e.getBlock().getState();
+                                                        Sign s = (Sign) e.getBlock().getState();
 
-                                                            s.setLine(0, "§b§k**************");
-                                                            s.setLine(1, "§aShop");
-                                                            s.setLine(2, "§cClosed");
-                                                            s.setLine(3, "§b§k**************");
+                                                        s.setLine(0, MainGUI.getString("SignLine1"));
+                                                        s.setLine(1, MainGUI.getString("SignLine2"));
+                                                        s.setLine(2, MainGUI.getString("SignLine3Closed"));
+                                                        s.setLine(3, MainGUI.getString("SignLine4"));
 
-                                                            s.update();
+                                                        s.update();
 
                                                             if (Core.isAboveEight() && Config.useTitles()) {
 

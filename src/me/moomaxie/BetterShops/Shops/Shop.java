@@ -96,6 +96,8 @@ public class Shop {
 
                                             this.file = f;
 
+                                            loadTransactions();
+
                                             break;
                                         }
                                     }
@@ -153,6 +155,8 @@ public class Shop {
                                             this.config = config;
 
                                             this.file = f;
+
+                                            loadTransactions();
 
                                             break;
                                         }
@@ -544,15 +548,17 @@ public class Shop {
 
             }
 
-            try {
-                config.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
 
         } else {
             config.getConfigurationSection(name).createSection("Transactions");
 
+        }
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         transLoaded = true;

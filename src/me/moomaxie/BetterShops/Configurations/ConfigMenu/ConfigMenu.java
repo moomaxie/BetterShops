@@ -175,7 +175,7 @@ public class ConfigMenu {
             allowChest = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
             allowChestMeta.setDisplayName("§eUse Chests §7- §cFalse");
         }
-        allowChestMeta.setLore(Arrays.asList("§7Allow use of chests by Shop Owners", "§e§lClick §7to toggle"));
+        allowChestMeta.setLore(Arrays.asList("§7Allow use of chests by Shop Owners", "&","§7Using double chests for shops" , "§e§lClick §7to toggle"));
         allowChest.setItemMeta(allowChestMeta);
 
         inv.setItem(10, general);

@@ -1,8 +1,12 @@
 package me.moomaxie.BetterShops.Configurations.GUIMessages;
 
 import me.moomaxie.BetterShops.Configurations.Messages;
+import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -67,7 +71,7 @@ public class LanguageInventory implements Listener {
 
         inv.setItem(4, it);
 
-        inv.setItem(0,back);
+        inv.setItem(0, back);
 
         if (page > 1) {
             inv.setItem(1, barrow);
@@ -99,6 +103,9 @@ public class LanguageInventory implements Listener {
         if (file.equals("History")) {
             config = History.config;
         }
+        if (file.equals("Messages")) {
+            config = Messages.config;
+        }
 
         if (config != null) {
             int maxPage = (int) Math.ceil((double) (config.getKeys(false).size() - 1) / 45);
@@ -117,7 +124,7 @@ public class LanguageInventory implements Listener {
 
             int k = array.length;
 
-            if (page != maxPage){
+            if (page != maxPage) {
                 k = k - (j + (array.length - 46));
             }
 
@@ -155,28 +162,28 @@ public class LanguageInventory implements Listener {
                     chat.put(m, title);
                     ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChatMessage());
                     e.getWhoClicked().closeInventory();
-                } else if (e.getCurrentItem().getType() == Material.ARROW){
-                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null){
-                        if (e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("NextPage"))){
+                } else if (e.getCurrentItem().getType() == Material.ARROW) {
+                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("NextPage"))) {
                             String file = e.getInventory().getItem(4).getItemMeta().getDisplayName();
                             List<String> lore = e.getInventory().getItem(4).getItemMeta().getLore();
                             int page = Integer.parseInt(lore.get(1).substring(10));
 
-                            openLanguageInventory(file.substring(2),(Player) e.getWhoClicked(),page + 1);
+                            openLanguageInventory(file.substring(2), (Player) e.getWhoClicked(), page + 1);
                         }
                     }
-                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null){
-                        if (e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("BackArrow"))){
+                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("BackArrow"))) {
                             GUIMessagesInv.openGUIMessagesInv((Player) e.getWhoClicked());
                         }
                     }
-                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null){
-                        if (e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("PreviousPage"))){
+                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                        if (e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("PreviousPage"))) {
                             String file = e.getInventory().getItem(4).getItemMeta().getDisplayName();
                             List<String> lore = e.getInventory().getItem(4).getItemMeta().getLore();
                             int page = Integer.parseInt(lore.get(1).substring(10));
 
-                            openLanguageInventory(file.substring(2),(Player) e.getWhoClicked(),page - 1);
+                            openLanguageInventory(file.substring(2), (Player) e.getWhoClicked(), page - 1);
                         }
                     }
                 }
@@ -218,7 +225,91 @@ public class LanguageInventory implements Listener {
                     if (file.equals("History")) {
                         History.setString(title, e.getMessage());
                     }
+                    if (file.equals("Messages")) {
+                        Messages.setString(title, e.getMessage());
+                    }
 
+                    if (title.equals("SignLine1")) {
+                        for (Shop shop : ShopLimits.getAllShops()) {
+                            Block b = shop.getLocation().getBlock();
+
+                            if (b.getRelative(1, 0, 0).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(1, 0, 0).getState();
+                                s.setLine(0, e.getMessage().replaceAll("&", "§"));
+                                s.update();
+                            }
+                            if (b.getRelative(-1, 0, 0).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(-1, 0, 0).getState();
+                                s.setLine(0, e.getMessage().replaceAll("&","§"));
+                                s.update();
+                            }
+                            if (b.getRelative(0, 0, 1).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(0, 0, 1).getState();
+                                s.setLine(0, e.getMessage().replaceAll("&","§"));
+                                s.update();
+                            }
+                            if (b.getRelative(0, 0, -1).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(0, 0, -1).getState();
+                                s.setLine(0, e.getMessage().replaceAll("&","§"));
+                                s.update();
+                            }
+                        }
+                    }
+
+                    if (title.equals("SignLine2")) {
+                        for (Shop shop : ShopLimits.getAllShops()) {
+                            Block b = shop.getLocation().getBlock();
+
+                            if (b.getRelative(1, 0, 0).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(1, 0, 0).getState();
+                                s.setLine(1, e.getMessage().replaceAll("&", "§"));
+                                s.update();
+                            }
+                            if (b.getRelative(-1, 0, 0).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(-1, 0, 0).getState();
+                                s.setLine(1, e.getMessage().replaceAll("&", "§"));
+                                s.update();
+                            }
+                            if (b.getRelative(0, 0, 1).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(0, 0, 1).getState();
+                                s.setLine(1, e.getMessage().replaceAll("&", "§"));
+                                s.update();
+                            }
+                            if (b.getRelative(0, 0, -1).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(0, 0, -1).getState();
+                                s.setLine(1, e.getMessage().replaceAll("&", "§"));
+                                s.update();
+                            }
+                        }
+                    }
+
+                    if (title.equals("SignLine4")) {
+                        for (Shop shop : ShopLimits.getAllShops()) {
+                            Block b = shop.getLocation().getBlock();
+
+                            if (b.getRelative(1, 0, 0).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(1, 0, 0).getState();
+                                s.setLine(3, e.getMessage().replaceAll("&", "§"));
+                                s.update();
+                            }
+                            if (b.getRelative(-1, 0, 0).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(-1, 0, 0).getState();
+                                s.setLine(3, e.getMessage().replaceAll("&","§"));
+                                s.update();
+
+                            }
+                            if (b.getRelative(0, 0, 1).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(0, 0, 1).getState();
+                                s.setLine(3, e.getMessage().replaceAll("&", "§"));
+                                s.update();
+                            }
+                            if (b.getRelative(0, 0, -1).getState() instanceof Sign) {
+                                Sign s = (Sign) b.getRelative(0, 0, -1).getState();
+                                s.setLine(3, e.getMessage().replaceAll("&","§"));
+                                s.update();
+                            }
+                        }
+                    }
 
                     chat.remove(map);
 

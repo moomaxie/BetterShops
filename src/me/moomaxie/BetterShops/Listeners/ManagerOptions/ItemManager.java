@@ -251,7 +251,7 @@ public class ItemManager implements Listener {
                                                         }
 
                                                         BigDecimal bd = new BigDecimal(amt);
-                                                        bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                                        bd = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
                                                         amt = bd.doubleValue();
 
                                                         if (can) {

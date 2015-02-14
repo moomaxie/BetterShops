@@ -8,7 +8,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 1.5.0 Beta 15
+Version: 1.5.0
 
 Prefix: '&b&lBetterShops &7&l» &d'
 
@@ -33,42 +33,42 @@ NotifySell: '&e<Player> &dSold an Item to you!'
 
 NotifyBuy: '&e<Player> &dBought an item from your shop!'
 
-ShopFull: 'The Shop is &cFull.'
+ShopFull: '&eThe Shop is &cFull.'
 
-AlreadyHave: 'You are already asking for this item!'
+AlreadyHave: '&cYou are already asking for this item!'
 
-InvalidItem: 'Cannot find an item that matches.'
+InvalidItem: '&cCannot find an item that matches.'
 
-ImproperSearch: 'You are not searching for that item.'
+ImproperSearch: '&cYou are not searching for that item.'
 
-ChangeStock: 'Changed Stock.'
+ChangeStock: '&aChanged Stock.'
 
-ChangeAmount: 'Changed Amount.'
+ChangeAmount: '&aChanged Amount.'
 
-ChangePrice: 'Changed Price.'
+ChangePrice: '&aChanged Price.'
 
-ChangeData: 'Changed Data.'
+ChangeData: '&aChanged Data.'
 
-LowStock: 'Stock is not high enough.'
+LowStock: '&cStock is not high enough.'
 
 # <Value> is the value of infinite stock (On/Off)
-InfiniteStock: 'Turned <Value> &dInfinite Stock.'
+InfiniteStock: '&dTurned &e<Value> &dInfinite Stock.'
 
-NotEnoughItems: 'Not enough items for that stock.'
+NotEnoughItems: '&cNot enough items for that stock.'
 
-DenyKeeper: 'Shop Keepers Cannot Withdraw Items!'
+DenyKeeper: '&cShop Keepers Cannot Withdraw Items!'
 
-InvalidNumber: 'Not a number.'
+InvalidNumber: '&cNot a number.'
 
-NoPermission: 'Not Enough Permissions.'
+NoPermission: '&cNot Enough Permissions.'
 
-ReceivedAmount: '&dYou have gained &d<Amount> &dDollars.'
+ReceivedAmount: '&dYou have gained &e<Amount> &dDollars.'
 
 TakenAmount: '&e<Amount> &dDollars has been taken from your account.'
 
-ServerShop: 'Turned <Value> &dServer Shop Mode.'
+ServerShop: '&dTurned &e<Value> &dServer Shop Mode.'
 
-NPCShop: 'Turned <Value> &dNPC Shop Mode.'
+NPCShop: '&dTurned &e<Value> &dNPC Shop Mode.'
 
 ChatMessage: '&aType a Name/Amount in your chat. Type &cCancel &ato cancel.'
 
