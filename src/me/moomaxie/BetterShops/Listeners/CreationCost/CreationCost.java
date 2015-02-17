@@ -24,10 +24,10 @@ public class CreationCost {
                 if (!Permissions.hasCostCreationPerm(p)) {
                     if (Core.getEconomy().getBalance(p) >= amt) {
                         Core.getEconomy().withdrawPlayer(p, amt);
-                        p.sendMessage(Messages.getPrefix() + Messages.getCreationCostAllow().replaceAll("<Amount>","" + amt));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CreationCostAllow").replaceAll("<Amount>","" + amt));
                         return true;
                     } else {
-                        p.sendMessage(Messages.getPrefix() + Messages.getCreationCostDeny().replaceAll("<Amount>","" + amt));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CreationCostDeny").replaceAll("<Amount>","" + amt));
                         return false;
                     }
                 } else {
@@ -37,10 +37,10 @@ public class CreationCost {
                 if (!p.isOp()) {
                     if (Core.getEconomy().getBalance(p) >= amt) {
                         Core.getEconomy().withdrawPlayer(p, amt);
-                        p.sendMessage(Messages.getPrefix() + Messages.getCreationCostAllow().replaceAll("<Amount>", "" + amt));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CreationCostAllow").replaceAll("<Amount>", "" + amt));
                         return true;
                     } else {
-                        p.sendMessage(Messages.getPrefix() + Messages.getCreationCostDeny().replaceAll("<Amount>", "" + amt));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CreationCostDeny").replaceAll("<Amount>", "" + amt));
                         return false;
                     }
                 } else {

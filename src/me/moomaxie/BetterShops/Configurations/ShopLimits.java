@@ -105,17 +105,18 @@ public class ShopLimits {
     public static Shop fromLocation(Location name){
         for (Shop shop : shops){
 
-            if (shop.getLocation().equals(name) || shop.getLocation().toString().equals(name.toString()) || shop.getLocation() == name){
-                return shop;
+            if (shop != null && name != null && shop.getLocation() != null) {
+                if (shop.getLocation().equals(name) || shop.getLocation().toString().equals(name.toString()) || shop.getLocation() == name) {
+                    return shop;
+                }
+
+                if ((int) shop.getLocation().getX() == (int) name.getX() && (int) shop.getLocation().getY() == (int) name.getY() && (int) shop.getLocation().getZ() == (int) name.getZ() && shop.getLocation().getWorld().getName().equals(name.getWorld().getName())
+                        || (int) shop.getLocation().getX() == (int) name.getX() && (int) shop.getLocation().getY() == (int) name.getY() && (int) shop.getLocation().getZ() == (int) name.getZ() && shop.getLocation().getWorld().equals(name.getWorld())) {
+                    shop.setLocation(name);
+
+                    return shop;
+                }
             }
-
-            if ((int)shop.getLocation().getX() == (int)name.getX() && (int)shop.getLocation().getY() == (int)name.getY() && (int)shop.getLocation().getZ() == (int)name.getZ() && shop.getLocation().getWorld().getName().equals(name.getWorld().getName())
-                    || (int)shop.getLocation().getX() == (int)name.getX() && (int)shop.getLocation().getY() == (int)name.getY() && (int)shop.getLocation().getZ() == (int)name.getZ() && shop.getLocation().getWorld().equals(name.getWorld())){
-                shop.setLocation(name);
-
-                return shop;
-            }
-
 
         }
         return null;

@@ -211,7 +211,7 @@ public class SellItem implements Listener {
 
                                 if (pr != shop.getPrice(item,true)){
                                     p.closeInventory();
-                                    p.sendMessage(Messages.getPrefix() + "§cThe price of this item has just been changed. You have exited the shop to avoid fraud.");
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("Fraud"));
 
                                     return;
                                 }
@@ -231,14 +231,14 @@ public class SellItem implements Listener {
 
                             if (shop.isNotify()) {
                                 if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getNotifySellItem().replaceAll("<Player>", p.getDisplayName()));
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + pr));
+                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
 
                                     if (Core.isAboveEight() && Config.useTitles()) {
 
                                             Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getNotifySellItem().replaceAll("<Player>", p.getDisplayName()));
-                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + pr));
+                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
 
 
                                     }
@@ -252,14 +252,14 @@ public class SellItem implements Listener {
 
                         OpenSellShop.openSellerShop(null, p, shop, 1);
 
-                        p.sendMessage(Messages.getPrefix() + Messages.getSellItem());
-                        p.sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + pr));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellItem"));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
 
                         if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 60, 20);
-                                Core.getTitleManager().sendTitle(p, Messages.getSellItem());
-                                Core.getTitleManager().sendSubTitle(p, Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + pr));
+                                Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
+                                Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
 
 
                                 p.closeInventory();
@@ -301,14 +301,14 @@ public class SellItem implements Listener {
 
                             if (shop.isNotify()) {
                                 if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getNotifySellItem().replaceAll("<Player>", p.getDisplayName()));
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + pr));
+                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
 
                                     if (Core.isAboveEight() && Config.useTitles()) {
 
                                             Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getNotifySellItem().replaceAll("<Player>", p.getDisplayName()));
-                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + pr));
+                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
 
 
                                     }
@@ -322,14 +322,14 @@ public class SellItem implements Listener {
 
                         OpenSellShop.openSellerShop(null, p, shop, 1);
 
-                        p.sendMessage(Messages.getPrefix() + Messages.getSellItem());
-                        p.sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + pr));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellItem"));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
 
                         if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 60, 20);
-                                Core.getTitleManager().sendTitle(p, Messages.getSellItem());
-                                Core.getTitleManager().sendSubTitle(p, Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + pr));
+                                Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
+                                Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
 
 
                                 p.closeInventory();

@@ -251,6 +251,7 @@ public class ShopRearranger implements Listener {
                                 ItemStack it = e.getInventory().getItem(3);
                                 if (it != null && it.getItemMeta().getDisplayName() != null) {
                                     String n = it.getItemMeta().getDisplayName();
+                                    arrange.remove(p.getUniqueId());
                                     if (n.contains(MainGUI.getString("ArrangeBuying"))) {
                                         if (shop.isServerShop()) {
                                             OpenShop.openShopItems(null, p, shop, 1);

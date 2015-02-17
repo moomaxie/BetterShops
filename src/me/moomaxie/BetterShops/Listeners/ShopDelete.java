@@ -80,7 +80,7 @@ public class ShopDelete implements Listener {
                                                     if (Config.useDeleteByBreak()) {
 
                                                         e.setCancelled(false);
-                                                        p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
+                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("DeleteShop"));
 
                                                         ShopDeleteEvent ev = new ShopDeleteEvent(shop);
                                                         Bukkit.getPluginManager().callEvent(ev);
@@ -89,7 +89,7 @@ public class ShopDelete implements Listener {
 
 
                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, Messages.getRemoveShop());
+                                                            Core.getTitleManager().sendTitle(p, Messages.getString("DeleteShop"));
 
 
                                                         }
@@ -119,38 +119,38 @@ public class ShopDelete implements Listener {
                                                         ShopLimits.loadShops();
                                                     } else {
                                                         e.setCancelled(true);
-                                                        p.sendMessage(Messages.getPrefix() + Messages.getDenyRemoveShop());
+                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
                                                         if (Core.isAboveEight() && Config.useTitles()) {
 
 
                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, Messages.getDenyRemoveShop());
+                                                            Core.getTitleManager().sendTitle(p, Messages.getString("DenyDeleteShop"));
 
 
                                                         }
                                                     }
                                                 } else {
                                                     e.setCancelled(true);
-                                                    p.sendMessage(Messages.getPrefix() + Messages.getDenyRemoveShop());
+                                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
                                                     if (Core.isAboveEight() && Config.useTitles()) {
 
 
                                                         Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                        Core.getTitleManager().sendTitle(p, Messages.getDenyRemoveShop());
+                                                        Core.getTitleManager().sendTitle(p, Messages.getString("DenyDeleteShop"));
 
 
                                                     }
                                                 }
                                                 break;
                                             } else {
-                                                p.sendMessage(Messages.getPrefix() + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted.");
+                                                p.sendMessage(Messages.getString("Prefix") + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted.");
                                             }
                                         }
                                     }
                                 }
                             } catch (NullPointerException ex) {
                                 ex.printStackTrace();
-                                p.sendMessage(Messages.getPrefix() + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted. Check the Console for more details.");
+                                p.sendMessage(Messages.getString("Prefix") + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted. Check the Console for more details.");
                             }
                         }
                     }
@@ -210,7 +210,7 @@ public class ShopDelete implements Listener {
                                                                         if (Config.useDeleteByBreak()) {
 
                                                                             e.setCancelled(false);
-                                                                            p.sendMessage(Messages.getPrefix() + Messages.getRemoveShop());
+                                                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("DeleteShop"));
 
                                                                             ShopDeleteEvent ev = new ShopDeleteEvent(shop);
                                                                             Bukkit.getPluginManager().callEvent(ev);
@@ -218,7 +218,7 @@ public class ShopDelete implements Listener {
                                                                             if (Core.isAboveEight() && Config.useTitles()) {
 
                                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                                                Core.getTitleManager().sendTitle(p, Messages.getRemoveShop());
+                                                                                Core.getTitleManager().sendTitle(p, Messages.getString("DeleteShop"));
 
 
                                                                             }
@@ -270,24 +270,24 @@ public class ShopDelete implements Listener {
                                                                             ShopLimits.loadShops();
                                                                         } else {
                                                                             e.setCancelled(true);
-                                                                            p.sendMessage(Messages.getPrefix() + Messages.getDenyRemoveShop());
+                                                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
                                                                             if (Core.isAboveEight() && Config.useTitles()) {
 
 
                                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                                                Core.getTitleManager().sendTitle(p, Messages.getDenyRemoveShop());
+                                                                                Core.getTitleManager().sendTitle(p, Messages.getString("DenyDeleteShop"));
 
 
                                                                             }
                                                                         }
                                                                     } else {
                                                                         e.setCancelled(true);
-                                                                        p.sendMessage(Messages.getPrefix() + Messages.getDenyRemoveShop());
+                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
                                                                         if (Core.isAboveEight() && Config.useTitles()) {
 
 
                                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                                            Core.getTitleManager().sendTitle(p, Messages.getDenyRemoveShop());
+                                                                            Core.getTitleManager().sendTitle(p, Messages.getString("DenyDeleteShop"));
 
 
                                                                         }
@@ -296,13 +296,13 @@ public class ShopDelete implements Listener {
                                                                     break;
                                                                 } else {
 
-                                                                    p.sendMessage(Messages.getPrefix() + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted.");
+                                                                    p.sendMessage(Messages.getString("Prefix") + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted.");
                                                                 }
                                                             }
                                                         }
                                                     } catch (NullPointerException ex) {
                                                         ex.printStackTrace();
-                                                        p.sendMessage(Messages.getPrefix() + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted. Check the Console for details.");
+                                                        p.sendMessage(Messages.getString("Prefix") + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted. Check the Console for details.");
                                                     }
                                                 }
                                             }

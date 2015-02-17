@@ -2,6 +2,7 @@ package me.moomaxie.BetterShops.Listeners.OwnerSellingOptions;
 
 import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
@@ -46,9 +47,6 @@ public class AddSellingItem implements Listener {
 
                 if (e.isLeftClick()) {
 
-                    if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains("§eStock:") && e.getCurrentItem().getItemMeta().getLore().contains("§eAmount:") && e.getCurrentItem().getItemMeta().getLore().contains("§ePrice:") && e.getCurrentItem().getItemMeta().getLore().contains("§e§lLeft Click §7to")) return;
-
-
                     if (p.getInventory().contains(ite)) {
                         if (p.getOpenInventory() != null && p.getOpenInventory().getTopInventory().getName().contains("§7[Shop]")) {
 
@@ -62,7 +60,7 @@ public class AddSellingItem implements Listener {
                             if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
 
 
-                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals("§e§lSelling")) {
+                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling"))) {
 
                                     ItemStack item = ite.clone();
 
@@ -102,14 +100,14 @@ public class AddSellingItem implements Listener {
                                                 p.getInventory().setItem(slot, new ItemStack(Material.AIR));
                                             }
 
-                                            p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
 
 
                                         } else {
-                                            p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                         }
                                     } else {
-                                        p.sendMessage(Messages.getPrefix() + Messages.getAlreadyAsk());
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                                     }
                                 }
                             }
@@ -188,15 +186,15 @@ public class AddSellingItem implements Listener {
 
                                                                         p.closeInventory();
 
-                                                                        p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
 
                                                                         can = true;
 
                                                                     } else {
-                                                                        p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                                                     }
                                                                 } else {
-                                                                    p.sendMessage(Messages.getPrefix() + Messages.getAlreadyAsk());
+                                                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                                                                 }
                                                             } else {
                                                                 can = true;
@@ -236,15 +234,15 @@ public class AddSellingItem implements Listener {
 
                                                                         p.closeInventory();
 
-                                                                        p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
 
                                                                         can = true;
 
                                                                     } else {
-                                                                        p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                                                     }
                                                                 } else {
-                                                                    p.sendMessage(Messages.getPrefix() + Messages.getAlreadyAsk());
+                                                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                                                                 }
                                                             } else {
                                                                 can = true;
@@ -281,15 +279,15 @@ public class AddSellingItem implements Listener {
 
                                                                                 p.closeInventory();
 
-                                                                                p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
 
                                                                                 can = true;
                                                                                 break;
                                                                             } else {
-                                                                                p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                                                             }
                                                                         } else {
-                                                                            p.sendMessage(Messages.getPrefix() + Messages.getAlreadyAsk());
+                                                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                                                                         }
                                                                     } else {
                                                                         can = true;
@@ -303,7 +301,7 @@ public class AddSellingItem implements Listener {
                                         }
 
                                         if (!can) {
-                                            p.sendMessage(Messages.getPrefix() + Messages.getInvalidItem());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidItem"));
                                         }
 
                                     } else {
@@ -328,7 +326,7 @@ public class AddSellingItem implements Listener {
                             map.put(shop, e.getInventory());
 
                             ChatMessages.addSellItem.put(p, map);
-                            p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                         }
                     }
                 }

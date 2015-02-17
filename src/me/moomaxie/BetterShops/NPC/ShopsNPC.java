@@ -44,7 +44,7 @@ public class ShopsNPC {
                 }
             }
 
-            entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation(),e);
+            entity = (LivingEntity) s.getLocation().getWorld().spawnEntity(s.getLocation().clone().add(.5,0,.5),e);
 
             entity.setCustomName("§a§l" + shop.getName());
             entity.setCustomNameVisible(true);
@@ -388,7 +388,7 @@ public class ShopsNPC {
     }
 
     public void spawn(){
-        if (!entity.isValid()){
+        if (!entity.isValid() && entity.isDead()){
             boolean c = false;
             try {
 
@@ -422,7 +422,7 @@ public class ShopsNPC {
 
     public void returnNPC(){
 
-        if (!entity.isValid()){
+        if (!entity.isValid() && entity.isDead()){
             spawn();
         } else {
             if (entity instanceof Monster){
@@ -432,7 +432,7 @@ public class ShopsNPC {
             entity.setFireTicks(0);
             entity.setFallDistance(0);
             entity.getEquipment().setItemInHand(null);
-            if (entity.getLocation().distance(l) > .75) {
+            if (entity.getLocation().distance(l.clone().add(.5,0,.5)) > .75) {
                 entity.teleport(l);
             }
         }

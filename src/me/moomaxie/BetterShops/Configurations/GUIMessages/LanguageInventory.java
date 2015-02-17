@@ -160,7 +160,7 @@ public class LanguageInventory implements Listener {
                     HashMap<UUID, String> m = new HashMap<>();
                     m.put(e.getWhoClicked().getUniqueId(), file.substring(2));
                     chat.put(m, title);
-                    ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                    ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                     e.getWhoClicked().closeInventory();
                 } else if (e.getCurrentItem().getType() == Material.ARROW) {
                     if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {

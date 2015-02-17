@@ -38,7 +38,7 @@ public class NPCMenu implements Listener{
         Inventory inv = Bukkit.createInventory(p,54,"§7[Shop] §a" + shop.getName());
 
         //Glass
-        org.bukkit.inventory.ItemStack glass = new org.bukkit.inventory.ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 7);
+        ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 7);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.setDisplayName(" ");
         glass.setItemMeta(glassMeta);
@@ -95,7 +95,7 @@ public class NPCMenu implements Listener{
                             p.closeInventory();
                             shop.setNPCShop(true);
                             shop.setOpen(true);
-                            p.sendMessage(Messages.getPrefix() + Messages.getNPCShop().replaceAll("<Value>", "§aOn"));
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("NPCShop").replaceAll("<Value>", "§aOn"));
                         } else {
                             ShopSettings.openShopManager(null,p,shop);
                         }

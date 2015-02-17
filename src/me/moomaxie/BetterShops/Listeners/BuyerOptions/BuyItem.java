@@ -58,13 +58,13 @@ public class BuyItem implements Listener {
                         if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("SellItem")) && !e.isShiftClick()) {
                             if (!shop.isOpen() && !Config.useWhenClosed()) {
                                 p.closeInventory();
-                                p.sendMessage(Messages.getPrefix() + "§cShop Closed");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                                 return;
                             }
                             if (Config.usePerms() && Permissions.hasSellPerm(p) || !Config.usePerms()) {
                                 SellItem.openSellScreen(null, p, shop, e.getCurrentItem());
                             } else {
-                                p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                             }
                         }
 
@@ -77,13 +77,13 @@ public class BuyItem implements Listener {
                                 if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("LeftClickToBuy")) && !e.isShiftClick()) {
                                     if (!shop.isOpen() && !Config.useWhenClosed()) {
                                         p.closeInventory();
-                                        p.sendMessage(Messages.getPrefix() + "§cShop Closed");
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                                         return;
                                     }
                                     if (Config.usePerms() && Permissions.hasBuyPerm(p) || !Config.usePerms()) {
                                         openBuyScreen(null, p, shop, e.getCurrentItem());
                                     } else {
-                                        p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                                     }
                                 }
                             }
@@ -91,13 +91,13 @@ public class BuyItem implements Listener {
                             if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("LeftClickToBuy")) && !e.isShiftClick()) {
                                 if (!shop.isOpen() && !Config.useWhenClosed()) {
                                     p.closeInventory();
-                                    p.sendMessage(Messages.getPrefix() + "§cShop Closed");
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                                     return;
                                 }
                                 if (Config.usePerms() && Permissions.hasBuyPerm(p) || !Config.usePerms()) {
                                     openBuyScreen(null, p, shop, e.getCurrentItem());
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                                 }
                             }
                         }
@@ -235,7 +235,7 @@ public class BuyItem implements Listener {
                     if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("BuyItem"))) {
                         if (!shop.isOpen() && !Config.useWhenClosed()) {
                             p.closeInventory();
-                            p.sendMessage(Messages.getPrefix() + "§cShop Closed");
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                             return;
                         }
                         ItemStack item = e.getInventory().getItem(4);
@@ -247,7 +247,7 @@ public class BuyItem implements Listener {
 
                                 if (pr != shop.getPrice(item,false)){
                                     p.closeInventory();
-                                    p.sendMessage(Messages.getPrefix() + "§cThe price of this item has just been changed. You have exited the shop to avoid fraud.");
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("Fraud"));
 
                                     return;
                                 }
@@ -281,21 +281,21 @@ public class BuyItem implements Listener {
 
                                 if (shop.isNotify()) {
                                     if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                        shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                        shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + price));
+                                        shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                        shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + price));
 
                                         if (Core.isAboveEight() && Config.useTitles()) {
 
                                             Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + price));
+                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + price));
 
 
                                         }
                                     }
                                 }
                             } else {
-                                p.sendMessage(Messages.getPrefix() + Messages.getLowStock());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("LowStock"));
                                 OpenShop.openShopItems(e.getInventory(), p, shop, 1);
                                 return;
                             }
@@ -318,16 +318,16 @@ public class BuyItem implements Listener {
 
                         OpenShop.openShopItems(null, p, shop, 1);
 
-                        p.sendMessage(Messages.getPrefix() + Messages.getBuyItem());
-                        p.sendMessage(Messages.getPrefix() + Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + price));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("BuyItem"));
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + price));
 
 
                         if (Core.isAboveEight() && Config.useTitles()) {
 
 
                             Core.getTitleManager().setTimes(p, 20, 60, 20);
-                            Core.getTitleManager().sendTitle(p, Messages.getBuyItem());
-                            Core.getTitleManager().sendSubTitle(p, Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + price));
+                            Core.getTitleManager().sendTitle(p, Messages.getString("BuyItem"));
+                            Core.getTitleManager().sendSubTitle(p, Messages.getString("TakenAmount").replaceAll("<Amount>", "" + price));
 
                             p.closeInventory();
 

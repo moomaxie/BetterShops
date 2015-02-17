@@ -144,15 +144,15 @@ public class ChatMessages implements Listener {
 
                                     p.closeInventory();
 
-                                    p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
 
                                     can = true;
 
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                 }
                             } else {
-                                p.sendMessage(Messages.getPrefix() + Messages.getAlreadyAsk());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                             }
                         } else {
                             can = true;
@@ -192,15 +192,15 @@ public class ChatMessages implements Listener {
 
                                     p.closeInventory();
 
-                                    p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
 
                                     can = true;
 
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                 }
                             } else {
-                                p.sendMessage(Messages.getPrefix() + Messages.getAlreadyAsk());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                             }
                         } else {
                             can = true;
@@ -237,15 +237,15 @@ public class ChatMessages implements Listener {
 
                                             p.closeInventory();
 
-                                            p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
 
                                             can = true;
                                             break;
                                         } else {
-                                            p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                         }
                                     } else {
-                                        p.sendMessage(Messages.getPrefix() + Messages.getAlreadyAsk());
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                                     }
                                 } else {
                                     can = true;
@@ -257,7 +257,7 @@ public class ChatMessages implements Listener {
 
 
                 if (!can) {
-                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidItem());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidItem"));
                 }
 
                 addSellItem.remove(p);
@@ -266,7 +266,7 @@ public class ChatMessages implements Listener {
             } else {
                 addSellItem.remove(p);
                 e.setCancelled(true);
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
         }
     }
@@ -324,7 +324,7 @@ public class ChatMessages implements Listener {
                         if (b.getType() == Material.WALL_SIGN) {
 
                             new AddShop(e.getPlayer(), finalChest, name);
-                            e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
+                            e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("CreateShop"));
 
                             shopCreate.remove(p);
                             shopCreate2.remove(p);
@@ -343,7 +343,7 @@ public class ChatMessages implements Listener {
                             if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                Core.getTitleManager().sendTitle(p, Messages.getCreateShop());
+                                Core.getTitleManager().sendTitle(p, Messages.getString("CreateShop"));
 
                             }
 
@@ -422,13 +422,12 @@ public class ChatMessages implements Listener {
                             shopCreate.remove(p);
                             shopCreate2.remove(p);
                             e.setCancelled(true);
-                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cThe sign has been removed. Please recreate the shop.");
+                            e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("SignRemoved"));
 
                             if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                Core.getTitleManager().sendTitle(p, "§cThe sign has been removed.");
-                                Core.getTitleManager().sendSubTitle(p, "§cPlease recreate the shop.");
+                                Core.getTitleManager().sendSubTitle(p, Messages.getString("SignRemoved"));
 
 
                             }
@@ -439,36 +438,36 @@ public class ChatMessages implements Listener {
                         shopCreate2.remove(p);
                         e.setCancelled(true);
                         if (Long) {
-                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 16 Characters)");
+                            e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("LongName"));
 
                             if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                Core.getTitleManager().sendTitle(p, "§cName Too Long");
+                                Core.getTitleManager().sendTitle(p, Messages.getString("LongName"));
 
 
                             }
                         }
 
                         if (!can) {
-                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
+                            e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NameTaken"));
 
                             if (Core.isAboveEight() && Config.useTitles()) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                Core.getTitleManager().sendTitle(p, "§cName Already Exists");
+                                Core.getTitleManager().sendTitle(p, Messages.getString("NameTaken"));
 
 
                             }
                         }
                     }
                 } else {
-                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cNot an acceptable name.");
+                    e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperName"));
 
                     if (Core.isAboveEight() && Config.useTitles()) {
 
                         Core.getTitleManager().setTimes(p, 20, 40, 20);
-                        Core.getTitleManager().sendTitle(p, "§cNot an acceptable name.");
+                        Core.getTitleManager().sendTitle(p, Messages.getString("ImproperName"));
 
 
                     }
@@ -477,7 +476,7 @@ public class ChatMessages implements Listener {
                 shopCreate.remove(p);
                 shopCreate2.remove(p);
                 e.setCancelled(true);
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
         }
     }
@@ -519,10 +518,10 @@ public class ChatMessages implements Listener {
                     }, 1L);
 
                 } else {
-                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             searchMaterial.remove(p);
             e.setCancelled(true);
@@ -561,10 +560,10 @@ public class ChatMessages implements Listener {
                     }, 1L);
 
                 } else {
-                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             searchID.remove(p);
             e.setCancelled(true);
@@ -603,10 +602,10 @@ public class ChatMessages implements Listener {
                     }, 1L);
 
                 } else {
-                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             searchPrice.remove(p);
             e.setCancelled(true);
@@ -643,11 +642,11 @@ public class ChatMessages implements Listener {
                     }, 1L);
 
                 } else {
-                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                 }
 
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             searchName.remove(p);
             e.setCancelled(true);
@@ -682,7 +681,7 @@ public class ChatMessages implements Listener {
                         Stocks.collectAll(ite, shop, p);
                         return;
                     } else {
-                        p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                         OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
                         return;
                     }
@@ -692,7 +691,7 @@ public class ChatMessages implements Listener {
 
 
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             collectStock.remove(p);
             e.setCancelled(true);
@@ -729,7 +728,7 @@ public class ChatMessages implements Listener {
                         Stocks.addAll(ite, shop, p);
                         return;
                     } else {
-                        p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                         OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
                         return;
                     }
@@ -739,7 +738,7 @@ public class ChatMessages implements Listener {
 
 
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             addStock.remove(p);
             e.setCancelled(true);
@@ -777,7 +776,7 @@ public class ChatMessages implements Listener {
                         Stocks.removeAll(ite, shop, p);
                         return;
                     } else {
-                        p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                         OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
                         return;
                     }
@@ -787,7 +786,7 @@ public class ChatMessages implements Listener {
 
 
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             removeStock.remove(p);
             e.setCancelled(true);
@@ -820,7 +819,7 @@ public class ChatMessages implements Listener {
                     amt = Double.parseDouble(name);
                     can = true;
                 } catch (Exception ex) {
-                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                     can = false;
                 }
 
@@ -829,21 +828,21 @@ public class ChatMessages implements Listener {
                         if (amt <= Config.getMaxPrice()) {
                             assert shop != null;
                             shop.setPrice(ite, amt, false);
-                            p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangePrice"));
                         } else {
                             if (String.valueOf(Config.getMaxPrice()).contains("E")) {
-                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPriceAsString() + ")");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighPrice") + " §7(Max: " + Config.getMaxPriceAsString() + ")");
                             } else {
-                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPrice() + ")");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighPrice") + " §7(Max: " + Config.getMaxPrice() + ")");
                             }
                         }
                     } else {
-                        p.sendMessage(Messages.getPrefix() + "§cMust be greater than 0");
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
                     }
                 }
                 OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             setBuyPrice.remove(p);
             e.setCancelled(true);
@@ -875,7 +874,7 @@ public class ChatMessages implements Listener {
                     amt = Double.parseDouble(name);
                     can = true;
                 } catch (Exception ex) {
-                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                     can = false;
                 }
 
@@ -884,22 +883,22 @@ public class ChatMessages implements Listener {
                         if (amt <= Config.getMaxPrice()) {
                             assert shop != null;
                             shop.setPrice(ite, amt, true);
-                            p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangePrice"));
                         } else {
                             if (String.valueOf(Config.getMaxPrice()).contains("E")) {
-                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPriceAsString() + ")");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighPrice") + " §7(Max: " + Config.getMaxPriceAsString() + ")");
                             } else {
-                                p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPrice() + ")");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighPrice") + " §7(Max: " + Config.getMaxPrice() + ")");
                             }
                         }
                     } else {
-                        p.sendMessage(Messages.getPrefix() + "§cMust be greater than 0");
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
                     }
                 }
 
                 OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             setSellPrice.remove(p);
             e.setCancelled(true);
@@ -930,7 +929,7 @@ public class ChatMessages implements Listener {
                     amt = Integer.parseInt(name);
                     can = true;
                 } catch (Exception ex) {
-                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                     can = false;
                 }
 
@@ -938,14 +937,14 @@ public class ChatMessages implements Listener {
                     if (amt > 0 && amt <= 2304) {
                         assert shop != null;
                         shop.setAmount(ite, amt, false);
-                        p.sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeAmount"));
                     } else {
-                        p.sendMessage(Messages.getPrefix() + "§cMust be between 0 and 2034");
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighAmount"));
                     }
                 }
                 OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             setBuyAmount.remove(p);
             e.setCancelled(true);
@@ -976,7 +975,7 @@ public class ChatMessages implements Listener {
                     amt = Integer.parseInt(name);
                     can = true;
                 } catch (Exception ex) {
-                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                     can = false;
                 }
 
@@ -984,15 +983,15 @@ public class ChatMessages implements Listener {
                     if (amt > 0 && amt <= 2304) {
                         assert shop != null;
                         shop.setAmount(ite, amt, true);
-                        p.sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeAmount"));
                     } else {
-                        p.sendMessage(Messages.getPrefix() + "§cMust be between 0 and 2034");
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighAmount"));
                     }
                 }
 
                 OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             setSellAmount.remove(p);
             e.setCancelled(true);
@@ -1024,7 +1023,7 @@ public class ChatMessages implements Listener {
                     amt = Integer.parseInt(name);
                     can = true;
                 } catch (Exception ex) {
-                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                     can = false;
                 }
 
@@ -1047,12 +1046,12 @@ public class ChatMessages implements Listener {
                     shop.setAmount(it, am, true);
                     shop.setPrice(it, price, true);
 
-                    p.sendMessage(Messages.getPrefix() + Messages.getChangeData());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeData"));
 
                 }
                 OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             e.setCancelled(true);
             changeData.remove(p);
@@ -1074,29 +1073,29 @@ public class ChatMessages implements Listener {
 
                         shop.setDescription(name);
 
-                        p.sendMessage(Messages.getPrefix() + "Changed Shop Description!");
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeDescription"));
                         p.closeInventory();
                         ShopSettings.openShopManager(null, p, shop);
                     } else {
-                        p.sendMessage(Messages.getPrefix() + "§cThat description is too long. §7(Max: 26 Characters)");
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("LongDescription"));
                         p.closeInventory();
                         ShopSettings.openShopManager(null, p, shop);
                     }
                 } else {
-                    p.sendMessage(Messages.getPrefix() + "§cNot an acceptable description.");
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperDescription"));
 
                     if (Core.isAboveEight() && Config.useTitles()) {
 
                         p.closeInventory();
                         Core.getTitleManager().setTimes(p, 20, 40, 20);
-                        Core.getTitleManager().sendSubTitle(p, "§cNot an acceptable description.");
+                        Core.getTitleManager().sendSubTitle(p, Messages.getString("ImproperDescription"));
 
 
                     }
                     e.setCancelled(true);
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             description.remove(p);
             e.setCancelled(true);
@@ -1118,14 +1117,14 @@ public class ChatMessages implements Listener {
                 if (player.hasPlayedBefore()) {
 
                     shop.addManager(player);
-                    p.sendMessage(Messages.getPrefix() + "Added shop keeper");
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddedKeeper"));
                     ShopKeeperManager.openKeeperManager(p, shop);
                 } else {
-                    p.sendMessage(Messages.getPrefix() + "§cNot a valid player or this player has not logged on to this server before.");
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidKeeper"));
                     ShopKeeperManager.openKeeperManager(p, shop);
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             addKeeper.remove(p);
             e.setCancelled(true);
@@ -1147,13 +1146,13 @@ public class ChatMessages implements Listener {
                 if (shop.getManagers().contains(player) && player.hasPlayedBefore()) {
 
                     shop.removeManager(player);
-                    p.sendMessage(Messages.getPrefix() + "Removed shop keeper");
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("RemovedKeeper"));
                 } else {
-                    p.sendMessage(Messages.getPrefix() + "§cNot A Valid Keeper");
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidKeeper"));
                 }
                 ShopKeeperManager.openKeeperManager(p, shop);
             } else {
-                p.sendMessage(Messages.getPrefix() + "§cCanceled");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             removeKeeper.remove(p);
             e.setCancelled(true);

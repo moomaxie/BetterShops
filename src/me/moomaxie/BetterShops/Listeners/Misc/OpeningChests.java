@@ -52,7 +52,7 @@ public class OpeningChests implements Listener {
                     } else {
 
                         e.setCancelled(true);
-                        p.sendMessage(Messages.getPrefix() + "§cCannot place a chest next to a shop.");
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotPlace"));
 
                         Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                             @Override
@@ -113,7 +113,7 @@ public class OpeningChests implements Listener {
                             if (shop.isOpen()) {
                                 OpenShop.openShopItems(null, p, shop, 1);
                             } else {
-                                p.sendMessage(Messages.getPrefix() + "Shop is §cClosed");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                             }
                         }
                     }
@@ -147,7 +147,7 @@ public class OpeningChests implements Listener {
                                                 OpenShop.openShopItems(null, p, shop, 1);
                                             }
                                         }
-                                        p.sendMessage(Messages.getPrefix() + Messages.getOpenShopMessage());
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("OpenShop"));
                                     } else if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) || shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
                                         if (shop.getShopContents(false).size() >= shop.getShopContents(true).size()) {
                                             OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
@@ -161,7 +161,7 @@ public class OpeningChests implements Listener {
                                     }
                                 } else {
                                     if (!shop.getOwner().getUniqueId().equals(p.getUniqueId()) || !shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
-                                        p.sendMessage(Messages.getPrefix() + "Shop Is §cClosed");
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                                     } else {
                                         if (!shop.isServerShop()) {
                                             if (shop.getShopContents(false).size() >= shop.getShopContents(true).size()) {
@@ -187,7 +187,7 @@ public class OpeningChests implements Listener {
                                     }
                                 }
                             } else {
-                                p.sendMessage(Messages.getPrefix() + "§cThis Shop has no Owner!");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoOwner"));
                             }
                         }
                     }

@@ -79,10 +79,10 @@ public class OpenNPCShop implements Listener {
                                                 OpenShop.openShopItems(null, p, npc.getShop(), 1);
                                             }
                                         }
-                                        p.sendMessage(Messages.getPrefix() + Messages.getOpenShopMessage());
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("OpenShop"));
                                     } else {
                                         e.setCancelled(true);
-                                        p.sendMessage(Messages.getPrefix() + "Shop Is §cClosed");
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                                     }
                                 }
 

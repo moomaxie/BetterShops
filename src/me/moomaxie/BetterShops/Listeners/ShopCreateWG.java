@@ -82,7 +82,7 @@ public class ShopCreateWG implements Listener {
 
                     if (e.getBlock().getType() == Material.WALL_SIGN) {
 
-                        org.bukkit.block.Sign sign = (org.bukkit.block.Sign) e.getBlock().getState();
+                        Sign sign = (Sign) e.getBlock().getState();
 
                         Block face = e.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
@@ -93,7 +93,7 @@ public class ShopCreateWG implements Listener {
                             }
 
                         } else {
-                            p.sendMessage(Messages.getPrefix() + "§cMust be attached to a chest!");
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("MustBeAttached"));
                             e.setLine(0, " ");
                             e.setLine(1, " ");
                             e.setLine(2, " ");
@@ -106,7 +106,7 @@ public class ShopCreateWG implements Listener {
                         return;
                     }
                 } else {
-                    p.sendMessage(Messages.getPrefix() + Messages.getWorldGuardDenyShop());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("WorldGuardDenyShop"));
                     return;
                 }
 
@@ -159,7 +159,7 @@ public class ShopCreateWG implements Listener {
                                                     if (CreationCost.useCost(p)) {
 
                                                             new AddShop(e.getPlayer(), finalChest, name);
-                                                            e.getPlayer().sendMessage(Messages.getPrefix() + Messages.getCreateShop());
+                                                            e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("CreateShop"));
 
                                                         e.setLine(0, MainGUI.getString("SignLine1"));
                                                         e.setLine(1, MainGUI.getString("SignLine2"));
@@ -179,7 +179,7 @@ public class ShopCreateWG implements Listener {
 
 
                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                                Core.getTitleManager().sendTitle(p, Messages.getCreateShop());
+                                                                Core.getTitleManager().sendTitle(p, Messages.getString("CreateShop"));
 
 
                                                             }
@@ -263,7 +263,7 @@ public class ShopCreateWG implements Listener {
                                                     }
                                                 } else {
                                                     if (Long) {
-                                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cThat Shop Name Is Too long! §7(Max: 16 Characters)");
+                                                        e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("LongName"));
                                                         e.setLine(0, " ");
                                                         e.setLine(1, " ");
                                                         e.setLine(2, " ");
@@ -271,13 +271,13 @@ public class ShopCreateWG implements Listener {
                                                         if (Core.isAboveEight() && Config.useTitles()) {
 
                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, "§cName Too Long");
+                                                            Core.getTitleManager().sendTitle(p, Messages.getString("LongName"));
 
                                                         }
                                                     }
 
                                                     if (!can) {
-                                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop with that name already exists!");
+                                                        e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NameTaken"));
                                                         e.setLine(0, " ");
                                                         e.setLine(1, " ");
                                                         e.setLine(2, " ");
@@ -286,13 +286,13 @@ public class ShopCreateWG implements Listener {
 
 
                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, "§cName Already Exists");
+                                                            Core.getTitleManager().sendTitle(p, Messages.getString("NameTaken"));
 
                                                         }
                                                     }
                                                 }
                                             } else {
-                                                e.getPlayer().sendMessage(Messages.getPrefix() + "§cNot an acceptable name.");
+                                                e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperName"));
                                                 e.setLine(0, " ");
                                                 e.setLine(1, " ");
                                                 e.setLine(2, " ");
@@ -301,7 +301,7 @@ public class ShopCreateWG implements Listener {
 
 
                                                     Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                    Core.getTitleManager().sendSubTitle(p, "§cNot an acceptable name.");
+                                                    Core.getTitleManager().sendSubTitle(p, Messages.getString("ImproperName"));
 
 
                                                 }
@@ -309,7 +309,7 @@ public class ShopCreateWG implements Listener {
                                             }
 
                                         } else {
-                                            e.getPlayer().sendMessage(Messages.getPrefix() + "§cPlease type a name.");
+                                            e.getPlayer().sendMessage(Messages.getString("Prefix") + "§cPlease type a name.");
                                             e.setLine(0, " ");
                                             e.setLine(1, " ");
                                             e.setLine(2, " ");
@@ -325,7 +325,7 @@ public class ShopCreateWG implements Listener {
                                             e.setCancelled(true);
                                         }
                                     } else {
-                                        e.getPlayer().sendMessage(Messages.getPrefix() + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
+                                        e.getPlayer().sendMessage(Messages.getString("Prefix") + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
                                         e.setLine(0, " ");
                                         e.setLine(1, " ");
                                         e.setLine(2, " ");
@@ -334,7 +334,7 @@ public class ShopCreateWG implements Listener {
 
 
                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                            Core.getTitleManager().sendTitle(p, "§4Error");
+                                            Core.getTitleManager().sendTitle(p, Messages.getString("Error"));
                                             Core.getTitleManager().sendSubTitle(p, "§cMalfunction with Shop Name Creating, is the plugin updated?");
 
 
@@ -342,7 +342,7 @@ public class ShopCreateWG implements Listener {
                                         e.setCancelled(true);
                                     }
                                 } else {
-                                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cShop creation cancelled");
+                                    e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("CreationCancelled"));
                                     e.setLine(0, " ");
                                     e.setLine(1, " ");
                                     e.setLine(2, " ");
@@ -350,7 +350,7 @@ public class ShopCreateWG implements Listener {
                                     if (Core.isAboveEight() && Config.useTitles()) {
 
                                         Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                        Core.getTitleManager().sendTitle(p, "§cShop creation cancelled");
+                                        Core.getTitleManager().sendTitle(p, Messages.getString("CreationCancelled"));
 
                                     }
                                 }
@@ -372,11 +372,11 @@ public class ShopCreateWG implements Listener {
                 } else {
                     ChatMessages.shopCreate.put(p, finalChest);
                     ChatMessages.shopCreate2.put(p, e.getBlock());
-                    p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
 
                 }
                 } else {
-                    e.getPlayer().sendMessage(Messages.getPrefix() + "§cA shop at this chest's location already exists");
+                    e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("LocationTaken"));
                     e.setLine(0, " ");
                     e.setLine(1, " ");
                     e.setLine(2, " ");
@@ -384,13 +384,13 @@ public class ShopCreateWG implements Listener {
                     if (Core.isAboveEight() && Config.useTitles()) {
 
                         Core.getTitleManager().setTimes(p, 20, 40, 20);
-                        Core.getTitleManager().sendSubTitle(p, "§cSorry");
-                        Core.getTitleManager().sendSubTitle(p, "§cA shop at this chest's location already exists");
+                        Core.getTitleManager().sendSubTitle(p, Messages.getString("Sorry"));
+                        Core.getTitleManager().sendSubTitle(p, Messages.getString("LocationTaken"));
 
                     }
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                 e.setLine(0, " ");
                 e.setLine(1, " ");
                 e.setLine(2, " ");
@@ -399,7 +399,7 @@ public class ShopCreateWG implements Listener {
 
 
                     Core.getTitleManager().setTimes(p, 20, 40, 20);
-                    Core.getTitleManager().sendTitle(p, Messages.getNoPermission());
+                    Core.getTitleManager().sendTitle(p, Messages.getString("NoPermission"));
 
 
                 }

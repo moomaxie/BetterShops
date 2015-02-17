@@ -255,7 +255,7 @@ public class CheckoutMenu implements Listener {
                         if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().contains(Checkout.getString("BuyItems"))) {
                             if (!shop.isOpen() && !Config.useWhenClosed()) {
                                 p.closeInventory();
-                                p.sendMessage(Messages.getPrefix() + "§cShop Closed");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
                                 return;
                             }
 
@@ -282,9 +282,9 @@ public class CheckoutMenu implements Listener {
                                     if (bd.doubleValue() != shop.getPrice(item,false)) {
                                         p.closeInventory();
                                         if (item.getItemMeta().getDisplayName() != null) {
-                                            p.sendMessage(Messages.getPrefix() + "§cThe price of " + item.getItemMeta().getDisplayName() + " has just been changed. You have exited the shop to avoid fraud.");
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("PriceChange").replaceAll("<Item>", item.getItemMeta().getDisplayName()));
                                         } else {
-                                            p.sendMessage(Messages.getPrefix() + "§cThe price of " + WordsCapitalizer.capitalizeEveryWord(item.getType().name().replaceAll("_", " ")) + " has just been changed. You have exited the shop to avoid fraud.");
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("PriceChange").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(item.getType().name().replaceAll("_", " "))));
                                         }
 
                                         return;
@@ -446,14 +446,14 @@ public class CheckoutMenu implements Listener {
 
                                         if (shop.isNotify()) {
                                             if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                                shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
                                                 if (Core.isAboveEight() && Config.useTitles()) {
 
                                                     Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                                    Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                    Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                    Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                    Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
 
                                                 }
@@ -477,9 +477,9 @@ public class CheckoutMenu implements Listener {
 
                                 } else {
                                     if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                        p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + ite.getItemMeta().getDisplayName());
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + ite.getItemMeta().getDisplayName());
                                     } else {
-                                        p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                     }
                                     p.closeInventory();
                                     return;
@@ -497,14 +497,14 @@ public class CheckoutMenu implements Listener {
                                             value = bd.doubleValue();
                                             if (shop.isNotify()) {
                                                 if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                    shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
                                                     if (Core.isAboveEight() && Config.useTitles()) {
 
                                                         Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                                        Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getNotifyBuyItem().replaceAll("<Player>", p.getDisplayName()));
-                                                        Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getGainedAmountMessage().replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                        Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                        Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
 
                                                     }
@@ -524,9 +524,9 @@ public class CheckoutMenu implements Listener {
 
                                         if (!shop.isInfinite(ite, false)) {
                                             if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                                p.sendMessage(Messages.getPrefix() + "§cCan only buy §e" + shop.getStock(ite, false) + " §cof §d" + ite.getItemMeta().getDisplayName());
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CanOnlyBuy") + shop.getStock(ite, false) + " §cof §d" + ite.getItemMeta().getDisplayName());
                                             } else {
-                                                p.sendMessage(Messages.getPrefix() + "§cCan only buy §e" + shop.getStock(ite, false) + " §cof §d" + ite.getType().name().replaceAll("_", " "));
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CanOnlyBuy") + shop.getStock(ite, false) + " §cof §d" + ite.getType().name().replaceAll("_", " "));
                                             }
                                         }
 
@@ -544,9 +544,9 @@ public class CheckoutMenu implements Listener {
 
                                     } else {
                                         if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                            p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + ite.getItemMeta().getDisplayName());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + ite.getItemMeta().getDisplayName());
                                         } else {
-                                            p.sendMessage(Messages.getPrefix() + "§cCould Not Afford §d" + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                         }
                                         p.closeInventory();
                                         return;
@@ -554,9 +554,9 @@ public class CheckoutMenu implements Listener {
                                 } else {
 
                                     if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                        p.sendMessage(Messages.getPrefix() + "§cRan out of stock for §d" + ite.getItemMeta().getDisplayName());
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock") + ite.getItemMeta().getDisplayName());
                                     } else {
-                                        p.sendMessage(Messages.getPrefix() + "§cRan out of stock for §d" + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                     }
                                     p.closeInventory();
                                     return;
@@ -567,8 +567,8 @@ public class CheckoutMenu implements Listener {
                 }
             }
         }
-        p.sendMessage(Messages.getPrefix() + Messages.getBuyItem());
-        p.sendMessage(Messages.getPrefix() + Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + t));
+        p.sendMessage(Messages.getString("Prefix") + Messages.getString("BuyItem"));
+        p.sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + t));
 
 
         if (Core.isAboveEight() && Config.useTitles()) {
@@ -576,8 +576,8 @@ public class CheckoutMenu implements Listener {
             p.closeInventory();
 
             Core.getTitleManager().setTimes(p, 20, 60, 20);
-            Core.getTitleManager().sendTitle(p, Messages.getBuyItem());
-            Core.getTitleManager().sendSubTitle(p, Messages.getTakenAmountMessage().replaceAll("<Amount>", "" + t));
+            Core.getTitleManager().sendTitle(p, Messages.getString("BuyItem"));
+            Core.getTitleManager().sendSubTitle(p, Messages.getString("TakenAmount").replaceAll("<Amount>", "" + t));
 
             p.closeInventory();
 

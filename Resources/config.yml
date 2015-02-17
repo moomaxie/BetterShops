@@ -6,7 +6,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 1.5.0
+Version: 1.5.3
 
 ####  General  ####
 
@@ -71,21 +71,23 @@ NPC:
   Cave Spider: true
   Chicken: true
   Cow: true
+  Endermite: true
   Horse: true
   Iron Golem: true
   Magma Cube: true
   Mushroom Cow: true
   Ocelot: true
   Pig Zombie: true
+  Rabbit: true
   Sheep: true
   Silverfish: true
   Skeleton: true
   Slime: true
   Snowman: true
   Spider: true
+  Squid: true
   Wolf: true
   Zombie: true
-
 
 ####  World Guard  ####
 

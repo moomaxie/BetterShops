@@ -42,10 +42,10 @@ public class Stocks {
                     collectAll(ite,shop,p);
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + "Must be greater than §c0");
+                p.sendMessage(Messages.getString("Prefix") + "Must be greater than §c0");
             }
         } else {
-            p.sendMessage(Messages.getPrefix() + Messages.getDenyKeeper());
+            p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyKeeper"));
         }
 
 
@@ -80,7 +80,7 @@ public class Stocks {
 
 
         shop.setStock(ite, shop.getStock(ite, false) + amt, false);
-        p.sendMessage(Messages.getPrefix() + Messages.getChangeStock());
+        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
     public static void addStock(ItemStack ite, int orig, Player p, Shop shop) {
@@ -165,17 +165,17 @@ public class Stocks {
                 }
 
             } else {
-                p.sendMessage(Messages.getPrefix() + Messages.getNotEnoughItems());
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("NotEnoughItems"));
                 return;
             }
 
         } else {
-            p.sendMessage(Messages.getPrefix() + "Must be greater than §c0");
+            p.sendMessage(Messages.getString("Prefix") + "Must be greater than §c0");
             return;
         }
 
         shop.setStock(ite, shop.getStock(ite, false) + orig, false);
-        p.sendMessage(Messages.getPrefix() + Messages.getChangeStock());
+        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
     public static void removeStock(ItemStack ite, int orig, Player p, Shop shop){
@@ -208,19 +208,19 @@ public class Stocks {
                     }
 
                 } else {
-                    p.sendMessage(Messages.getPrefix() + Messages.getLowStock());
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("LowStock"));
                     return;
                 }
             } else {
-                p.sendMessage(Messages.getPrefix() + "Must be greater than §c0");
+                p.sendMessage(Messages.getString("Prefix") + "Must be greater than §c0");
                 return;
             }
         } else {
-            p.sendMessage(Messages.getPrefix() + Messages.getDenyKeeper());
+            p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyKeeper"));
             return;
         }
         shop.setStock(ite, shop.getStock(ite, false) - orig, false);
-        p.sendMessage(Messages.getPrefix() + Messages.getChangeStock());
+        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
     public static void removeAll(ItemStack ite, Shop shop, Player p) {
@@ -252,7 +252,7 @@ public class Stocks {
         shop.setStock(ite, 0, false);
 
 
-        p.sendMessage(Messages.getPrefix() + Messages.getChangeStock());
+        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
     public static void removeAllOfDeletedItem(ItemStack ite, Shop shop, Player p, boolean sell) {
@@ -310,7 +310,7 @@ public class Stocks {
         }
 
         shop.setStock(ite, 0, true);
-        p.sendMessage(Messages.getPrefix() + Messages.getChangeStock());
+        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
     public static int getNumberInInventory(ItemStack ite, Player p, Shop shop){

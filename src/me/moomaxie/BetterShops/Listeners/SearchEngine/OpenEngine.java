@@ -164,7 +164,7 @@ public class OpenEngine implements Listener {
                                     }, 1L);
 
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                                 }
                             }
                         }
@@ -219,7 +219,7 @@ public class OpenEngine implements Listener {
                                     }, 1L);
 
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                                 }
                             }
                         }
@@ -275,7 +275,7 @@ public class OpenEngine implements Listener {
                                     }, 1L);
 
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                                 }
                             }
                         }
@@ -331,7 +331,7 @@ public class OpenEngine implements Listener {
                                     }, 1L);
 
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getImproperSearch());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperSearch"));
                                 }
                             }
                         }

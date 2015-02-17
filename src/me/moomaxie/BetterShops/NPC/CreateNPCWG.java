@@ -33,7 +33,7 @@ public class CreateNPCWG {
 
             if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
 
-                shop.getOwner().getPlayer().sendMessage(Messages.getPrefix() + Messages.getWorldGuardDenyNPC());
+                shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("WorldGuardDenyNPC"));
                 shop.setNPCShop(false);
                 return false;
             }
@@ -107,7 +107,7 @@ public class CreateNPCWG {
         com.sk89q.worldguard.protection.ApplicableRegionSet set = Core.getRegionSet(l);
 
         for (com.sk89q.worldguard.protection.regions.ProtectedRegion r : set) {
-            r.setFlag(com.sk89q.worldguard.protection.flags.DefaultFlag.MOB_SPAWNING, com.sk89q.worldguard.protection.flags.StateFlag.State.ALLOW);
+            r.setFlag(DefaultFlag.MOB_SPAWNING, com.sk89q.worldguard.protection.flags.StateFlag.State.ALLOW);
         }
     }
 
@@ -115,7 +115,7 @@ public class CreateNPCWG {
         com.sk89q.worldguard.protection.ApplicableRegionSet set = Core.getRegionSet(l);
 
         for (com.sk89q.worldguard.protection.regions.ProtectedRegion r : set) {
-            r.setFlag(com.sk89q.worldguard.protection.flags.DefaultFlag.MOB_SPAWNING, com.sk89q.worldguard.protection.flags.StateFlag.State.DENY);
+            r.setFlag(DefaultFlag.MOB_SPAWNING, com.sk89q.worldguard.protection.flags.StateFlag.State.DENY);
         }
     }
 }

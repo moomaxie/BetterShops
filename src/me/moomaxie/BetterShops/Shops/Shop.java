@@ -618,7 +618,7 @@ public class Shop {
         if (alreadyBeingSold(item, sell)) {
 
             if (getOwner().isOnline()) {
-                getOwner().getPlayer().sendMessage(Messages.getPrefix() + "§aYou can add more of an item by going into the item settings!");
+                getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("AddMore"));
             }
 
             int amt1 = item.getAmount();
@@ -705,7 +705,7 @@ public class Shop {
             if (alreadyBeingSold(item, sell)) {
 
                 if (getOwner().isOnline()) {
-                    getOwner().getPlayer().sendMessage(Messages.getPrefix() + "§aYou can add more of an item by going into the item settings!");
+                    getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("AddMore"));
                 }
 
                 int amt1 = item.getAmount();

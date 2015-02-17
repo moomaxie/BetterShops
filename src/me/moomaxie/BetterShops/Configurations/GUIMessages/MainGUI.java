@@ -73,7 +73,7 @@ public class MainGUI {
             while (enumEntries.hasMoreElements()) {
                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                 if (file.getName().equals("Language/MainGUI.yml")) {
-                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
+                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
                     try {
                         MainGUI.file.createNewFile();
                     } catch (IOException e) {
@@ -136,7 +136,7 @@ public class MainGUI {
                             while (enumEntries.hasMoreElements()) {
                                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                                 if (file.getName().equals("Language/MainGUI.yml")) {
-                                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
+                                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
                                     try {
                                         MainGUI.file.createNewFile();
                                     } catch (IOException e) {
@@ -190,7 +190,7 @@ public class MainGUI {
                     while (enumEntries.hasMoreElements()) {
                         java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                         if (file.getName().equals("Language/MainGUI.yml")) {
-                            java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
+                            File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
                             try {
                                 MainGUI.file.createNewFile();
                             } catch (IOException e) {

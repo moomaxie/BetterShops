@@ -52,9 +52,8 @@ public class ShopKeeperManager implements Listener {
                     Shop shop = ShopLimits.fromString(p, name);
 
                     if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-                        if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals("§e§lShop Keeper Management")) {
+                        if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("ShopKeepersDisplayName"))) {
                             if (e.getAction() == InventoryAction.PICKUP_ALL) {
-                                ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Opening shop keeper settings");
                                 openKeeperManager(p, shop);
                             }
                         }
@@ -163,14 +162,14 @@ public class ShopKeeperManager implements Listener {
 
                                                         if (!shop.getManagers().contains(player)){
                                                             shop.addManager(player);
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Added shop keeper");
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("AddedKeeper"));
                                                             openKeeperManager((Player) e.getWhoClicked(), shop);
                                                         } else {
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cAlready a shop keeper");
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + "§cAlready a shop keeper");
                                                             openKeeperManager((Player) e.getWhoClicked(), shop);
                                                         }
                                                     } else {
-                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cNot a valid player or this player has not logged on to this server before.");
+                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidKeeper"));
                                                         openKeeperManager((Player) e.getWhoClicked(), shop);
                                                     }
                                                 }
@@ -196,7 +195,7 @@ public class ShopKeeperManager implements Listener {
                         } else {
                             p.closeInventory();
                             ChatMessages.addKeeper.put(p, shop);
-                            p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                         }
                     } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(me.moomaxie.BetterShops.Configurations.GUIMessages.ShopKeeperManager.getString("RemoveKeeperDisplayName"))) {
                         if (Config.useAnvil()) {
@@ -218,10 +217,10 @@ public class ShopKeeperManager implements Listener {
                                                     if (shop.getManagers().contains(player) && player.hasPlayedBefore()) {
 
                                                         shop.removeManager(Bukkit.getOfflinePlayer(name));
-                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Removed shop keeper");
+                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("RemovedKeeper"));
                                                         openKeeperManager((Player) e.getWhoClicked(), shop);
                                                     } else {
-                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cNot A Valid Keeper");
+                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidKeeper"));
                                                     }
                                                 }
                                             }
@@ -245,14 +244,14 @@ public class ShopKeeperManager implements Listener {
                         } else {
                             p.closeInventory();
                             ChatMessages.removeKeeper.put(p, shop);
-                            p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                         }
                     } else if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(me.moomaxie.BetterShops.Configurations.GUIMessages.ShopKeeperManager.getString("ClickRemoveKeeper"))) {
 
                         if (e.getCurrentItem().getItemMeta().getDisplayName() != null){
                             String n = e.getCurrentItem().getItemMeta().getDisplayName().substring(2);
                             shop.removeManager(Bukkit.getOfflinePlayer(n));
-                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Removed shop keeper");
+                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("RemovedKeeper"));
                             openKeeperManager(p,shop);
                         }
                     }

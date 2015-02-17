@@ -159,7 +159,7 @@ public class ConfigMenuListener implements Listener{
                                         }
                                     }, 1L);
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
                                             ConfigMenu.openConfigMenu(null,p);
@@ -221,7 +221,7 @@ public class ConfigMenuListener implements Listener{
                                         }
                                     }, 1L);
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
                                             ConfigMenu.openConfigMenu(null,p);
@@ -283,7 +283,7 @@ public class ConfigMenuListener implements Listener{
                                         }
                                     }, 1L);
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
                                             ConfigMenu.openConfigMenu(null,p);
@@ -343,7 +343,7 @@ public class ConfigMenuListener implements Listener{
                                         }
                                     }, 1L);
                                 } else {
-                                    p.sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
                                             ConfigMenu.openConfigMenu(null,p);

@@ -182,7 +182,7 @@ public class HistoryGUI implements Listener {
                                 shop.getHistory().clearHistory();
                                 openHistoryGUI(p, shop, 1);
                             } else {
-                                p.sendMessage(Messages.getPrefix() + "§cPlease wait until more transactions occur in order to Clear History.");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ClearHistoryLimit"));
                             }
                         }
 

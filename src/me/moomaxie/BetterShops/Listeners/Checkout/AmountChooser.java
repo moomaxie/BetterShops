@@ -132,7 +132,7 @@ public class AmountChooser implements Listener {
                                         if (shop.getOwner() == p) {
                                             OpenShop.openShopItems(e.getInventory(), p, shop, 1);
                                         } else {
-                                            p.sendMessage(Messages.getPrefix() + "§cShop is closed.");
+                                            p.sendMessage(Messages.getString("Prefix") + "§cShop is closed.");
                                         }
                                     } else {
                                         OpenShop.openShopItems(e.getInventory(), p, shop, 1);
@@ -142,7 +142,7 @@ public class AmountChooser implements Listener {
                                 if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("Confirm"))) {
                                     CheckoutMenu.addToCart(p, shop, e.getInventory().getItem(4), total);
 
-                                    p.sendMessage(Messages.getPrefix() + "§eAdded Item to §aCart");
+                                    p.sendMessage(Messages.getString("Prefix") + "§eAdded Item to §aCart");
 
                                     OpenShop.openShopItems(e.getInventory(), p, shop, 1);
 
@@ -195,7 +195,7 @@ public class AmountChooser implements Listener {
                                                                                 openAmountChooser(shop.getStock(e.getInventory().getItem(4), false), e.getInventory().getItem(4), p, shop, null);
 
                                                                             } else {
-                                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                                                                 openAmountChooser(total, e.getInventory().getItem(4), p, shop, null);
 
                                                                             }

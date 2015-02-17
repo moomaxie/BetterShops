@@ -178,7 +178,7 @@ public class SellingItemManager implements Listener {
                                                             amt = Double.parseDouble(name);
                                                             can = true;
                                                         } catch (Exception ex) {
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                                             can = false;
                                                         }
 
@@ -190,16 +190,16 @@ public class SellingItemManager implements Listener {
                                                             if (amt > 0) {
                                                                 if (amt <= Config.getMaxPrice()) {
                                                                     shop.setPrice(ite, amt, true);
-                                                                    p.sendMessage(Messages.getPrefix() + Messages.getChangePrice());
+                                                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangePrice"));
                                                                 } else {
                                                                     if (String.valueOf(Config.getMaxPrice()).contains("E")) {
-                                                                        p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPriceAsString() + ")");
+                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighPrice") + " §7(Max: " + Config.getMaxPriceAsString() + ")");
                                                                     } else {
-                                                                        p.sendMessage(Messages.getPrefix() + "§cThat price is too high §7(Max: " + Config.getMaxPrice() + ")");
+                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighPrice") + " §7(Max: " + Config.getMaxPrice() + ")");
                                                                     }
                                                                 }
                                                             } else {
-                                                                p.sendMessage(Messages.getPrefix() + "§cMust be greater than 0");
+                                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
                                                             }
                                                         }
                                                         OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
@@ -228,7 +228,7 @@ public class SellingItemManager implements Listener {
                                 map.put(shop, ite);
 
                                 ChatMessages.setSellPrice.put(p, map);
-                                p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                             }
                         } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(ItemTexts.getString("ChangeAskingAmount"))) {
                             if (Config.useAnvil()) {
@@ -252,16 +252,16 @@ public class SellingItemManager implements Listener {
                                                             amt = Integer.parseInt(name);
                                                             can = true;
                                                         } catch (Exception ex) {
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                                             can = false;
                                                         }
 
                                                         if (can) {
                                                             if (amt > 0 && amt < 2304) {
                                                                 shop.setAmount(ite, amt, true);
-                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangeAmount());
+                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeAmount"));
                                                             } else {
-                                                                p.sendMessage(Messages.getPrefix() + "§cMust be between 0 and 2034");
+                                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighAmount"));
                                                             }
                                                         }
                                                         OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
@@ -290,7 +290,7 @@ public class SellingItemManager implements Listener {
                                 map.put(shop, ite);
 
                                 ChatMessages.setSellAmount.put(p, map);
-                                p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                             }
                         } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(ItemTexts.getString("CollectStockDisplayName"))) {
                             if (Config.useAnvil()) {
@@ -316,7 +316,7 @@ public class SellingItemManager implements Listener {
                                                                 Stocks.collectAll(ite, shop, p);
                                                                 return;
                                                             } else {
-                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                                                ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                                                 OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, 1);
                                                                 return;
                                                             }
@@ -353,7 +353,7 @@ public class SellingItemManager implements Listener {
                                 map.put(shop, ite);
 
                                 ChatMessages.collectStock.put(p, map);
-                                p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                             }
                         } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(ItemTexts.getString("SellRemoveItemDisplayName"))) {
 
@@ -372,14 +372,14 @@ public class SellingItemManager implements Listener {
                                     Stocks.removeAllOfDeletedItem(item, shop, p, true);
                                     shop.deleteItem(ite, true);
                                     OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
-                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getRemoveItem());
+                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("RemoveItem"));
                                 } else {
                                     shop.deleteItem(ite, true);
                                     OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
-                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getRemoveItem());
+                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("RemoveItem"));
                                 }
                             } else {
-                                p.sendMessage(Messages.getPrefix() + "§cNon-Existing Item");
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("NonExistingItem"));
                             }
 
                         } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(ItemTexts.getString("ItemDataDisplayName"))) {
@@ -404,7 +404,7 @@ public class SellingItemManager implements Listener {
                                                             amt = Integer.parseInt(name);
                                                             can = true;
                                                         } catch (Exception ex) {
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getInvalidNumber());
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                                             can = false;
                                                         }
 
@@ -426,7 +426,7 @@ public class SellingItemManager implements Listener {
                                                             shop.setAmount(it, am, true);
                                                             shop.setPrice(it, price, true);
 
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + Messages.getChangeData());
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeData"));
 
                                                         }
                                                         OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, 1);
@@ -455,7 +455,7 @@ public class SellingItemManager implements Listener {
                                 map.put(shop, ite);
 
                                 ChatMessages.changeData.put(p, map);
-                                p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                             }
                         }
                     }

@@ -29,7 +29,7 @@ public class NPCChooser implements Listener {
         Inventory inv = Bukkit.createInventory(p, 54, "§7[Shop] §dChoose NPCs");
 
         //Glass
-        org.bukkit.inventory.ItemStack glass = new org.bukkit.inventory.ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
+        ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.setDisplayName(" ");
         glass.setItemMeta(glassMeta);

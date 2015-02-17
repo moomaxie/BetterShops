@@ -1,5 +1,6 @@
 package me.moomaxie.BetterShops.Listeners.ManagerOptions;
 
+import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
@@ -36,7 +37,7 @@ public class AddItemManager implements Listener {
                 final Player p = (Player) e.getWhoClicked();
 
                 if (e.isLeftClick()) {
-                    if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains("§eStock:") && e.getCurrentItem().getItemMeta().getLore().contains("§eAmount:") && e.getCurrentItem().getItemMeta().getLore().contains("§ePrice:") && e.getCurrentItem().getItemMeta().getLore().contains("§e§lLeft Click §7to")) {
+                    if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("Stock")) && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("Amount")) && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("Price"))) {
                         return;
                     }
                     if (p.getInventory().contains(ite)) {
@@ -51,7 +52,7 @@ public class AddItemManager implements Listener {
 
                             if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
 
-                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals("§e§lBuying")) {
+                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Buying"))) {
 
                                     ItemStack item = ite.clone();
 
@@ -73,7 +74,7 @@ public class AddItemManager implements Listener {
                                             }
 
 
-                                            p.sendMessage(Messages.getPrefix() + Messages.getAddItem());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
                                             p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
 
@@ -94,7 +95,7 @@ public class AddItemManager implements Listener {
 
 
                                         } else {
-                                            p.sendMessage(Messages.getPrefix() + Messages.getShopFull());
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
                                         }
                                     } else {
                                         Stocks.addAll(item, shop, p);

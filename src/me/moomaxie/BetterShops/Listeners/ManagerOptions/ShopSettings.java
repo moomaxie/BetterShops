@@ -65,7 +65,7 @@ public class ShopSettings implements Listener {
                             if (e.getAction() == InventoryAction.PICKUP_ALL) {
                                 if (shop.isOpen()) {
                                     shop.setOpen(false);
-                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Your shop is now §cClosed");
+                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ShopOption").replaceAll("<Value>",MainGUI.getString("ShopInfoDisplayNameClosed")));
                                     if (!shop.isNPCShop()) {
 
 
@@ -85,10 +85,10 @@ public class ShopSettings implements Listener {
                                         }
 
                                         if (sign != null) {
-                                            if (sign.getLine(0).contains("§b§k********")) {
-                                                if (sign.getLine(3).contains("§b§k********")) {
-                                                    if (sign.getLine(1).contains("§aShop")) {
-                                                        sign.setLine(2, "§cClosed");
+                                            if (sign.getLine(0).contains(MainGUI.getString("SignLine1"))) {
+                                                if (sign.getLine(3).contains(MainGUI.getString("SignLine4"))) {
+                                                    if (sign.getLine(1).contains(MainGUI.getString("SignLine2"))) {
+                                                        sign.setLine(2, MainGUI.getString("SignLine3Closed"));
                                                         sign.update();
                                                     }
                                                 }
@@ -99,7 +99,7 @@ public class ShopSettings implements Listener {
 
                                 } else {
                                     shop.setOpen(true);
-                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Your shop is now §aOpen");
+                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ShopOption").replaceAll("<Value>",MainGUI.getString("ShopInfoDisplayNameOpen")));
 
                                     if (!shop.isNPCShop()) {
 
@@ -119,10 +119,10 @@ public class ShopSettings implements Listener {
                                         }
 
                                         if (sign != null) {
-                                            if (sign.getLine(0).contains("§b§k********")) {
-                                                if (sign.getLine(3).contains("§b§k********")) {
-                                                    if (sign.getLine(1).contains("§aShop")) {
-                                                        sign.setLine(2, "§aOpen");
+                                            if (sign.getLine(0).contains(MainGUI.getString("SignLine1"))) {
+                                                if (sign.getLine(3).contains(MainGUI.getString("SignLine4"))) {
+                                                    if (sign.getLine(1).contains(MainGUI.getString("SignLine2"))) {
+                                                        sign.setLine(2, MainGUI.getString("SignLine3Open"));
                                                         sign.update();
                                                     }
                                                 }
@@ -133,7 +133,6 @@ public class ShopSettings implements Listener {
 
                                 OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, 1);
                             } else if (e.getAction() == InventoryAction.PICKUP_HALF) {
-                                ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Opening shop settings");
                                 openShopManager(e.getInventory(), p, shop);
                             }
                         }
@@ -253,11 +252,9 @@ public class ShopSettings implements Listener {
                     if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(me.moomaxie.BetterShops.Configurations.GUIMessages.ShopSettings.getString("NotificationsLore"))) {
                         if (shop.isNotify()) {
                             shop.setNotification(false);
-                            p.sendMessage(Messages.getPrefix() + "Turned §cOff §dNotifications");
                             openShopManager(e.getInventory(), p, shop);
                         } else {
                             shop.setNotification(true);
-                            p.sendMessage(Messages.getPrefix() + "Turned §aOn §dNotifications");
                             openShopManager(e.getInventory(), p, shop);
                         }
                     } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(me.moomaxie.BetterShops.Configurations.GUIMessages.ShopSettings.getString("ChangeDescription"))) {
@@ -282,22 +279,22 @@ public class ShopSettings implements Listener {
 
                                                             shop.setDescription(name);
 
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "Changed Shop Description!");
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeDescription"));
                                                             e.getWhoClicked().closeInventory();
                                                             openShopManager(e.getInventory(), (Player) e.getWhoClicked(), shop);
                                                         } else {
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cThat description is too long. §7(Max: 26 Characters)");
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("LongDescription"));
                                                             e.getWhoClicked().closeInventory();
                                                             openShopManager(e.getInventory(), (Player) e.getWhoClicked(), shop);
                                                         }
                                                     } else {
-                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getPrefix() + "§cNot an acceptable description.");
+                                                        ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperDescription"));
 
                                                         if (Core.isAboveEight() && Config.useTitles()) {
 
                                                             e.getWhoClicked().closeInventory();
                                                             Core.getTitleManager().setTimes(((Player) e.getWhoClicked()), 20, 40, 20);
-                                                            Core.getTitleManager().sendSubTitle(((Player) e.getWhoClicked()), "§cNot an acceptable description.");
+                                                            Core.getTitleManager().sendSubTitle(((Player) e.getWhoClicked()), Messages.getString("ImproperDescription"));
 
 
                                                         }
@@ -325,7 +322,7 @@ public class ShopSettings implements Listener {
                         } else {
                             p.closeInventory();
                             ChatMessages.description.put(p, shop);
-                            p.sendMessage(Messages.getPrefix() + Messages.getChatMessage());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                         }
                     } else if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(me.moomaxie.BetterShops.Configurations.GUIMessages.ShopSettings.getString("ServerShopLore"))) {
                         boolean can = true;
@@ -337,11 +334,11 @@ public class ShopSettings implements Listener {
                         if (can) {
                             if (shop.isServerShop()) {
                                 shop.setServerShop(false);
-                                p.sendMessage(Messages.getPrefix() + Messages.getServerShop().replaceAll("<Value>", "§cOff"));
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ServerShop").replaceAll("<Value>", "§cOff"));
                                 openShopManager(e.getInventory(), p, shop);
                             } else {
                                 shop.setServerShop(true);
-                                p.sendMessage(Messages.getPrefix() + Messages.getServerShop().replaceAll("<Value>", "§aOn"));
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ServerShop").replaceAll("<Value>", "§aOn"));
                                 openShopManager(e.getInventory(), p, shop);
 
                                 ServerShopCreateEvent ev = new ServerShopCreateEvent(shop);
@@ -349,7 +346,7 @@ public class ShopSettings implements Listener {
                                 Bukkit.getPluginManager().callEvent(ev);
                             }
                         } else {
-                            p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                         }
                     } else if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(me.moomaxie.BetterShops.Configurations.GUIMessages.ShopSettings.getString("NPCLore"))) {
                         boolean can = true;
@@ -361,7 +358,7 @@ public class ShopSettings implements Listener {
                         if (can) {
                             if (shop.isNPCShop()) {
                                 shop.setNPCShop(false);
-                                p.sendMessage(Messages.getPrefix() + Messages.getNPCShop().replaceAll("<Value>", "§cOff"));
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("NPCShop").replaceAll("<Value>", "§cOff"));
                                 try {
                                     for (ShopsNPC npc : NPCs.getNPCs()) {
                                         if (npc.getShop().getName().equals(shop.getName())) {
@@ -377,7 +374,7 @@ public class ShopSettings implements Listener {
                                 NPCMenu.openNPCMenu(shop, p);
                             }
                         } else {
-                            p.sendMessage(Messages.getPrefix() + Messages.getNoPermission());
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                         }
                     }
                 }
