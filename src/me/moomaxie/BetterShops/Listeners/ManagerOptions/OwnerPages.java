@@ -1,5 +1,6 @@
 package me.moomaxie.BetterShops.Listeners.ManagerOptions;
 
+import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
@@ -126,7 +127,7 @@ public class OwnerPages implements Listener {
                                 }
                             }
                         }
-                        if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling"))) {
+                        if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling")) && Config.useSellingShop()) {
 
                             if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("NextPage"))) {
                                 if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop()) {

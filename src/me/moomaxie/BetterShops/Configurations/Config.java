@@ -70,6 +70,20 @@ public class Config {
         }
     }
 
+    public static boolean useTransactions() {
+        return config.isBoolean("UseTransactions") && config.getBoolean("UseTransactions");
+    }
+
+    public static void setUseTransactions(boolean b) {
+        config.set("UseTransactions", b);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static boolean useSellingShop() {
         return config.isBoolean("SellingShops") && config.getBoolean("SellingShops");
     }

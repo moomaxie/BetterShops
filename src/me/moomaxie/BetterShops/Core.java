@@ -147,59 +147,12 @@ public class Core extends JavaPlugin {
                 me.moomaxie.BetterShops.Configurations.GUIMessages.ShopSettings.changeShopSettingsConfig();
                 History.changeHistoryConfig();
 
-                //Create "Shops" file
-                boolean found2 = false;
-
-                if (this.getDataFolder() != null) {
-
-                    if (this.getDataFolder().listFiles() == null) {
-                        this.getDataFolder().mkdir();
-                    }
-                    for (File f : this.getDataFolder().listFiles()) {
-                        if (f.getName().equals("Shops")) {
-                            found2 = true;
-                        }
-                    }
-                }
-
-                if (!found2) {
-
-                    File fil = new File(this.getDataFolder().getParent(), "BetterShops.jar");
-
-                    java.util.jar.JarFile jar = null;
-                    try {
-                        jar = new java.util.jar.JarFile(fil);
-                    } catch (IOException e) {
-                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cImproper Jar Name, Rename the .Jar to 'BetterShops.jar'. Plugin Disabling!");
-                        this.setEnabled(false);
-                    }
-                    java.util.Enumeration enumEntries = jar.entries();
-                    while (enumEntries.hasMoreElements()) {
-                        java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
-                        if (file.getName().equals("Shops")) {
-                            File f = new File(this.getDataFolder() + File.separator + file.getName());
-                            if (file.isDirectory()) { // if its a directory, create it
-                                f.mkdir();
-                                continue;
-                            }
-                            try {
-                                java.io.InputStream is = jar.getInputStream(file); // get the input stream
-                                java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-                                while (is.available() > 0) {  // write contents of 'is' to 'fos'
-                                    fos.write(is.read());
-                                }
-                                fos.close();
-                                is.close();
-                            } catch (Exception e) {
-
-                            }
-                        }
-                    }
-                }
-
                 //Get Bukkit Version
 
                 String packageName = this.getServer().getClass().getPackage().getName();
+
+                String v = this.getServer().getVersion();
+
                 // Get full package string of CraftServer.
                 // org.bukkit.craftbukkit.version
                 String version = packageName.substring(packageName.lastIndexOf('.') + 1);
@@ -223,32 +176,34 @@ public class Core extends JavaPlugin {
                         this.setEnabled(false);
                         return;
                     }
+
+                    boolean c = false;
+
+                    if (v.contains("Spigot")) {
+                        if (version.equals("v1_7_R4") || version.equals("v1_8_R1") || version.equals("v1_8_R2")) {
+                            c = true;
+                        }
+                    }
+
+                    if (c) {
+                        final Class<?> clazz2 = Class.forName("BetterShops.Versions." + version + ".TitleManager");
+                        // Check if we have a NMSHandler class at that location.
+
+                        if (clazz2 != null) {
+                            if (TitleManager.class.isAssignableFrom(clazz2)) { // Make sure it actually implements NMS
+                                manager = (TitleManager) clazz2.getConstructor().newInstance(); // Set our handler
+                            }
+                        } else {
+                            aboveEight = false;
+
+                            return;
+                        }
+                    }
                 } catch (final Exception e) {
 //                e.printStackTrace();
                     Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cCould not find support for this CraftBukkit version. Currently Supports CB version 1.7.9 RO.3 - Spigot 1.8.R1, You are using §d" + version + "§c. Plugin Disabling!");
                     this.setEnabled(false);
                     return;
-                }
-
-                //Choose Title Manager for Version
-                try {
-                    final Class<?> clazz = Class.forName("BetterShops.Versions." + version + ".TitleManager");
-                    // Check if we have a NMSHandler class at that location.
-
-                    if (clazz != null) {
-                        if (TitleManager.class.isAssignableFrom(clazz)) { // Make sure it actually implements NMS
-                            manager = (TitleManager) clazz.getConstructor().newInstance(); // Set our handler
-                        }
-                    } else {
-                        aboveEight = false;
-
-                        return;
-                    }
-
-                } catch (final Exception e) {
-//                e.printStackTrace();
-
-
                 }
 
 

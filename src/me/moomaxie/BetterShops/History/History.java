@@ -26,15 +26,19 @@ public class History {
     private LinkedList<Transaction> transactions = new LinkedList<>();
     private LinkedList<Transaction> Selltransactions = new LinkedList<>();
 
+    private YamlConfiguration config;
+    private File file;
     private Shop shop;
 
-    public History(Shop shop){
+    public History(Shop shop) {
         this.shop = shop;
+        file = new File(Core.getCore().getDataFolder(), "Transactions/" + shop.getName() + ".yml");
+        config = YamlConfiguration.loadConfiguration(file);
     }
 
-    public void addTransaction(OfflinePlayer p, Date date, ItemStack item, double price, int amount, boolean sell, boolean save){
+    public void addTransaction(OfflinePlayer p, Date date, ItemStack item, double price, int amount, boolean sell, boolean save) {
 
-        Transaction trans = new Transaction(p, date, item,price, amount,sell);
+        Transaction trans = new Transaction(p, date, item, price, amount, sell);
 
         if (sell) {
             Selltransactions.add(trans);
@@ -46,31 +50,39 @@ public class History {
 
         if (save) {
             shop.saveTransaction(trans, true);
+            saveTransactionToFile(trans);
         }
-        saveTransactionToFile(trans);
+
+        if (transactions.size() > 36) {
+            shop.deleteFirstTransaction();
+        }
+
+
     }
 
-    public LinkedList<Transaction> getBuyingTransactions(){
+    public LinkedList<Transaction> getBuyingTransactions() {
         return Buytransactions;
     }
-    public LinkedList<Transaction> getSellingTransactions(){
+
+    public LinkedList<Transaction> getSellingTransactions() {
         return Selltransactions;
     }
-    public LinkedList<Transaction> getAllTransactions(){
+
+    public LinkedList<Transaction> getAllTransactions() {
         return transactions;
     }
 
-    public Shop getShop(){
+    public Shop getShop() {
         return shop;
     }
 
-    public void clearAllTransactions(){
+    public void clearAllTransactions() {
         transactions.clear();
         Buytransactions.clear();
         Selltransactions.clear();
     }
 
-    public void clearHistory(){ //Everyday
+    public void clearHistory() { //Everyday
         transactions.clear();
         Buytransactions.clear();
         Selltransactions.clear();
@@ -78,11 +90,10 @@ public class History {
         shop.clearTransactions();
     }
 
-    public void saveTransactionToFile(Transaction t){
-        File file = new File(Core.getCore().getDataFolder(),"Transactions/" + shop.getName() + ".yml");
+    public void saveTransactionToFile(Transaction t) {
 
-        if (!file.exists()){
-            if (!file.getParentFile().exists()){
+        if (!file.exists()) {
+            if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
             try {
@@ -92,7 +103,6 @@ public class History {
             }
         }
 
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         int next = config.getKeys(false).size() + 1;
 
         config.createSection("" + next);

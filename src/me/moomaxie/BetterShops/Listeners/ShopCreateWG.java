@@ -166,6 +166,7 @@ public class ShopCreateWG implements Listener {
                                                         e.setLine(2, MainGUI.getString("SignLine3Closed"));
                                                         e.setLine(3, MainGUI.getString("SignLine4"));
 
+
                                                         Sign s = (Sign) e.getBlock().getState();
 
                                                         s.setLine(0, MainGUI.getString("SignLine1"));

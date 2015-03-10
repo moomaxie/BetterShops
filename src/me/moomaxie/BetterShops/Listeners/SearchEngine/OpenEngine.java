@@ -1,6 +1,7 @@
 package me.moomaxie.BetterShops.Listeners.SearchEngine;
 
 import me.moomaxie.BetterShops.Configurations.AnvilGUI;
+import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
@@ -49,7 +50,7 @@ public class OpenEngine implements Listener {
                         if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("SearchOptions"))) {
                             boolean sell = false;
 
-                            if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("Selling"))) {
+                            if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("Selling")) && Config.useSellingShop()) {
                                 sell = true;
                             }
 

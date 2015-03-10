@@ -275,11 +275,11 @@ public class CheckoutMenu implements Listener {
                                         }
                                     }
 
-                                    BigDecimal bd = new BigDecimal((pr / amt) * shop.getAmount(item,false));
+                                    BigDecimal bd = new BigDecimal((pr / amt) * shop.getAmount(item, false));
 
                                     bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
 
-                                    if (bd.doubleValue() != shop.getPrice(item,false)) {
+                                    if (bd.doubleValue() != shop.getPrice(item, false)) {
                                         p.closeInventory();
                                         if (item.getItemMeta().getDisplayName() != null) {
                                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("PriceChange").replaceAll("<Item>", item.getItemMeta().getDisplayName()));
@@ -477,9 +477,17 @@ public class CheckoutMenu implements Listener {
 
                                 } else {
                                     if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + ite.getItemMeta().getDisplayName());
+                                        if (!Messages.getString("CannotAfford").contains("<Item>")) {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + ite.getItemMeta().getDisplayName());
+                                        } else {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
+                                        }
                                     } else {
-                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                        if (!Messages.getString("CannotAfford").contains("<Item>")) {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                        } else {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
+                                        }
                                     }
                                     p.closeInventory();
                                     return;
@@ -544,9 +552,17 @@ public class CheckoutMenu implements Listener {
 
                                     } else {
                                         if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + ite.getItemMeta().getDisplayName());
+                                            if (!Messages.getString("CannotAfford").contains("<Item>")) {
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + ite.getItemMeta().getDisplayName());
+                                            } else {
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
+                                            }
                                         } else {
-                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                            if (!Messages.getString("CannotAfford").contains("<Item>")) {
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                            } else {
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CannotAfford").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
+                                            }
                                         }
                                         p.closeInventory();
                                         return;
@@ -554,9 +570,17 @@ public class CheckoutMenu implements Listener {
                                 } else {
 
                                     if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock") + ite.getItemMeta().getDisplayName());
+                                        if (!Messages.getString("OutOfStock").contains("<Item>")) {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock") + ite.getItemMeta().getDisplayName());
+                                        } else {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
+                                        }
                                     } else {
-                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                        if (!Messages.getString("OutOfStock").contains("<Item>")) {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                        } else {
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("OutOfStock").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
+                                        }
                                     }
                                     p.closeInventory();
                                     return;
@@ -570,7 +594,6 @@ public class CheckoutMenu implements Listener {
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("BuyItem"));
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + t));
 
-
         if (Core.isAboveEight() && Config.useTitles()) {
 
             p.closeInventory();
@@ -581,8 +604,9 @@ public class CheckoutMenu implements Listener {
 
             p.closeInventory();
 
+        } else {
+            OpenShop.openShopItems(null, p, shop, 1);
         }
-        OpenShop.openShopItems(null, p, shop, 1);
         cart.remove(k);
     }
 }

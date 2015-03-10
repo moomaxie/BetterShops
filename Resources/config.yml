@@ -6,7 +6,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 1.5.3
+Version: 1.5.5
 
 ####  General  ####
 
@@ -44,6 +44,9 @@ DeleteByBreak: True
 
 # Allows players to use shop when closed if they had opened it while the shop was open (True/False)
 UseOnClose: False
+
+# Enables Transactions to be visible to the shop owners (May cause startup lag if enabled)
+UseTransactions: True
 
 ####  Shop Creation  ####
 

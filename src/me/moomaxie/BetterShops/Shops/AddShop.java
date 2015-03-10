@@ -64,8 +64,13 @@ public class AddShop {
 
         }
 
-        if (ShopLimits.fromString(name) == null)
-            ShopLimits.shops.add(new Shop(name));
+        if (ShopLimits.fromString(name) == null) {
+            Shop shop = new Shop(name, config, file);
+            ShopLimits.shops.add(shop);
+            ShopLimits.locs.put(chest.getLocation(),shop);
+            ShopLimits.names.put(name,shop);
+        }
+
     }
 
     public void setName(String name) {

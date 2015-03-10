@@ -1,6 +1,6 @@
 name: BetterShops
 main: me.moomaxie.BetterShops.Core
-version: 1.5.3
+version: 1.5.5
 author: moomaxie
 softdepend: [WorldGuard, Vault]
 description: >

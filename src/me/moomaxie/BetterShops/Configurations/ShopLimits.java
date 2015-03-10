@@ -27,38 +27,45 @@ public class ShopLimits {
     private static HashMap<UUID, Integer> limit = new HashMap<UUID, Integer>();
     public static List<Shop> shops = new ArrayList<>();
 
-
+    public static HashMap<Location, Shop> locs = new HashMap<>();
+    public static HashMap<String, Shop> names = new HashMap<>();
 
     public static int loadShops() {
 
         limit.clear();
         shops.clear();
+        names.clear();
+        locs.clear();
 
         int ss = 0;
 
         File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Shops");
 
-        if (file.listFiles() != null) {
+        if (!file.exists()){
+            file.mkdirs();
+        }
 
-            for (File f : file.listFiles()) {
-                if (f.getName().contains(".yml")) {
-                    UUID id = UUID.fromString(f.getName().substring(0, f.getName().length() - 4));
+        for (File f : file.listFiles()) {
+            if (f.getName().contains(".yml")) {
+                UUID id = UUID.fromString(f.getName().substring(0, f.getName().length() - 4));
 
-                    YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
+                YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
 
-                    int amt = config.getKeys(false).size();
+                int amt = config.getKeys(false).size();
 
-                    if (amt > 0) {
-                        limit.put(id, amt);
-                        ss = ss + amt;
-                    }
-                    for (String s : config.getKeys(false)) {
-                        Shop shop = new Shop(s);
+                if (amt > 0) {
+                    limit.put(id, amt);
+                    ss = ss + amt;
+                }
+                for (String s : config.getKeys(false)) {
+                    Shop shop = new Shop(s, config, f);
 
-                        shops.add(shop);
-                    }
+                    shops.add(shop);
+                    locs.put(shop.getLocation(), shop);
+                    names.put(shop.getName(), shop);
                 }
             }
+
         }
         return ss;
     }
@@ -84,41 +91,20 @@ public class ShopLimits {
         return shops;
     }
 
-    public static Shop fromString(String name){
-        for (Shop shop : shops){
-            if (shop.getName().equals(name)){
-                return shop;
-            }
-        }
-        return null;
+    public static Shop fromString(String name) {
+        return names.get(name);
     }
 
-    public static Shop fromString(Player p, String name){
-        for (Shop shop : shops){
-            if (shop.getName().equals(name)){
-                return shop;
-            }
-        }
-        return null;
+    public static Shop fromString(Player p, String name) {
+        return names.get(name);
     }
 
-    public static Shop fromLocation(Location name){
-        for (Shop shop : shops){
-
-            if (shop != null && name != null && shop.getLocation() != null) {
-                if (shop.getLocation().equals(name) || shop.getLocation().toString().equals(name.toString()) || shop.getLocation() == name) {
-                    return shop;
-                }
-
-                if ((int) shop.getLocation().getX() == (int) name.getX() && (int) shop.getLocation().getY() == (int) name.getY() && (int) shop.getLocation().getZ() == (int) name.getZ() && shop.getLocation().getWorld().getName().equals(name.getWorld().getName())
-                        || (int) shop.getLocation().getX() == (int) name.getX() && (int) shop.getLocation().getY() == (int) name.getY() && (int) shop.getLocation().getZ() == (int) name.getZ() && shop.getLocation().getWorld().equals(name.getWorld())) {
-                    shop.setLocation(name);
-
-                    return shop;
-                }
-            }
-
+    public static Shop fromLocation(Location name) {
+        if (locs.containsKey(name)) {
+            return locs.get(name);
+        } else {
+            name = new Location(name.getWorld(), (int) name.getX(), (int) name.getY(), (int) name.getZ());
+            return locs.get(name);
         }
-        return null;
     }
 }

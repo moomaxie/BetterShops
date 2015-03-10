@@ -211,7 +211,11 @@ public class ItemManager implements Listener {
 
                         if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
                             if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(History.getString("OpenHistory"))) {
-                                HistoryGUI.openHistoryGUI(p, shop, 1);
+                                if (Config.useTransactions()) {
+                                    HistoryGUI.openHistoryGUI(p, shop, 1);
+                                } else {
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
+                                }
                             }
                         }
 

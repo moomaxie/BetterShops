@@ -59,7 +59,7 @@ public class OpeningChests implements Listener {
                             public void run() {
                                 e.getBlock().setType(Material.AIR);
                             }
-                        },2L);
+                        }, 2L);
                     }
                 }
             }
@@ -128,12 +128,16 @@ public class OpeningChests implements Listener {
                                 && sign.getLine(1).equals("§0§0" + MainGUI.getString("SignLine2"))
                                 && sign.getLine(3).equals("§0§0" + MainGUI.getString("SignLine4")) ||
                         sign.getLine(0).equals(MainGUI.getString("SignLine1"))
-                        && sign.getLine(1).equals(MainGUI.getString("SignLine2"))
-                        && sign.getLine(3).equals(MainGUI.getString("SignLine4"))) {
+                                && sign.getLine(1).equals(MainGUI.getString("SignLine2"))
+                                && sign.getLine(3).equals(MainGUI.getString("SignLine4"))) {
 
                     Block face = e.getClickedBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
                     if (face.getType() == Material.CHEST) {
                         Shop shop = ShopLimits.fromLocation(face.getLocation());
+                        if (shop == null) {
+                            ShopLimits.loadShops();
+                            shop = ShopLimits.fromLocation(face.getLocation());
+                        }
                         if (shop != null) {
                             if (shop.getOwner() != null) {
                                 if (shop.isOpen()) {

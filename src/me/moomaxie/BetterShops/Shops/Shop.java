@@ -39,7 +39,7 @@ public class Shop {
     private String name;
     public File file;
     private YamlConfiguration config;
-    private History history = new History(this);
+    private History history;
 
     private LinkedList<ShopItem> sellItems = null;
     private LinkedList<ShopItem> buyItems = null;
@@ -52,7 +52,7 @@ public class Shop {
      * @param owner    - the owner of the shop
      * @param shopName - The name of the shop
      */
-
+    @Deprecated
     public Shop(Player owner, String shopName) {
         name = shopName;
 
@@ -96,6 +96,8 @@ public class Shop {
 
                                             this.file = f;
 
+                                            history = new History(this);
+
                                             loadTransactions();
 
                                             break;
@@ -110,9 +112,32 @@ public class Shop {
         }
     }
 
+    public Shop(String name, YamlConfiguration config, File file) {
+        this.config = config;
+        this.name = name;
+        this.file = file;
+
+        String s = config.getConfigurationSection(name).getString("Location");
+
+        String[] locs = s.split(" ");
+
+        World w = Bukkit.getWorld(locs[0]);
+
+        double x = Double.parseDouble(locs[1]);
+        double y = Double.parseDouble(locs[2]);
+        double z = Double.parseDouble(locs[3]);
+
+        p = Bukkit.getOfflinePlayer(UUID.fromString(file.getName().substring(0, file.getName().length() - 4)));
+
+        l = new Location(w, x, y, z);
+        history = new History(this);
+        loadTransactions();
+    }
+
     /**
      * @param shopName - The name of the shop
      */
+    @Deprecated
     public Shop(String shopName) {
         name = shopName;
 
@@ -155,7 +180,7 @@ public class Shop {
                                             this.config = config;
 
                                             this.file = f;
-
+                                            history = new History(this);
                                             loadTransactions();
 
                                             break;
@@ -173,6 +198,7 @@ public class Shop {
     /**
      * @param loc - the location of the shop (where the chest is)
      */
+    @Deprecated
     public Shop(Location loc) {
 
         File file = new File(Core.getCore().getDataFolder(), "Shops");
@@ -533,21 +559,29 @@ public class Shop {
                 history.clearAllTransactions();
             }
 
+            Object[] carl = config.getConfigurationSection(name).getConfigurationSection("Transactions").getKeys(false).toArray();
 
-            for (String s : config.getConfigurationSection(name).getConfigurationSection("Transactions").getKeys(false)) {
+            for (int i = carl.length; i > 0; i--) {
 
-                Date d = new Date(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getLong("Date"));
-                OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getString("Player")));
-                ItemStack item = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getItemStack("Item");
-                double price = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getDouble("Price");
-                int amount = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getInt("Amount");
-                boolean sell = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getBoolean("Selling");
+                if (carl.length - i < 36) {
+
+                    String s = (String) carl[i - 1];
+
+                    Date d = new Date(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getLong("Date"));
+                    OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getString("Player")));
+                    ItemStack item = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getItemStack("Item");
+                    double price = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getDouble("Price");
+                    int amount = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getInt("Amount");
+                    boolean sell = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getBoolean("Selling");
 
 
-                history.addTransaction(p, d, item, price, amount, sell, false);
+                    history.addTransaction(p, d, item, price, amount, sell, false);
+                } else {
+                    String s = (String) carl[i - 1];
 
+                    config.getConfigurationSection(name).getConfigurationSection("Transactions").set(s, null);
+                }
             }
-
 
 
         } else {
@@ -562,6 +596,22 @@ public class Shop {
         }
 
         transLoaded = true;
+    }
+
+    public void deleteFirstTransaction() {
+        if (!config.getConfigurationSection(name).isConfigurationSection("Transactions")) {
+            config.getConfigurationSection(name).createSection("Transactions");
+        }
+
+        Object[] carl = config.getConfigurationSection(name).getConfigurationSection("Transactions").getKeys(false).toArray();
+
+        config.getConfigurationSection(name).getConfigurationSection("Transactions").set((String) carl[0], null);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1073,7 +1123,7 @@ public class Shop {
             }
         }
 
-        if (String.valueOf(price).contains(",")){
+        if (String.valueOf(price).contains(",")) {
             price = Double.parseDouble(String.valueOf(price).replaceFirst(",", ".").replaceAll(",", ""));
         }
 
@@ -1880,9 +1930,7 @@ public class Shop {
     }
 
 
-
     // Start of new Item System
-
 
 
     public List<ShopItem> getShopItems() {
@@ -1990,8 +2038,8 @@ public class Shop {
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Page", getPageForSlot(item.getSlot()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Slot", item.getSlot());
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Selling", item.isSelling());
-                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", getStock(item.getItem(),item.isSelling()));
-                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", getAmount(item.getItem(),item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", getStock(item.getItem(), item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", getAmount(item.getItem(), item.isSelling()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Price", getPrice(item.getItem(), item.isSelling()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Infinite", isInfinite(item.getItem(), item.isSelling()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("LiveEconomy", false);
@@ -1999,7 +2047,7 @@ public class Shop {
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("DoubleAmount", 200);
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MinimumPrice", 0);
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MaximumPrice", Config.getMaxPrice());
-                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", getPrice(item.getItem(),item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", getPrice(item.getItem(), item.isSelling()));
             }
         }
 
@@ -2026,7 +2074,7 @@ public class Shop {
         return (new BigDecimal(Double.toString(getPrice(item, sell)))).toPlainString();
     }
 
-    public boolean alreadyInShop(ItemStack item, boolean sell){
+    public boolean alreadyInShop(ItemStack item, boolean sell) {
         boolean exists = false;
 
         int a = item.getAmount();
@@ -2094,9 +2142,9 @@ public class Shop {
         return exists;
     }
 
-    public void createShopItem(ItemStack it, int slot, int page, boolean sell){
-        if (alreadyInShop(it,sell)){
-            ShopItem item = new ShopItem(this,it,getNextAvailableId(),page,slot,sell);
+    public void createShopItem(ItemStack it, int slot, int page, boolean sell) {
+        if (alreadyInShop(it, sell)) {
+            ShopItem item = new ShopItem(this, it, getNextAvailableId(), page, slot, sell);
             items.add(item);
 
             config.getConfigurationSection(name).getConfigurationSection("Items").createSection("" + item.getShopItemID());
@@ -2105,8 +2153,8 @@ public class Shop {
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Page", getPageForSlot(item.getSlot()));
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Slot", item.getSlot());
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Selling", item.isSelling());
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", getStock(item.getItem(),item.isSelling()));
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", getAmount(item.getItem(),item.isSelling()));
+            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", getStock(item.getItem(), item.isSelling()));
+            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", getAmount(item.getItem(), item.isSelling()));
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Price", getPrice(item.getItem(), item.isSelling()));
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Infinite", isInfinite(item.getItem(), item.isSelling()));
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("LiveEconomy", false);
@@ -2114,7 +2162,7 @@ public class Shop {
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("DoubleAmount", 200);
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MinimumPrice", 0);
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MaximumPrice", Config.getMaxPrice());
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", getPrice(item.getItem(),item.isSelling()));
+            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", getPrice(item.getItem(), item.isSelling()));
 
             config.getConfigurationSection(name).set("NextShopId", item.getShopItemID() + 1);
 
@@ -2128,8 +2176,8 @@ public class Shop {
         }
     }
 
-    public void deleteShopItem(ShopItem item){
-        config.getConfigurationSection(name).getConfigurationSection("Items").set("" + item.getShopItemID(),null);
+    public void deleteShopItem(ShopItem item) {
+        config.getConfigurationSection(name).getConfigurationSection("Items").set("" + item.getShopItemID(), null);
 
         try {
             config.save(file);
@@ -2140,7 +2188,7 @@ public class Shop {
         items.remove(item);
     }
 
-    public int getNextAvailableId(){
+    public int getNextAvailableId() {
         return config.getConfigurationSection(name).getInt("NextShopId");
     }
 }

@@ -60,7 +60,7 @@ public class AddSellingItem implements Listener {
                             if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
 
 
-                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling"))) {
+                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling")) && Config.useSellingShop()) {
 
                                     ItemStack item = ite.clone();
 

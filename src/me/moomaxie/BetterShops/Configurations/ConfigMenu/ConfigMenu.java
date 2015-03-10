@@ -285,12 +285,28 @@ public class ConfigMenu {
         maxPriceMeta.setLore(Arrays.asList("§7Set Max Price", "§e§lClick §7to change"));
         maxPrice.setItemMeta(maxPriceMeta);
 
+        ItemStack transactions = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
+        ItemMeta transactionsMeta = transactions.getItemMeta();
+        if (Config.useTransactions()) {
+
+            transactionsMeta.setDisplayName("§eUse Transactions §7- §aOn");
+        } else {
+            MaterialData data = transactions.getData();
+            data.setData((byte) 14);
+            transactions.setData(data);
+            transactions = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+            transactionsMeta.setDisplayName("§eUse Transactions §7- §cFalse");
+        }
+        transactionsMeta.setLore(Arrays.asList("§7Enables Transactions to be visible to the shop owners", "§e§lClick §7to toggle"));
+        transactions.setItemMeta(transactionsMeta);
+
         inv.setItem(46, shopOptions);
         inv.setItem(47, sellingShop);
         inv.setItem(48, defaultPrice);
         inv.setItem(49, deleteOnBreak);
         inv.setItem(50, maxPrice);
         inv.setItem(51, useOnClose);
+        inv.setItem(52, transactions);
 
         // NPC Options
 
