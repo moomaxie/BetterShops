@@ -5,7 +5,6 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.History;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
-import me.moomaxie.BetterShops.Configurations.WordsCapitalizer;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
 import me.moomaxie.BetterShops.Shops.Shop;
@@ -36,7 +35,7 @@ import java.util.List;
 public class HistoryGUI implements Listener {
 
     public static void openHistoryGUI(Player p, Shop shop, int page) {
-        Inventory inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+        Inventory inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
 
         if (!shop.transLoaded){
             shop.loadTransactions();
@@ -126,19 +125,12 @@ public class HistoryGUI implements Listener {
 
                 sk.setDisplayName("§a" + trans.getPlayer().getName());
 
-                if (trans.getItem().getItemMeta().getDisplayName() != null) {
                     sk.setLore(Arrays.asList(History.getString("Date") + " §8" + trans.getDate().toLocaleString(),
-                            History.getString("Item") + " §8" + trans.getItem().getItemMeta().getDisplayName(),
+                            History.getString("Item") + " §8" + trans.getItem(),
                             History.getString("Price") + " §8" + trans.getPrice(),
                             History.getString("Amount") + " §8" + trans.getAmount(),
                             History.getString("Shop") + " §8" + s));
-                } else {
-                    sk.setLore(Arrays.asList(History.getString("Date") + " §8" + trans.getDate().toLocaleString(),
-                            History.getString("Item") + " §8" + WordsCapitalizer.capitalizeEveryWord(trans.getItem().getType().name().replaceAll("_", " ")),
-                            History.getString("Price") + " §8" + trans.getPrice(),
-                            History.getString("Amount") + " §8" + trans.getAmount(),
-                            History.getString("Shop") + " §8" + s));
-                }
+
                 it.setItemMeta(sk);
 
                 if (inv.firstEmpty() > 0)
@@ -152,7 +144,7 @@ public class HistoryGUI implements Listener {
     @EventHandler
     public void onHistoryChangePage(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {

@@ -7,7 +7,9 @@ import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
+import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,10 +21,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -69,11 +72,6 @@ public class ShopDelete implements Listener {
                                             Player owner = Bukkit.getPlayer(UUID.fromString(config.getConfigurationSection(s).getString("Owner")));
                                             Shop shop = ShopLimits.fromLocation(e.getBlock().getLocation());
 
-                                            if (shop == null) {
-                                                ShopLimits.loadShops();
-                                                shop = ShopLimits.fromLocation(new Location(w, x, y, z));
-                                            }
-
                                             if (shop != null) {
                                                 if (owner == p || p.isOp() || Config.usePerms() && Permissions.hasBreakPerm(p)) {
 
@@ -85,7 +83,7 @@ public class ShopDelete implements Listener {
                                                         ShopDeleteEvent ev = new ShopDeleteEvent(shop);
                                                         Bukkit.getPluginManager().callEvent(ev);
 
-                                                        if (Core.isAboveEight() && Config.useTitles()) {
+                                                        if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -95,19 +93,11 @@ public class ShopDelete implements Listener {
                                                         }
 
 
-                                                        for (ItemStack item : shop.getShopContents(false).keySet()) {
-                                                            if (item.getType() != Material.AIR) {
-                                                                item.setAmount(shop.getStock(item, false));
-                                                                b.getWorld().dropItem(b.getLocation(), item);
-                                                            }
+                                                        for (ShopItem item : shop.getShopItems(false)) {
+                                                            Stocks.removeAllOfDeletedItem(item, shop, p, false);
                                                         }
-                                                        for (ItemStack item : shop.getShopContents(true).keySet()) {
-                                                            if (shop.getStock(item, true) > 0) {
-                                                                if (item.getType() != Material.AIR) {
-                                                                    item.setAmount(shop.getStock(item, true));
-                                                                    b.getWorld().dropItem(b.getLocation(), item);
-                                                                }
-                                                            }
+                                                        for (ShopItem item : shop.getShopItems(true)) {
+                                                            Stocks.removeAllOfDeletedItem(item, shop, p, true);
                                                         }
 
                                                         config.set(s, null);
@@ -116,23 +106,37 @@ public class ShopDelete implements Listener {
                                                         } catch (IOException e1) {
                                                             e1.printStackTrace();
                                                         }
-                                                        ShopLimits.loadShops();
+                                                        ShopLimits.locs.remove(shop.getLocation());
+                                                        ShopLimits.names.remove(shop.getName());
+                                                        ShopLimits.shops.remove(shop);
+
+                                                        int amt = ShopLimits.getLimits().get(owner.getUniqueId());
+                                                        ShopLimits.getLimits().put(owner.getUniqueId(), amt - 1);
+
+                                                        List<Shop> li = ShopLimits.getShopsForPlayer(owner);
+                                                        li.remove(shop);
+                                                        ShopLimits.playerShops.put(owner.getUniqueId(), li);
+
+
+                                                        if (Core.useSQL()) {
+                                                            Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
+                                                        }
+
                                                     } else {
                                                         e.setCancelled(true);
                                                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
-                                                        if (Core.isAboveEight() && Config.useTitles()) {
+                                                        if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
                                                             Core.getTitleManager().sendTitle(p, Messages.getString("DenyDeleteShop"));
-
 
                                                         }
                                                     }
                                                 } else {
                                                     e.setCancelled(true);
                                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
-                                                    if (Core.isAboveEight() && Config.useTitles()) {
+                                                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                         Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -151,6 +155,8 @@ public class ShopDelete implements Listener {
                             } catch (NullPointerException ex) {
                                 ex.printStackTrace();
                                 p.sendMessage(Messages.getString("Prefix") + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted. Check the Console for more details.");
+                            } catch (SQLException e1) {
+                                e1.printStackTrace();
                             }
                         }
                     }
@@ -215,7 +221,7 @@ public class ShopDelete implements Listener {
                                                                             ShopDeleteEvent ev = new ShopDeleteEvent(shop);
                                                                             Bukkit.getPluginManager().callEvent(ev);
 
-                                                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                                                                 Core.getTitleManager().sendTitle(p, Messages.getString("DeleteShop"));
@@ -223,42 +229,11 @@ public class ShopDelete implements Listener {
 
                                                                             }
 
-                                                                            if (shop.getShopContents(false) != null) {
-
-                                                                                for (ItemStack item : shop.getShopContents(false).keySet()) {
-                                                                                    if (chest.getInventory().firstEmpty() > -1) {
-                                                                                        if (item.getType() != Material.AIR) {
-                                                                                            item.setAmount(shop.getStock(item, false));
-                                                                                            chest.getInventory().addItem(item);
-                                                                                        }
-                                                                                    } else {
-                                                                                        if (item.getType() != Material.AIR) {
-                                                                                            item.setAmount(shop.getStock(item, false));
-
-                                                                                            chest.getWorld().dropItem(chest.getLocation(), item);
-                                                                                        }
-                                                                                    }
-                                                                                }
+                                                                            for (ShopItem item : shop.getShopItems(false)) {
+                                                                                Stocks.removeAllOfDeletedItem(item, shop, p, false);
                                                                             }
-
-                                                                            if (shop.getShopContents(true) != null) {
-                                                                                for (ItemStack item : shop.getShopContents(true).keySet()) {
-                                                                                    if (chest.getInventory().firstEmpty() > -1) {
-                                                                                        if (shop.getStock(item, true) > 0) {
-                                                                                            if (item.getType() != Material.AIR) {
-                                                                                                item.setAmount(shop.getStock(item, true));
-                                                                                                chest.getInventory().addItem(item);
-                                                                                            }
-                                                                                        }
-                                                                                    } else {
-                                                                                        if (shop.getStock(item, true) > 0) {
-                                                                                            if (item.getType() != Material.AIR) {
-                                                                                                item.setAmount(shop.getStock(item, true));
-                                                                                                chest.getWorld().dropItem(chest.getLocation(), item);
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
+                                                                            for (ShopItem item : shop.getShopItems(true)) {
+                                                                                Stocks.removeAllOfDeletedItem(item, shop, p, true);
                                                                             }
 
                                                                             config.set(s, null);
@@ -267,11 +242,24 @@ public class ShopDelete implements Listener {
                                                                             } catch (IOException e1) {
                                                                                 e1.printStackTrace();
                                                                             }
-                                                                            ShopLimits.loadShops();
+                                                                            ShopLimits.locs.remove(shop.getLocation());
+                                                                            ShopLimits.names.remove(shop.getName());
+                                                                            ShopLimits.shops.remove(shop);
+
+                                                                            int amt = ShopLimits.getLimits().get(owner.getUniqueId());
+                                                                            ShopLimits.getLimits().put(owner.getUniqueId(), amt - 1);
+
+                                                                            List<Shop> li = ShopLimits.getShopsForPlayer(owner);
+                                                                            li.remove(shop);
+                                                                            ShopLimits.playerShops.put(owner.getUniqueId(), li);
+
+                                                                            if (Core.useSQL()) {
+                                                                                Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
+                                                                            }
                                                                         } else {
                                                                             e.setCancelled(true);
                                                                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
-                                                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -283,7 +271,7 @@ public class ShopDelete implements Listener {
                                                                     } else {
                                                                         e.setCancelled(true);
                                                                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyDeleteShop"));
-                                                                        if (Core.isAboveEight() && Config.useTitles()) {
+                                                                        if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -303,6 +291,8 @@ public class ShopDelete implements Listener {
                                                     } catch (NullPointerException ex) {
                                                         ex.printStackTrace();
                                                         p.sendMessage(Messages.getString("Prefix") + "§4Error: §cPlease inform a admin or owner. A shop's file appears to be corrupted. Check the Console for details.");
+                                                    } catch (SQLException e1) {
+                                                        e1.printStackTrace();
                                                     }
                                                 }
                                             }
@@ -315,5 +305,43 @@ public class ShopDelete implements Listener {
                 }
             }
         }
+    }
+
+    public static void deleteShopExternally(Shop shop) {
+        ShopDeleteEvent ev = new ShopDeleteEvent(shop);
+        Bukkit.getPluginManager().callEvent(ev);
+
+        shop.getLocation().getBlock().setType(Material.AIR);
+
+        for (ShopItem item : shop.getShopItems()) {
+            Stocks.throwItemsOnGround(item);
+        }
+
+        shop.config.set(shop.getName(), null);
+        try {
+            shop.config.save(shop.file);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        ShopLimits.locs.remove(shop.getLocation());
+        ShopLimits.names.remove(shop.getName());
+        ShopLimits.shops.remove(shop);
+        if (shop.getOwner() != null) {
+            int amt = ShopLimits.getLimits().get(shop.getOwner().getUniqueId());
+            ShopLimits.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
+
+            List<Shop> li = ShopLimits.getShopsForPlayer(shop.getOwner());
+            li.remove(shop);
+            ShopLimits.playerShops.put(shop.getOwner().getUniqueId(), li);
+        }
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }

@@ -2,6 +2,7 @@ package me.moomaxie.BetterShops.Listeners.ManagerOptions;
 
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,26 +24,26 @@ public class Stocks {
 
     //Collect Stock
 
-    public static void collectStock(ItemStack ite, int amt, Player p, Shop shop) {
+    public static void collectStock(ShopItem ite, int amt, Player p, Shop shop) {
 
         if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
 
             if (amt > 0) {
 
-                if (shop.getStock(ite,true) != amt) {
+                if (ite.getStock() != amt) {
 
-                    int left = shop.getStock(ite,true) - amt;
+                    int left = ite.getStock() - amt;
 
-                    collectAll(ite,shop,p);
-                    removeItemsFromInventory(ite,p,shop,left);
+                    collectAll(ite, shop, p);
+                    removeItemsFromInventory(ite, p, shop, left);
 
-                    shop.setStock(ite,left,true);
+                    ite.setStock(left);
 
                 } else {
-                    collectAll(ite,shop,p);
+                    collectAll(ite, shop, p);
                 }
             } else {
-                p.sendMessage(Messages.getString("Prefix") + "Must be greater than §c0");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
             }
         } else {
             p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyKeeper"));
@@ -51,39 +52,26 @@ public class Stocks {
 
     }
 
-    public static void addAll(ItemStack ite, Shop shop, Player p) {
+    public static void addAll(ShopItem ite, Shop shop, Player p) {
         int amt = 0;
 
-        if (ite.getType() != Material.SKULL_ITEM) {
-            ItemMeta meta = ite.getItemMeta();
+        ItemStack copy = ite.getItem().clone();
 
-            List<String> lore = shop.getLore(ite);
+        for (int i = 1; i < ite.getItem().getMaxStackSize() + 1; i++) {
 
-            meta.setLore(lore);
-            ite.setItemMeta(meta);
-        } else {
-            SkullMeta meta = (SkullMeta) ite.getItemMeta();
-            List<String> lore = shop.getLore(ite);
-            meta.setLore(lore);
-            ite.setItemMeta(meta);
-        }
+            copy.setAmount(i);
 
-        for (int i = 1; i < ite.getMaxStackSize() + 1; i++) {
-
-            ite.setAmount(i);
-
-            for (ItemStack it : p.getInventory().all(ite).values()) {
+            for (ItemStack it : p.getInventory().all(copy).values()) {
                 amt = amt + it.getAmount();
-                p.getInventory().remove(ite);
+                p.getInventory().remove(copy);
             }
         }
 
-
-        shop.setStock(ite, shop.getStock(ite, false) + amt, false);
+        ite.setStock(ite.getStock() + amt);
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
-    public static void addStock(ItemStack ite, int orig, Player p, Shop shop) {
+    public static void addStock(ShopItem ite, int orig, Player p, Shop shop) {
 
         int o = orig;
 
@@ -91,25 +79,11 @@ public class Stocks {
 
             int amt = 0;
 
-            if (ite.getType() != Material.SKULL_ITEM) {
-                ItemMeta meta = ite.getItemMeta();
-
-                List<String> lore = shop.getLore(ite);
-
-                meta.setLore(lore);
-                ite.setItemMeta(meta);
-            } else {
-                SkullMeta meta = (SkullMeta) ite.getItemMeta();
-                List<String> lore = shop.getLore(ite);
-                meta.setLore(lore);
-                ite.setItemMeta(meta);
-            }
-
-            for (int i = 1; i < ite.getMaxStackSize() + 1; i++) {
+            for (int i = 1; i < ite.getItem().getMaxStackSize() + 1; i++) {
 
                 ite.setAmount(i);
 
-                for (ItemStack it : p.getInventory().all(ite).values()) {
+                for (ItemStack it : p.getInventory().all(ite.getItem()).values()) {
                     amt = amt + it.getAmount();
                 }
             }
@@ -131,8 +105,7 @@ public class Stocks {
                                 it.setAmount(1);
 
 
-
-                                if (it.equals(ite) || it.toString().equals(ite.toString()) && it.getData().getData() == ite.getData().getData() && it.getDurability() == ite.getDurability()) {
+                                if (it.equals(ite.getItem()) || it.toString().equals(ite.getItem().toString()) && it.getData().getData() == ite.getData() && it.getDurability() == ite.getDurability()) {
 
                                     it.setAmount(u);
 
@@ -170,15 +143,15 @@ public class Stocks {
             }
 
         } else {
-            p.sendMessage(Messages.getString("Prefix") + "Must be greater than §c0");
+            p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
             return;
         }
+        ite.setStock(ite.getStock() + orig);
 
-        shop.setStock(ite, shop.getStock(ite, false) + orig, false);
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
-    public static void removeStock(ItemStack ite, int orig, Player p, Shop shop){
+    public static void removeStock(ShopItem ite, int orig, Player p, Shop shop) {
 
         int o = orig;
 
@@ -186,22 +159,22 @@ public class Stocks {
 
             if (orig > 0) {
 
-                if (shop.getStock(ite, false) >= orig) {
+                if (ite.getStock() >= orig) {
 
-                    int stacks = orig / ite.getMaxStackSize();
+                    int stacks = orig / ite.getItem().getMaxStackSize();
 
                     for (int i = 0; i < stacks; i++) {
-                        o = o - ite.getMaxStackSize();
+                        o = o - ite.getItem().getMaxStackSize();
 
-                        ItemStack it = ite.clone();
+                        ItemStack it = ite.getItem().clone();
 
-                        it.setAmount(ite.getMaxStackSize());
+                        it.setAmount(ite.getItem().getMaxStackSize());
 
                         p.getInventory().addItem(it);
                     }
 
                     if (o > 0) {
-                        ItemStack it = ite.clone();
+                        ItemStack it = ite.getItem().clone();
 
                         it.setAmount(o);
                         p.getInventory().addItem(it);
@@ -212,36 +185,37 @@ public class Stocks {
                     return;
                 }
             } else {
-                p.sendMessage(Messages.getString("Prefix") + "Must be greater than §c0");
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
                 return;
             }
         } else {
             p.sendMessage(Messages.getString("Prefix") + Messages.getString("DenyKeeper"));
             return;
         }
-        shop.setStock(ite, shop.getStock(ite, false) - orig, false);
+        ite.setStock(ite.getStock() - orig);
+
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
-    public static void removeAll(ItemStack ite, Shop shop, Player p) {
-        int amt = shop.getStock(ite, false);
+    public static void removeAll(ShopItem ite, Shop shop, Player p) {
+        int amt = ite.getStock();
 
-        int stacks = amt / ite.getMaxStackSize();
+        int stacks = amt / ite.getItem().getMaxStackSize();
 
         if (stacks > 0) {
             for (int i = 0; i < stacks; i++) {
-                amt = amt - ite.getMaxStackSize();
+                amt = amt - ite.getItem().getMaxStackSize();
 
-                ItemStack it = ite.clone();
+                ItemStack it = ite.getItem().clone();
 
-                it.setAmount(ite.getMaxStackSize());
+                it.setAmount(ite.getItem().getMaxStackSize());
 
                 p.getInventory().addItem(it);
             }
         }
 
         if (amt > 0) {
-            ItemStack it = ite.clone();
+            ItemStack it = ite.getItem().clone();
 
             it.setAmount(amt);
 
@@ -249,24 +223,24 @@ public class Stocks {
 
         }
 
-        shop.setStock(ite, 0, false);
+        ite.setStock(0);
 
 
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
-    public static void removeAllOfDeletedItem(ItemStack ite, Shop shop, Player p, boolean sell) {
-        int amt = shop.getStock(ite, sell);
+    public static void removeAllOfDeletedItem(ShopItem ite, Shop shop, Player p, boolean sell) {
+        int amt = ite.getStock();
 
-        int stacks = amt / ite.getMaxStackSize();
+        int stacks = amt / ite.getItem().getMaxStackSize();
 
         if (stacks > 0) {
             for (int i = 0; i < stacks; i++) {
-                amt = amt - ite.getMaxStackSize();
+                amt = amt - ite.getItem().getMaxStackSize();
 
-                ItemStack it = ite.clone();
+                ItemStack it = ite.getItem().clone();
 
-                it.setAmount(ite.getMaxStackSize());
+                it.setAmount(ite.getItem().getMaxStackSize());
 
 
                 p.getInventory().addItem(it);
@@ -274,7 +248,7 @@ public class Stocks {
         }
 
         if (amt > 0) {
-            ItemStack it = ite.clone();
+            ItemStack it = ite.getItem().clone();
 
             it.setAmount(amt);
 
@@ -283,25 +257,53 @@ public class Stocks {
         }
     }
 
-    public static void collectAll(ItemStack ite, Shop shop, Player p) {
-        int amt = shop.getStock(ite, true);
+    public static void throwItemsOnGround(ShopItem ite){
+        int amt = ite.getStock();
 
-        int stacks = amt / ite.getMaxStackSize();
+        int stacks = amt / ite.getItem().getMaxStackSize();
 
         if (stacks > 0) {
             for (int i = 0; i < stacks; i++) {
-                amt = amt - ite.getMaxStackSize();
+                amt = amt - ite.getItem().getMaxStackSize();
 
-                ItemStack it = ite.clone();
+                ItemStack it = ite.getItem().clone();
 
-                it.setAmount(ite.getMaxStackSize());
+                it.setAmount(ite.getItem().getMaxStackSize());
+
+
+                ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(),it);
+            }
+        }
+
+        if (amt > 0) {
+            ItemStack it = ite.getItem().clone();
+
+            it.setAmount(amt);
+
+            ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(),it);
+
+        }
+    }
+
+    public static void collectAll(ShopItem ite, Shop shop, Player p) {
+        int amt = ite.getStock();
+
+        int stacks = amt / ite.getItem().getMaxStackSize();
+
+        if (stacks > 0) {
+            for (int i = 0; i < stacks; i++) {
+                amt = amt - ite.getItem().getMaxStackSize();
+
+                ItemStack it = ite.getItem().clone();
+
+                it.setAmount(ite.getItem().getMaxStackSize());
 
                 p.getInventory().addItem(it);
             }
         }
 
         if (amt > 0) {
-            ItemStack it = ite.clone();
+            ItemStack it = ite.getItem().clone();
 
             it.setAmount(amt);
 
@@ -309,11 +311,11 @@ public class Stocks {
 
         }
 
-        shop.setStock(ite, 0, true);
+        ite.setStock(0);
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeStock"));
     }
 
-    public static int getNumberInInventory(ItemStack ite, Player p, Shop shop){
+    public static int getNumberInInventory(ItemStack ite, Player p, Shop shop) {
 
         int amt = 0;
 
@@ -347,8 +349,8 @@ public class Stocks {
         return amt;
     }
 
-    public static void removeItemsFromInventory(ItemStack ite, Player p, Shop shop, int orig){
-        if (getNumberInInventory(ite,p,shop) >= orig){
+    public static void removeItemsFromInventory(ShopItem ite, Player p, Shop shop, int orig) {
+        if (getNumberInInventory(ite.getItem(), p, shop) >= orig) {
             int o = orig;
 
             if (o > 0) {
@@ -364,8 +366,7 @@ public class Stocks {
                             it.setAmount(1);
 
 
-
-                            if (it.equals(ite) || it.toString().equals(ite.toString()) && it.getData().getData() == ite.getData().getData() && it.getDurability() == ite.getDurability()) {
+                            if (it.equals(ite.getItem()) || it.toString().equals(ite.getItem().toString()) && it.getData().getData() == ite.getData() && it.getDurability() == ite.getDurability()) {
 
                                 it.setAmount(u);
 

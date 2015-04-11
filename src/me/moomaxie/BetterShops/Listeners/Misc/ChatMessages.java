@@ -5,6 +5,7 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
+import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.ShopKeeperManager;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.ShopSettings;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
@@ -14,8 +15,11 @@ import me.moomaxie.BetterShops.Listeners.SearchEngine.DisplayNameCheck;
 import me.moomaxie.BetterShops.Listeners.SearchEngine.IdCheck;
 import me.moomaxie.BetterShops.Listeners.SearchEngine.MaterialCheck;
 import me.moomaxie.BetterShops.Listeners.SearchEngine.PriceCheck;
+import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
 import me.moomaxie.BetterShops.Shops.AddShop;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
+import me.moomaxie.BetterShops.SupplyandDemand.LiveEco;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -49,19 +53,23 @@ public class ChatMessages implements Listener {
     public static Map<Player, Chest> shopCreate = new HashMap<>();
     public static Map<Player, Block> shopCreate2 = new HashMap<>();
 
-    public static Map<Player, Map<Shop, ItemStack>> collectStock = new HashMap<>();
-    public static Map<Player, Map<Shop, ItemStack>> addStock = new HashMap<>();
-    public static Map<Player, Map<Shop, ItemStack>> removeStock = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> collectStock = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> addStock = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> removeStock = new HashMap<>();
 
     public static Map<Player, Shop> description = new HashMap<>();
 
-    public static Map<Player, Map<Shop, ItemStack>> setSellAmount = new HashMap<>();
-    public static Map<Player, Map<Shop, ItemStack>> setBuyAmount = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> setSellAmount = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> setBuyAmount = new HashMap<>();
 
-    public static Map<Player, Map<Shop, ItemStack>> setSellPrice = new HashMap<>();
-    public static Map<Player, Map<Shop, ItemStack>> setBuyPrice = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> setDoubleAmount = new HashMap<>();
 
-    public static Map<Player, Map<Shop, ItemStack>> changeData = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> setSellPrice = new HashMap<>();
+    public static Map<Player, Map<Shop, ShopItem>> setBuyPrice = new HashMap<>();
+
+    public static Map<Player, Map<Shop, ShopItem>> setLimit = new HashMap<>();
+
+    public static Map<Player, Map<Shop, ShopItem>> changeData = new HashMap<>();
 
     public static Map<Player, Shop> addKeeper = new HashMap<>();
     public static Map<Player, Shop> removeKeeper = new HashMap<>();
@@ -81,7 +89,7 @@ public class ChatMessages implements Listener {
                 if (!shopCreate.containsKey(p) && !collectStock.containsKey(p) && !addStock.containsKey(p) && !description.containsKey(p)
                         && !setSellAmount.containsKey(p) && !setBuyAmount.containsKey(p) && !setSellPrice.containsKey(p) && !setBuyPrice.containsKey(p)
                         && !searchID.containsKey(p) && !searchMaterial.containsKey(p) && !searchName.containsKey(p) && !searchPrice.containsKey(p) && !changeData.containsKey(p)
-                        && !addKeeper.containsKey(p) && !removeKeeper.containsKey(p) && !addSellItem.containsKey(p)) {
+                        && !addKeeper.containsKey(p) && !removeKeeper.containsKey(p) && !addSellItem.containsKey(p) && !setDoubleAmount.containsKey(p) && !setLimit.containsKey(p)) {
 
                 } else {
                     e.getRecipients().remove(p);
@@ -116,44 +124,23 @@ public class ChatMessages implements Listener {
 
                     ItemStack item = new ItemStack(amt);
 
-                    if (item != null) {
-                        if (!shop.alreadyBeingSold(item, true)) {
+                    if (shop != null) {
+                        if (ShopItem.fromItemStack(shop, item, true) == null) {
+                            int page = shop.getNextAvailablePage(true);
+                            int s = shop.getNextSlotForPage(page, true);
 
-                            if (!shop.alreadyBeingSold(item, true)) {
-                                if (shop.getHighestSlot(true) < 161) {
+                            ShopItem sItem = shop.createShopItem(item, s, page, true);
 
-                                    if (shop.getHighestSlot(true) == 53) {
-                                        shop.addItem(item, 72, true);
-                                    } else if (shop.getHighestSlot(true) == 107) {
-                                        shop.addItem(item, 126, true);
-                                    } else if (inv.getItem(12).getData().getData() == (byte) 10) {
-                                        if (inv.firstEmpty() >= 18) {
-                                            if (inv.firstEmpty() == 18) {
-                                                shop.addItem(item, 18, true);
-                                            } else {
-                                                shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                            }
-                                        } else {
-                                            shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                        }
-                                    } else {
-                                        shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                    }
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+                            p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                    p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                    p.closeInventory();
-
-                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
-
-                                    can = true;
-
-                                } else {
-                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
-                                }
+                            if (shop.isServerShop()) {
+                                OpenShop.openShopItems(inv, p, shop, page);
                             } else {
-                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
+                                OpenShopOptions.openShopOwnerOptionsInventory(inv, p, shop, page);
                             }
+
                         } else {
                             can = true;
                         }
@@ -165,90 +152,52 @@ public class ChatMessages implements Listener {
                     if (Material.getMaterial(name.toUpperCase()) != null) {
                         ItemStack item = new ItemStack(Material.valueOf(name.toUpperCase()));
 
-                        if (!shop.alreadyBeingSold(item, true)) {
+                        if (shop != null) {
+                            if (ShopItem.fromItemStack(shop, item, true) == null) {
+                                int page = shop.getNextAvailablePage(true);
+                                int s = shop.getNextSlotForPage(page, true);
 
-                            if (!shop.alreadyBeingSold(item, true)) {
-                                if (shop.getHighestSlot(true) < 161) {
+                                ShopItem sItem = shop.createShopItem(item, s, page, true);
 
-                                    if (shop.getHighestSlot(true) == 53) {
-                                        shop.addItem(item, 72, true);
-                                    } else if (shop.getHighestSlot(true) == 107) {
-                                        shop.addItem(item, 126, true);
-                                    } else if (inv.getItem(12).getData().getData() == (byte) 10) {
-                                        if (inv.firstEmpty() >= 18) {
-                                            if (inv.firstEmpty() == 18) {
-                                                shop.addItem(item, 18, true);
-                                            } else {
-                                                shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                            }
-                                        } else {
-                                            shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                        }
-                                    } else {
-                                        shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                    }
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+                                p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                    p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                    p.closeInventory();
-
-                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
-
-                                    can = true;
-
+                                if (shop.isServerShop()) {
+                                    OpenShop.openShopItems(inv, p, shop, page);
                                 } else {
-                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
+                                    OpenShopOptions.openShopOwnerOptionsInventory(inv, p, shop, page);
                                 }
+
                             } else {
-                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
+                                can = true;
                             }
-                        } else {
-                            can = true;
                         }
                     } else {
                         for (Material m : Material.values()) {
                             if (m.name().contains(name.toUpperCase().replaceAll(" ", "_"))) {
                                 ItemStack item = new ItemStack(m);
 
-                                if (!shop.alreadyBeingSold(item, true)) {
+                                if (shop != null) {
+                                    if (ShopItem.fromItemStack(shop, item, true) == null) {
+                                        int page = shop.getNextAvailablePage(true);
+                                        int s = shop.getNextSlotForPage(page, true);
 
-                                    if (!shop.alreadyBeingSold(item, true)) {
-                                        if (shop.getHighestSlot(true) < 161) {
+                                        ShopItem sItem = shop.createShopItem(item, s, page, true);
 
-                                            if (shop.getHighestSlot(true) == 53) {
-                                                shop.addItem(item, 72, true);
-                                            } else if (shop.getHighestSlot(true) == 107) {
-                                                shop.addItem(item, 126, true);
-                                            } else if (inv.getItem(12).getData().getData() == (byte) 10) {
-                                                if (inv.firstEmpty() >= 18) {
-                                                    if (inv.firstEmpty() == 18) {
-                                                        shop.addItem(item, 18, true);
-                                                    } else {
-                                                        shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                    }
-                                                } else {
-                                                    shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                }
-                                            } else {
-                                                shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                            }
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+                                        p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                            p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                            p.closeInventory();
-
-                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
-
-                                            can = true;
-                                            break;
+                                        if (shop.isServerShop()) {
+                                            OpenShop.openShopItems(inv, p, shop, page);
                                         } else {
-                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
+                                            OpenShopOptions.openShopOwnerOptionsInventory(inv, p, shop, page);
                                         }
+
                                     } else {
-                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
+                                        can = true;
                                     }
-                                } else {
-                                    can = true;
                                 }
                             }
                         }
@@ -275,7 +224,7 @@ public class ChatMessages implements Listener {
         if (str.trim().length() < 1) {
             return false;
         }
-        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 ";
+        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 &/$";
         for (int i = 0; i < str.length(); i++) {
             if (!acceptable.contains(str.substring(i, i + 1).toLowerCase())) {
                 return false;
@@ -340,7 +289,7 @@ public class ChatMessages implements Listener {
 
                             s.update();
 
-                            if (Core.isAboveEight() && Config.useTitles()) {
+                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                 Core.getTitleManager().sendTitle(p, Messages.getString("CreateShop"));
@@ -361,29 +310,19 @@ public class ChatMessages implements Listener {
 
                                             items.setAmount(1);
 
-                                            if (!shop.getShopContents(false).containsKey(items)) {
-                                                if (i < 53) {
-                                                    shop.addItem(items, i, false);
-                                                    i++;
-                                                } else {
-                                                    if (i == 53) {
-                                                        shop.addItem(items, i, false);
-                                                        i = 72;
-                                                    } else {
-                                                        shop.addItem(items, i, false);
-                                                        i++;
-                                                    }
-                                                }
-                                            } else {
-                                                shop.addItem(items, i, false);
-                                            }
+                                            int page = shop.getNextAvailablePage(false);
+                                            int sl = shop.getNextSlotForPage(page, false);
+
+                                            ShopItem shopItem = shop.createShopItem(items, sl, page, false);
 
                                             items.setAmount(am);
 
                                             if (items.getAmount() > 1) {
                                                 int amt = items.getAmount();
 
-                                                shop.setStock(items, ((shop.getStock(items, false) + amt) - 1), false);
+                                                amt = amt - 1;
+
+                                                shopItem.setStock(shopItem.getStock() + amt);
 
                                                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                                     public void run() {
@@ -424,7 +363,7 @@ public class ChatMessages implements Listener {
                             e.setCancelled(true);
                             e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("SignRemoved"));
 
-                            if (Core.isAboveEight() && Config.useTitles()) {
+                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                 Core.getTitleManager().sendSubTitle(p, Messages.getString("SignRemoved"));
@@ -440,7 +379,7 @@ public class ChatMessages implements Listener {
                         if (Long) {
                             e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("LongName"));
 
-                            if (Core.isAboveEight() && Config.useTitles()) {
+                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                 Core.getTitleManager().sendTitle(p, Messages.getString("LongName"));
@@ -452,7 +391,7 @@ public class ChatMessages implements Listener {
                         if (!can) {
                             e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NameTaken"));
 
-                            if (Core.isAboveEight() && Config.useTitles()) {
+                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                 Core.getTitleManager().sendTitle(p, Messages.getString("NameTaken"));
@@ -464,7 +403,7 @@ public class ChatMessages implements Listener {
                 } else {
                     e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperName"));
 
-                    if (Core.isAboveEight() && Config.useTitles()) {
+                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                         Core.getTitleManager().setTimes(p, 20, 40, 20);
                         Core.getTitleManager().sendTitle(p, Messages.getString("ImproperName"));
@@ -671,7 +610,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = collectStock.get(p).get(shop);
+                ShopItem ite = collectStock.get(p).get(shop);
 
                 int amt;
                 try {
@@ -679,10 +618,15 @@ public class ChatMessages implements Listener {
                 } catch (Exception ex) {
                     if (name.equalsIgnoreCase("all")) {
                         Stocks.collectAll(ite, shop, p);
+                        assert shop != null;
+                        if (shop.isHoloShop()){
+                            ShopHologram h = shop.getHolographicShop();
+                            h.updateItemLines(h.getItemLine(),true);
+                        }
                         return;
                     } else {
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
-                        OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                        OpenSellingOptions.openShopSellingOptions(null, p, shop, ite.getPage());
                         return;
                     }
                 }
@@ -718,7 +662,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = addStock.get(p).get(shop);
+                ShopItem ite = addStock.get(p).get(shop);
 
                 int amt;
                 try {
@@ -726,10 +670,15 @@ public class ChatMessages implements Listener {
                 } catch (Exception ex) {
                     if (name.equalsIgnoreCase("all")) {
                         Stocks.addAll(ite, shop, p);
+                        assert shop != null;
+                        if (shop.isHoloShop()){
+                            ShopHologram h = shop.getHolographicShop();
+                            h.updateItemLines(h.getItemLine(),ite.isSelling());
+                        }
                         return;
                     } else {
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
-                        OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                        OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, ite.getPage());
                         return;
                     }
                 }
@@ -766,7 +715,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = removeStock.get(p).get(shop);
+                ShopItem ite = removeStock.get(p).get(shop);
 
                 int amt;
                 try {
@@ -774,10 +723,15 @@ public class ChatMessages implements Listener {
                 } catch (Exception ex) {
                     if (name.equalsIgnoreCase("all")) {
                         Stocks.removeAll(ite, shop, p);
+                        assert shop != null;
+                        if (shop.isHoloShop()){
+                            ShopHologram h = shop.getHolographicShop();
+                            h.updateItemLines(h.getItemLine(),ite.isSelling());
+                        }
                         return;
                     } else {
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
-                        OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                        OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, ite.getPage());
                         return;
                     }
                 }
@@ -811,7 +765,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = setBuyPrice.get(p).get(shop);
+                ShopItem ite = setBuyPrice.get(p).get(shop);
 
                 boolean can;
                 double amt = 0.0;
@@ -827,7 +781,11 @@ public class ChatMessages implements Listener {
                     if (amt > 0) {
                         if (amt <= Config.getMaxPrice()) {
                             assert shop != null;
-                            shop.setPrice(ite, amt, false);
+                            ite.setPrice(amt);
+                            if (shop.isHoloShop()){
+                                ShopHologram h = shop.getHolographicShop();
+                                h.updateItemLines(h.getItemLine(),ite.isSelling());
+                            }
                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangePrice"));
                         } else {
                             if (String.valueOf(Config.getMaxPrice()).contains("E")) {
@@ -840,7 +798,7 @@ public class ChatMessages implements Listener {
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
                     }
                 }
-                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, ite.getPage());
             } else {
                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
@@ -866,7 +824,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = setSellPrice.get(p).get(shop);
+                ShopItem ite = setSellPrice.get(p).get(shop);
 
                 boolean can;
                 double amt = 0.0;
@@ -882,7 +840,11 @@ public class ChatMessages implements Listener {
                     if (amt > 0) {
                         if (amt <= Config.getMaxPrice()) {
                             assert shop != null;
-                            shop.setPrice(ite, amt, true);
+                            ite.setPrice(amt);
+                            if (shop.isHoloShop()){
+                                ShopHologram h = shop.getHolographicShop();
+                                h.updateItemLines(h.getItemLine(),ite.isSelling());
+                            }
                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangePrice"));
                         } else {
                             if (String.valueOf(Config.getMaxPrice()).contains("E")) {
@@ -896,7 +858,7 @@ public class ChatMessages implements Listener {
                     }
                 }
 
-                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, ite.getPage());
             } else {
                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
@@ -921,7 +883,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = setBuyAmount.get(p).get(shop);
+                ShopItem ite = setBuyAmount.get(p).get(shop);
 
                 boolean can;
                 int amt = 0;
@@ -936,13 +898,17 @@ public class ChatMessages implements Listener {
                 if (can) {
                     if (amt > 0 && amt <= 2304) {
                         assert shop != null;
-                        shop.setAmount(ite, amt, false);
+                        ite.setAmount(amt);
+                        if (shop.isHoloShop()){
+                            ShopHologram h = shop.getHolographicShop();
+                            h.updateItemLines(h.getItemLine(),ite.isSelling());
+                        }
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeAmount"));
                     } else {
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighAmount"));
                     }
                 }
-                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, ite.getPage());
             } else {
                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
@@ -967,7 +933,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = setSellAmount.get(p).get(shop);
+                ShopItem ite = setSellAmount.get(p).get(shop);
 
                 boolean can;
                 int amt = 0;
@@ -982,18 +948,63 @@ public class ChatMessages implements Listener {
                 if (can) {
                     if (amt > 0 && amt <= 2304) {
                         assert shop != null;
-                        shop.setAmount(ite, amt, true);
+                        ite.setAmount(amt);
+                        if (shop.isHoloShop()){
+                            ShopHologram h = shop.getHolographicShop();
+                            h.updateItemLines(h.getItemLine(),ite.isSelling());
+                        }
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeAmount"));
                     } else {
                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighAmount"));
                     }
                 }
 
-                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, ite.getPage());
             } else {
                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             setSellAmount.remove(p);
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onSetDoubleAmount(AsyncPlayerChatEvent e) {
+        Player p = e.getPlayer();
+
+        String name = e.getMessage();
+
+        if (setDoubleAmount.containsKey(p)) {
+            if (!name.equalsIgnoreCase("Cancel")) {
+                Shop shp = null;
+
+                for (Shop s : setDoubleAmount.get(p).keySet()) {
+                    shp = s;
+                }
+
+                final Shop shop = shp;
+
+                ShopItem ite = setDoubleAmount.get(p).get(shop);
+
+                boolean can;
+                int amt = 0;
+                try {
+                    amt = Integer.parseInt(name);
+                    can = true;
+                } catch (Exception ex) {
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
+                    can = false;
+                }
+
+                if (can) {
+                    assert shop != null;
+                    ite.setAmountToDouble(amt);
+                }
+                LiveEco.openLiveEcoInventory(shop, p, ite, ite.getItem());
+            } else {
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
+            }
+            setDoubleAmount.remove(p);
             e.setCancelled(true);
         }
     }
@@ -1015,7 +1026,7 @@ public class ChatMessages implements Listener {
 
                 final Shop shop = shp;
 
-                ItemStack ite = changeData.get(p).get(shop);
+                ShopItem ite = changeData.get(p).get(shop);
 
                 boolean can;
                 int amt = 0;
@@ -1030,31 +1041,78 @@ public class ChatMessages implements Listener {
                 if (can) {
 
                     assert shop != null;
-                    int am = shop.getAmount(ite, true);
-                    double price = shop.getPrice(ite, true);
 
-                    int slot = shop.getSlotForItem(ite, true);
+                    boolean cal = false;
 
-                    Material mat = ite.getType();
+                    if (shop.isHoloShop()) {
+                        ShopHologram h = shop.getHolographicShop();
+                        if (h.getItemLine().getItemStack().equals(ite.getItem())) {
+                            cal = true;
+                        }
+                    }
 
-                    shop.deleteItem(ite, true);
+                    ite.setData((byte) amt);
 
-                    ItemStack it = new ItemStack(mat, 1, (byte) amt);
-
-                    shop.addItem(it, slot, true);
-
-                    shop.setAmount(it, am, true);
-                    shop.setPrice(it, price, true);
-
+                    if (cal) {
+                        ShopHologram h = shop.getHolographicShop();
+                        h.getItemLine().setItemStack(ite.getItem());
+                    }
                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeData"));
 
                 }
-                OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                OpenSellingOptions.openShopSellingOptions(null, p, shop, ite.getPage());
             } else {
                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
             }
             e.setCancelled(true);
             changeData.remove(p);
+        }
+    }
+
+    @EventHandler
+    public void onSetLimit(AsyncPlayerChatEvent e) {
+        Player p = e.getPlayer();
+
+        String name = e.getMessage();
+
+        if (setLimit.containsKey(p)) {
+            if (!name.equalsIgnoreCase("Cancel")) {
+                e.setCancelled(true);
+                Shop shp = null;
+
+                for (Shop s : setLimit.get(p).keySet()) {
+                    shp = s;
+                }
+
+                final Shop shop = shp;
+
+                ShopItem ite = setLimit.get(p).get(shop);
+
+                boolean can;
+                int amt = 0;
+                try {
+                    amt = Integer.parseInt(name);
+                    can = true;
+                } catch (Exception ex) {
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
+                    can = false;
+                }
+
+                if (can) {
+
+                    assert shop != null;
+
+                    ite.setLimit(amt);
+
+                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeLimit"));
+
+                }
+                OpenSellingOptions.openShopSellingOptions(null, p, shop, ite.getPage());
+            } else {
+                p.sendMessage(Messages.getString("Prefix") + Messages.getString("Cancelled"));
+            }
+            e.setCancelled(true);
+            setLimit.remove(p);
         }
     }
 
@@ -1084,7 +1142,7 @@ public class ChatMessages implements Listener {
                 } else {
                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperDescription"));
 
-                    if (Core.isAboveEight() && Config.useTitles()) {
+                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                         p.closeInventory();
                         Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -1116,9 +1174,14 @@ public class ChatMessages implements Listener {
                 OfflinePlayer player = Bukkit.getOfflinePlayer(name);
                 if (player.hasPlayedBefore()) {
 
-                    shop.addManager(player);
-                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddedKeeper"));
-                    ShopKeeperManager.openKeeperManager(p, shop);
+                    if (!shop.getManagers().contains(player)) {
+                        shop.addManager(player);
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddedKeeper"));
+                        ShopKeeperManager.openKeeperManager(p, shop);
+                    } else {
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyAKeeper"));
+                        ShopKeeperManager.openKeeperManager(p, shop);
+                    }
                 } else {
                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidKeeper"));
                     ShopKeeperManager.openKeeperManager(p, shop);

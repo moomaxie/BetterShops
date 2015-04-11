@@ -3,11 +3,13 @@ package me.moomaxie.BetterShops.Listeners.Checkout;
 import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.Checkout;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -35,7 +37,7 @@ public class AmountChooser implements Listener {
 
         boolean already = false;
         if (inv == null) {
-            inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+            inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
             already = true;
         } else {
             inv.clear();
@@ -109,7 +111,7 @@ public class AmountChooser implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onSelect(final InventoryClickEvent e) {
         final Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
@@ -127,6 +129,8 @@ public class AmountChooser implements Listener {
 
                             if (e.getCurrentItem().getItemMeta().getDisplayName() != null) {
 
+                                final ShopItem shopItem = ShopItem.fromItemStack(shop, e.getInventory().getItem(4), false);
+
                                 if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("Cancel"))) {
                                     if (!shop.isOpen()) {
                                         if (shop.getOwner() == p) {
@@ -139,22 +143,27 @@ public class AmountChooser implements Listener {
                                     }
                                 }
 
-                                if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("Confirm"))) {
-                                    CheckoutMenu.addToCart(p, shop, e.getInventory().getItem(4), total);
+                                if (e.getCurrentItem().getItemMeta().getLore() != null) {
+                                    if (e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("AddToCart")) && e.isShiftClick()) {
+                                        AmountChooser.openAmountChooser(1, e.getCurrentItem(), p, shop, e.getInventory());
+                                    }
+                                } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("Confirm"))) {
+
+                                    CheckoutMenu.addToCart(p, shop, ShopItem.fromItemStack(shop, e.getInventory().getItem(4), false), total);
 
                                     p.sendMessage(Messages.getString("Prefix") + "§eAdded Item to §aCart");
 
                                     OpenShop.openShopItems(e.getInventory(), p, shop, 1);
 
                                 } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("AddOne"))) {
-                                    if (shop.getStock(e.getInventory().getItem(4), false) >= total + 1 || shop.isInfinite(e.getInventory().getItem(4), false)) {
+                                    if (shopItem.getStock() >= total + 1 || shopItem.isInfinite()) {
                                         openAmountChooser(total + 1, e.getInventory().getItem(4), p, shop, e.getInventory());
                                     }
                                 } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("AddStack"))) {
-                                    if (shop.getStock(e.getInventory().getItem(4), false) >= total + e.getInventory().getItem(4).getMaxStackSize() || shop.isInfinite(e.getInventory().getItem(4), false)) {
+                                    if (shopItem.getStock() >= total + e.getInventory().getItem(4).getMaxStackSize() || shopItem.isInfinite()) {
                                         openAmountChooser(total + e.getInventory().getItem(4).getMaxStackSize(), e.getInventory().getItem(4), p, shop, e.getInventory());
                                     } else {
-                                        openAmountChooser(shop.getStock(e.getInventory().getItem(4), false), e.getInventory().getItem(4), p, shop, e.getInventory());
+                                        openAmountChooser(shopItem.getStock(), e.getInventory().getItem(4), p, shop, e.getInventory());
                                     }
                                 } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Checkout.getString("RemoveOne"))) {
                                     if (1 <= total - 1) {
@@ -192,7 +201,7 @@ public class AmountChooser implements Listener {
 
                                                                         } catch (Exception ex) {
                                                                             if (name.equalsIgnoreCase("all")) {
-                                                                                openAmountChooser(shop.getStock(e.getInventory().getItem(4), false), e.getInventory().getItem(4), p, shop, null);
+                                                                                openAmountChooser(shopItem.getStock(), e.getInventory().getItem(4), p, shop, null);
 
                                                                             } else {
                                                                                 ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
@@ -225,7 +234,6 @@ public class AmountChooser implements Listener {
                                         gui.open();
                                     }
                                 }
-
                             }
                         }
                     }

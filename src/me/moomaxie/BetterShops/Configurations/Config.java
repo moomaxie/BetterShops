@@ -2,6 +2,7 @@ package me.moomaxie.BetterShops.Configurations;
 
 import me.moomaxie.BetterShops.Core;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 
@@ -25,8 +26,8 @@ import java.util.jar.JarFile;
  */
 public class Config {
 
-    private static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "config.yml");
-    private static YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+    public static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "config.yml");
+    public static FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
     public static boolean autoAddItems() {
         return config.isBoolean("Auto Add") && config.getBoolean("Auto Add");
@@ -76,6 +77,34 @@ public class Config {
 
     public static void setUseTransactions(boolean b) {
         config.set("UseTransactions", b);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean useLiveEco() {
+        return config.isBoolean("UseLiveEco") && config.getBoolean("UseLiveEco");
+    }
+
+    public static void setUseLiveEco(boolean b) {
+        config.set("UseLiveEco", b);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean useHoloShops() {
+        return config.isBoolean("HoloShops") && config.getBoolean("HoloShops");
+    }
+
+    public static void setUseHoloShops(boolean b) {
+        config.set("HoloShops", b);
 
         try {
             config.save(file);
@@ -368,7 +397,9 @@ public class Config {
         List<EntityType> ent = new ArrayList<>();
 
         for (String s : config.getConfigurationSection("NPC").getKeys(false)) {
-            ent.add(EntityType.valueOf(s.toUpperCase().replaceAll(" ", "_")));
+            if (isInEnum(s.toUpperCase().replaceAll(" ", "_"),EntityType.class)) {
+                ent.add(EntityType.valueOf(s.toUpperCase().replaceAll(" ", "_")));
+            }
         }
 
         return ent;
@@ -378,13 +409,24 @@ public class Config {
 
         List<EntityType> ent = new ArrayList<>();
 
+
+
         for (String s : config.getConfigurationSection("NPC").getKeys(false)) {
             if (config.getConfigurationSection("NPC").getBoolean(s)) {
-                ent.add(EntityType.valueOf(s.toUpperCase().replaceAll(" ", "_")));
+                if (isInEnum(s.toUpperCase().replaceAll(" ", "_"),EntityType.class)) {
+                    ent.add(EntityType.valueOf(s.toUpperCase().replaceAll(" ", "_")));
+                }
             }
         }
 
         return ent;
+    }
+
+    public static <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
+        for (E e : enumClass.getEnumConstants()) {
+            if(e.name().equals(value)) { return true; }
+        }
+        return false;
     }
 
     public static void changeConfig() {
@@ -404,11 +446,11 @@ public class Config {
 
         if (!found3) {
 
-            File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+            File fil = Core.getCore().getFile();
 
             JarFile jar = null;
             try {
-                jar = new JarFile(fil);
+                jar = new java.util.jar.JarFile(fil);
             } catch (IOException e) {
                 Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cImproper Jar Name, Rename the .Jar to 'BetterShops.jar'. Plugin Disabling!");
                 Bukkit.getPluginManager().disablePlugin(Core.getCore());
@@ -417,7 +459,7 @@ public class Config {
             while (enumEntries.hasMoreElements()) {
                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                 if (file.getName().equals("config.yml")) {
-                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                     if (file.isDirectory()) { // if its a directory, create it
                         f.mkdir();
                         continue;
@@ -443,7 +485,7 @@ public class Config {
                 HashMap<String, Object> hash = new HashMap<>();
 
                 for (String s : config.getKeys(true)) {
-                    if (!s.contains("Version"))
+                    if (!s.contains("Version") && !s.contains("NPC"))
                         hash.put(s, config.get(s));
                 }
 
@@ -452,11 +494,11 @@ public class Config {
 
                     if (!d.equals(Core.getCore().getDescription().getVersion())) {
                         if (file.delete()) {
-                            File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                            File fil = Core.getCore().getFile();
 
                             JarFile jar = null;
                             try {
-                                jar = new JarFile(fil);
+                                jar = new java.util.jar.JarFile(fil);
                             } catch (IOException e) {
                                 Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cImproper Jar Name, Rename the .Jar to 'BetterShops.jar'. Plugin Disabling!");
                                 Bukkit.getPluginManager().disablePlugin(Core.getCore());
@@ -465,7 +507,7 @@ public class Config {
                             while (enumEntries.hasMoreElements()) {
                                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                                 if (file.getName().equals("config.yml")) {
-                                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                                     if (file.isDirectory()) { // if its a directory, create it
                                         f.mkdir();
                                         continue;
@@ -480,7 +522,7 @@ public class Config {
                                         fos.close();
                                         is.close();
 
-                                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the config file to it's new version");
+                                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the Config file.");
 
                                     } catch (Exception e) {
 
@@ -494,11 +536,11 @@ public class Config {
 
                     file.delete();
 
-                    File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                    File fil = Core.getCore().getFile();
 
                     JarFile jar = null;
                     try {
-                        jar = new JarFile(fil);
+                        jar = new java.util.jar.JarFile(fil);
                     } catch (IOException e) {
                         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cImproper Jar Name, Rename the .Jar to 'BetterShops.jar'. Plugin Disabling!");
                         Bukkit.getPluginManager().disablePlugin(Core.getCore());
@@ -507,7 +549,7 @@ public class Config {
                     while (enumEntries.hasMoreElements()) {
                         java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                         if (file.getName().equals("config.yml")) {
-                            File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                            java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                             if (file.isDirectory()) { // if its a directory, create it
                                 f.mkdir();
                                 continue;
@@ -520,7 +562,7 @@ public class Config {
                                 }
                                 fos.close();
                                 is.close();
-                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the config file to it's new version");
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the Config file.");
 
                             } catch (Exception e) {
 

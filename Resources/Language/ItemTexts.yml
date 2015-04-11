@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.5
+Version: 1.6.0 Beta 10
 
 PriceDisplayName: '&a&lChange Price of Item'
 SellPriceDisplayName: '&a&lChange Price'
@@ -40,3 +40,9 @@ ItemDataExample: '&8(Example) &7Use this to specify a wool color'
 InfiniteDisplayNameOn: '&a&lChange Infinite &7- &aOn'
 InfiniteDisplayNameOff: '&a&lChange Infinite &7- &cOff'
 InfiniteLore: '&e&lLeft Click &7to toggle &dInfinite'
+
+LiveEco: '&a&lLive Economy'
+LiveEcoLore: '&e&lLeft Click &7to &dView'
+
+SellLimit: '&a&lSell Limit &7- &e<Amount>'
+SellLimitLore: '&e&lClick &7to change'

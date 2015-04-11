@@ -19,7 +19,7 @@ import java.util.HashMap;
  */
 public class Checkout {
 
-    private static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/Checkout.yml");
+    public static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/Checkout.yml");
     public static YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
     public static String getString(String name){
@@ -59,7 +59,7 @@ public class Checkout {
 
         if (!found3) {
 
-            File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+            File fil = Core.getCore().getFile();
 
             java.util.jar.JarFile jar = null;
             try {
@@ -72,7 +72,7 @@ public class Checkout {
             while (enumEntries.hasMoreElements()) {
                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                 if (file.getName().equals("Language/Checkout.yml")) {
-                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                     try {
                         Checkout.file.createNewFile();
                     } catch (IOException e) {
@@ -121,7 +121,7 @@ public class Checkout {
 
                     if (!d.equals(Core.getCore().getDescription().getVersion())) {
                         if (file.delete()) {
-                            File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                            File fil = Core.getCore().getFile();
 
                             java.util.jar.JarFile jar = null;
                             try {
@@ -134,7 +134,7 @@ public class Checkout {
                             while (enumEntries.hasMoreElements()) {
                                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                                 if (file.getName().equals("Language/Checkout.yml")) {
-                                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                                     try {
                                         Checkout.file.createNewFile();
                                     } catch (IOException e) {
@@ -175,7 +175,7 @@ public class Checkout {
 
                     file.delete();
 
-                    File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                    File fil = Core.getCore().getFile();
 
                     java.util.jar.JarFile jar = null;
                     try {
@@ -188,7 +188,7 @@ public class Checkout {
                     while (enumEntries.hasMoreElements()) {
                         java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                         if (file.getName().equals("Language/Checkout.yml")) {
-                            File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                            java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                             try {
                                 Checkout.file.createNewFile();
                             } catch (IOException e) {

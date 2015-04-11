@@ -21,7 +21,7 @@ import java.util.HashMap;
 public class AnvilGUI implements me.moomaxie.BetterShops.Configurations.AnvilGUI {
     private class AnvilContainer extends ContainerAnvil {
         public AnvilContainer(EntityHuman entity) {
-            super(entity.inventory, entity.world, new BlockPosition(0,0,0), entity);
+            super(entity.inventory, entity.world, new BlockPosition(0, 0, 0), entity);
         }
 
         @Override
@@ -32,7 +32,7 @@ public class AnvilGUI implements me.moomaxie.BetterShops.Configurations.AnvilGUI
 
     private class EightAnvilContainer extends ContainerAnvil {
         public EightAnvilContainer(EntityHuman entity) {
-            super(entity.inventory, entity.world, new BlockPosition(0,0,0), entity);
+            super(entity.inventory, entity.world, new BlockPosition(0, 0, 0), entity);
         }
 
         @Override
@@ -300,35 +300,35 @@ public class AnvilGUI implements me.moomaxie.BetterShops.Configurations.AnvilGUI
     public void open() {
         EntityPlayer p = ((CraftPlayer) player).getHandle();
 
-            AnvilContainer container = new AnvilContainer(p);
+        AnvilContainer container = new AnvilContainer(p);
 
-            //Set the items to the items from the inventory given
-            inv = container.getBukkitView().getTopInventory();
+        //Set the items to the items from the inventory given
+        inv = container.getBukkitView().getTopInventory();
 
-            if (items == null) {
-                items = new HashMap<me.moomaxie.BetterShops.Configurations.AnvilGUI.AnvilSlot, ItemStack>();
-            }
-            for (me.moomaxie.BetterShops.Configurations.AnvilGUI.AnvilSlot slot : items.keySet()) {
-                inv.setItem(slot.getSlot(), items.get(slot));
-            }
-
-
-            //Counter stuff that the game uses to keep track of inventories
-            int c = p.nextContainerCounter();
-
-            //Send the packet
-
-            p.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:anvil", new ChatComponentText("Repairing")));
+        if (items == null) {
+            items = new HashMap<me.moomaxie.BetterShops.Configurations.AnvilGUI.AnvilSlot, ItemStack>();
+        }
+        for (me.moomaxie.BetterShops.Configurations.AnvilGUI.AnvilSlot slot : items.keySet()) {
+            inv.setItem(slot.getSlot(), items.get(slot));
+        }
 
 
-            //Set their active container to the container
-            p.activeContainer = container;
+        //Counter stuff that the game uses to keep track of inventories
+        int c = p.nextContainerCounter();
 
-            //Set their active container window id to that counter stuff
-            p.activeContainer.windowId = c;
+        //Send the packet
 
-            //Add the slot listener
-            p.activeContainer.addSlotListener(p);
+        p.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:anvil", new ChatComponentText("Repairing")));
+
+
+        //Set their active container to the container
+        p.activeContainer = container;
+
+        //Set their active container window id to that counter stuff
+        p.activeContainer.windowId = c;
+
+        //Add the slot listener
+        p.activeContainer.addSlotListener(p);
 
     }
 
@@ -337,7 +337,10 @@ public class AnvilGUI implements me.moomaxie.BetterShops.Configurations.AnvilGUI
         handler = null;
         items = null;
 
-        HandlerList.unregisterAll(listener);
+        if (listener != null) {
+
+            HandlerList.unregisterAll(listener);
+        }
 
         listener = null;
     }

@@ -9,7 +9,9 @@ import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Configurations.WordsCapitalizer;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
+import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -39,9 +41,9 @@ import java.util.*;
 
 public class CheckoutMenu implements Listener {
 
-    private static HashMap<HashMap<UUID, Shop>, List<HashMap<HashMap<ItemStack, Byte>, Integer>>> cart = new HashMap<>();
+    private static HashMap<HashMap<UUID, Shop>, List<HashMap<HashMap<ShopItem, Byte>, Integer>>> cart = new HashMap<>();
 
-    public static void addToCart(Player p, Shop shop, ItemStack item, int amt) {
+    public static void addToCart(Player p, Shop shop, ShopItem item, int amt) {
         HashMap<UUID, Shop> k = null;
         boolean can = false;
 
@@ -57,12 +59,12 @@ public class CheckoutMenu implements Listener {
 
         if (can) {
 
-            HashMap<HashMap<ItemStack, Byte>, Integer> value = new HashMap<>();
-            HashMap<ItemStack, Byte> by = new HashMap<>();
-            by.put(item, item.getData().getData());
+            HashMap<HashMap<ShopItem, Byte>, Integer> value = new HashMap<>();
+            HashMap<ShopItem, Byte> by = new HashMap<>();
+            by.put(item, item.getData());
             value.put(by, amt);
 
-            List<HashMap<HashMap<ItemStack, Byte>, Integer>> v = cart.get(k);
+            List<HashMap<HashMap<ShopItem, Byte>, Integer>> v = cart.get(k);
 
             v.add(value);
 
@@ -73,12 +75,12 @@ public class CheckoutMenu implements Listener {
             HashMap<UUID, Shop> key = new HashMap<>();
             key.put(p.getUniqueId(), shop);
 
-            HashMap<HashMap<ItemStack, Byte>, Integer> value = new HashMap<>();
-            HashMap<ItemStack, Byte> by = new HashMap<>();
-            by.put(item, item.getData().getData());
+            HashMap<HashMap<ShopItem, Byte>, Integer> value = new HashMap<>();
+            HashMap<ShopItem, Byte> by = new HashMap<>();
+            by.put(item, item.getData());
             value.put(by, amt);
 
-            List<HashMap<HashMap<ItemStack, Byte>, Integer>> v = new ArrayList<>();
+            List<HashMap<HashMap<ShopItem, Byte>, Integer>> v = new ArrayList<>();
             v.add(value);
 
             cart.put(key, v);
@@ -87,7 +89,7 @@ public class CheckoutMenu implements Listener {
 
     public static void openCheckoutMenu(Player p, Shop shop) {
 
-        Inventory inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+        Inventory inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
 
         ItemStack item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
         ItemMeta m = item.getItemMeta();
@@ -149,27 +151,27 @@ public class CheckoutMenu implements Listener {
         }
 
         if (can) {
-            List<HashMap<HashMap<ItemStack, Byte>, Integer>> items = cart.get(k);
+            List<HashMap<HashMap<ShopItem, Byte>, Integer>> items = cart.get(k);
             if (items != null) {
-                for (HashMap<HashMap<ItemStack, Byte>, Integer> ie : items) {
-                    for (HashMap<ItemStack, Byte> i : ie.keySet()) {
-                        for (ItemStack it : i.keySet()) {
+                for (HashMap<HashMap<ShopItem, Byte>, Integer> ie : items) {
+                    for (HashMap<ShopItem, Byte> i : ie.keySet()) {
+                        for (ShopItem it : i.keySet()) {
 
                             if (it != null && ie.get(i) != null) {
-                                MaterialData data = new MaterialData(it.getType(), i.get(it));
-                                it.setData(data);
+                                MaterialData data = new MaterialData(it.getItem().getType(), i.get(it));
+                                it.getItem().setData(data);
 
-                                total = total + (ie.get(i) * (shop.getPrice(it, false) / shop.getAmount(it, false)));
+                                total = total + (ie.get(i) * (it.getPrice() / it.getAmount()));
 
-                                ItemMeta meta = it.getItemMeta();
-                                List<String> lore;
-                                if (shop.getLore(it) != null) {
-                                    lore = shop.getLore(it);
-                                } else {
-                                    lore = new ArrayList<>();
+                                ItemMeta meta = it.getItem().getItemMeta();
+                                List<String> lore = new ArrayList<>();
+                                if (it.getLore() != null) {
+                                    for (String s : it.getLore()) {
+                                        lore.add(s);
+                                    }
                                 }
 
-                                ItemStack ite = it.clone();
+                                ItemStack ite = it.getItem().clone();
 
                                 if (lore != null) {
 
@@ -179,12 +181,12 @@ public class CheckoutMenu implements Listener {
                                         lore.add(MainGUI.getString("Amount") + " §71");
                                     }
                                     if (ie.get(i) != null) {
-                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * ie.get(i));
+                                        BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * ie.get(i));
 
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                         lore.add(MainGUI.getString("Price") + " §7" + bd.doubleValue());
                                     } else {
-                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * 1);
+                                        BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * 1);
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                         lore.add(MainGUI.getString("Price") + " §7" + bd.doubleValue());
 
@@ -229,7 +231,7 @@ public class CheckoutMenu implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onArrange(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
@@ -239,20 +241,21 @@ public class CheckoutMenu implements Listener {
 
                     Shop shop = ShopLimits.fromString(p, name);
 
-                    if (e.getCurrentItem().getItemMeta() != null) {
+                    if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().hasItemMeta()) {
+
+                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("CheckoutLore")) && e.isLeftClick()) {
+                            openCheckoutMenu(p, shop);
+                            return;
+                        }
 
                         if (e.getCurrentItem().getItemMeta().getLore() != null) {
                             if (e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("AddToCart")) && e.isShiftClick()) {
                                 AmountChooser.openAmountChooser(1, e.getCurrentItem(), p, shop, e.getInventory());
+                                return;
                             }
                         }
 
-                        if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("CheckoutLore")) && e.isLeftClick()) {
-                            openCheckoutMenu(p, shop);
-
-                        }
-
-                        if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().contains(Checkout.getString("BuyItems"))) {
+                        if (e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName().contains(Checkout.getString("BuyItems"))) {
                             if (!shop.isOpen() && !Config.useWhenClosed()) {
                                 p.closeInventory();
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
@@ -261,7 +264,8 @@ public class CheckoutMenu implements Listener {
 
                             for (int i = 9; i < e.getInventory().getContents().length; i++) {
                                 ItemStack item = e.getInventory().getItem(i);
-                                if (item != null && item.getItemMeta().getLore() != null) {
+                                ShopItem shopItem = ShopItem.fromItemStack(shop, item, false);
+                                if (shopItem != null && item != null && item.getItemMeta().getLore() != null) {
                                     List<String> lore = item.getItemMeta().getLore();
 
                                     double pr = Config.getDefaultPrice();
@@ -275,11 +279,11 @@ public class CheckoutMenu implements Listener {
                                         }
                                     }
 
-                                    BigDecimal bd = new BigDecimal((pr / amt) * shop.getAmount(item, false));
+                                    BigDecimal bd = new BigDecimal((pr / amt) * shopItem.getAmount());
 
                                     bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
 
-                                    if (bd.doubleValue() != shop.getPrice(item, false)) {
+                                    if (bd.doubleValue() != shopItem.getPrice()) {
                                         p.closeInventory();
                                         if (item.getItemMeta().getDisplayName() != null) {
                                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("PriceChange").replaceAll("<Item>", item.getItemMeta().getDisplayName()));
@@ -293,7 +297,7 @@ public class CheckoutMenu implements Listener {
                             }
 
                             buyCheckoutItems(p, shop);
-
+                            return;
 
                         }
 
@@ -313,49 +317,57 @@ public class CheckoutMenu implements Listener {
                             }
 
                             if (can) {
-                                List<HashMap<HashMap<ItemStack, Byte>, Integer>> items = cart.get(k);
+                                List<HashMap<HashMap<ShopItem, Byte>, Integer>> items = cart.get(k);
                                 if (items != null) {
-                                    for (HashMap<HashMap<ItemStack, Byte>, Integer> ie : items) {
-                                        for (HashMap<ItemStack, Byte> i : ie.keySet()) {
-                                            for (ItemStack it : i.keySet()) {
-                                                ItemMeta meta = it.getItemMeta();
-                                                List<String> lore;
-                                                if (shop.getLore(it) != null) {
-                                                    lore = shop.getLore(it);
-                                                } else {
-                                                    lore = new ArrayList<>();
-                                                }
+                                    for (HashMap<HashMap<ShopItem, Byte>, Integer> ie : items) {
+                                        for (HashMap<ShopItem, Byte> i : ie.keySet()) {
+                                            for (ShopItem it : i.keySet()) {
 
-                                                ItemStack ite = it.clone();
+                                                if (it != null && ie.get(i) != null) {
+                                                    MaterialData data = new MaterialData(it.getItem().getType(), i.get(it));
+                                                    it.getItem().setData(data);
 
-                                                if (lore != null) {
-                                                    if (!lore.contains(Checkout.getString("ClickToRemove"))) {
+                                                    ItemMeta meta = it.getItem().getItemMeta();
+                                                    List<String> lore = new ArrayList<>();
+                                                    if (it.getLore() != null) {
+                                                        for (String s : it.getLore()) {
+                                                            lore.add(s);
+                                                        }
+                                                    }
+
+                                                    ItemStack ite = it.getItem().clone();
+
+                                                    if (lore != null) {
+
                                                         if (ie.get(i) != null) {
                                                             lore.add(MainGUI.getString("Amount") + " §7" + ie.get(i));
                                                         } else {
                                                             lore.add(MainGUI.getString("Amount") + " §71");
                                                         }
                                                         if (ie.get(i) != null) {
-                                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * ie.get(i));
+                                                            BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * ie.get(i));
+
                                                             bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                                             lore.add(MainGUI.getString("Price") + " §7" + bd.doubleValue());
                                                         } else {
-                                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * 1);
+                                                            BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * 1);
                                                             bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                                             lore.add(MainGUI.getString("Price") + " §7" + bd.doubleValue());
+
                                                         }
                                                         lore.add(" ");
                                                         lore.add(Checkout.getString("ClickToRemove"));
                                                         meta.setLore(lore);
                                                         ite.setItemMeta(meta);
+
                                                     }
-                                                }
 
-                                                if (e.getCurrentItem().equals(ite) && e.getCurrentItem().getData().getData() == ite.getData().getData() || e.getCurrentItem().toString().equals(ite.toString()) && e.getCurrentItem().getData().getData() == ite.getData().getData()) {
+                                                    if (e.getCurrentItem().equals(ite) && e.getCurrentItem().getData().getData() == ite.getData().getData() || e.getCurrentItem().toString().equals(ite.toString()) && e.getCurrentItem().getData().getData() == ite.getData().getData()) {
 
-                                                    cart.get(k).remove(ie);
-                                                    openCheckoutMenu(p, shop);
-                                                    return;
+                                                        cart.get(k).remove(ie);
+                                                        openCheckoutMenu(p, shop);
+                                                        return;
+                                                    }
                                                 }
                                             }
                                         }
@@ -387,22 +399,22 @@ public class CheckoutMenu implements Listener {
 
         double t = 0;
         if (can) {
-            List<HashMap<HashMap<ItemStack, Byte>, Integer>> items = cart.get(k);
+            List<HashMap<HashMap<ShopItem, Byte>, Integer>> items = cart.get(k);
             if (items != null) {
-                for (HashMap<HashMap<ItemStack, Byte>, Integer> ie : items) {
-                    for (HashMap<ItemStack, Byte> i : ie.keySet()) {
-                        for (ItemStack it : i.keySet()) {
-                            ItemMeta meta = it.getItemMeta();
-                            List<String> lore;
-                            if (shop.getLore(it) != null) {
-                                lore = shop.getLore(it);
-                            } else {
-                                lore = new ArrayList<>();
+                for (HashMap<HashMap<ShopItem, Byte>, Integer> ie : items) {
+                    for (HashMap<ShopItem, Byte> i : ie.keySet()) {
+                        for (ShopItem it : i.keySet()) {
+                            ItemMeta meta = it.getItem().getItemMeta();
+                            List<String> lore = new ArrayList<>();
+                            if (it.getLore() != null) {
+                                for (String s : it.getLore()) {
+                                    lore.add(s);
+                                }
                             }
 
                             int amt = 1;
 
-                            ItemStack ite = it.clone();
+                            ItemStack ite = it.getItem().clone();
 
                             if (lore != null) {
                                 if (!lore.contains(Checkout.getString("ClickToRemove"))) {
@@ -413,12 +425,12 @@ public class CheckoutMenu implements Listener {
                                         lore.add(MainGUI.getString("Amount") + " §71");
                                     }
                                     if (ie.get(i) != null) {
-                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * ie.get(i));
+                                        BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * ie.get(i));
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                         lore.add(MainGUI.getString("Price") + " §7" + bd.doubleValue());
                                         total = total + bd.doubleValue();
                                     } else {
-                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * 1);
+                                        BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * 1);
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                         lore.add(MainGUI.getString("Price") + " §7" + bd.doubleValue());
                                         total = total + bd.doubleValue();
@@ -430,13 +442,13 @@ public class CheckoutMenu implements Listener {
                                 }
                             }
 
-                            if (shop.getStock(ite, false) >= amt) {
-                                if (Core.getEconomy().getBalance(p) >= shop.getPrice(it, false) * amt) {
+                            if (it.getStock() >= amt) {
+                                if (Core.getEconomy().getBalance(p) >= it.getPrice() * amt) {
                                     double value;
                                     if (!shop.isServerShop()) {
 
 
-                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                        BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * amt);
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                         Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
                                         Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), bd.doubleValue());
@@ -449,7 +461,7 @@ public class CheckoutMenu implements Listener {
                                                 shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
                                                 shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
-                                                if (Core.isAboveEight() && Config.useTitles()) {
+                                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                                     Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
                                                     Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
@@ -460,7 +472,7 @@ public class CheckoutMenu implements Listener {
                                             }
                                         }
                                     } else {
-                                        BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                        BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * amt);
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                         Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
                                         t = t + bd.doubleValue();
@@ -468,12 +480,22 @@ public class CheckoutMenu implements Listener {
                                     }
 
                                     for (int o = 0; o < amt; o++) {
-                                        p.getInventory().addItem(it);
+                                        p.getInventory().addItem(it.getItem());
                                     }
-                                    if (!shop.isInfinite(ite, false))
-                                        shop.setStock(ite, shop.getStock(ite, false) - amt, false);
+                                    if (!it.isInfinite())
+                                        it.setStock(it.getStock() - amt);
 
-                                    shop.getHistory().addTransaction(p, new Date(), ite, value, amt, false, true);
+                                    shop.getHistory().addTransaction(p, new Date(), it, value, amt, false, true);
+
+                                    ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop);
+
+                                    Bukkit.getPluginManager().callEvent(ev);
+
+                                    double a = amt / it.getAmount();
+
+                                    if (it.getLiveEco()) {
+                                        it.setAmountTo(it.getAmountTo() + a);
+                                    }
 
                                 } else {
                                     if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
@@ -493,11 +515,11 @@ public class CheckoutMenu implements Listener {
                                     return;
                                 }
                             } else {
-                                if (shop.getStock(ite, false) > 0 || shop.getStock(ite, false) <= 0 && shop.isInfinite(ite, false)) {
-                                    if (Core.getEconomy().getBalance(p) >= shop.getPrice(it, false) * shop.getStock(ite, false)) {
+                                if (it.getStock() > 0 || it.getStock() <= 0 && it.isInfinite()) {
+                                    if (Core.getEconomy().getBalance(p) >= it.getPrice() * it.getStock()) {
                                         double value;
                                         if (!shop.isServerShop()) {
-                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                            BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * amt);
                                             bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                             Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
                                             Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), bd.doubleValue());
@@ -508,7 +530,7 @@ public class CheckoutMenu implements Listener {
                                                     shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
                                                     shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
-                                                    if (Core.isAboveEight() && Config.useTitles()) {
+                                                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                                         Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
                                                         Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
@@ -519,7 +541,7 @@ public class CheckoutMenu implements Listener {
                                                 }
                                             }
                                         } else {
-                                            BigDecimal bd = new BigDecimal((shop.getPrice(it, false) / shop.getAmount(it, false)) * amt);
+                                            BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * amt);
                                             bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                                             Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), bd.doubleValue());
                                             t = t + bd.doubleValue();
@@ -527,28 +549,33 @@ public class CheckoutMenu implements Listener {
                                         }
 
                                         for (int o = 0; o < amt; o++) {
-                                            p.getInventory().addItem(it);
+                                            p.getInventory().addItem(it.getItem());
                                         }
 
-                                        if (!shop.isInfinite(ite, false)) {
-                                            if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CanOnlyBuy") + shop.getStock(ite, false) + " §cof §d" + ite.getItemMeta().getDisplayName());
+                                        if (!it.isInfinite()) {
+                                            if (it.getDisplayName() != null) {
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CanOnlyBuy") + it.getStock() + " §cof §d" + it.getDisplayName());
                                             } else {
-                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CanOnlyBuy") + shop.getStock(ite, false) + " §cof §d" + ite.getType().name().replaceAll("_", " "));
+                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("CanOnlyBuy") + it.getStock() + " §cof §d" + it.getItem().getType().name().replaceAll("_", " "));
                                             }
                                         }
 
-                                        if (!shop.isInfinite(ite, false))
-                                            shop.setStock(ite, 0, false);
+                                        if (!it.isInfinite())
+                                            it.setStock(0);
 
                                         if (shop.getHistory() == null) {
                                             shop.loadTransactions();
                                         }
-                                        shop.getHistory().addTransaction(p, new Date(), ite, value, amt, false, true);
+                                        shop.getHistory().addTransaction(p, new Date(), it, value, amt, false, true);
 
-                                        ShopBuyItemEvent ev = new ShopBuyItemEvent(ite, shop);
+                                        ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop);
 
                                         Bukkit.getPluginManager().callEvent(ev);
+
+                                        if (it.getLiveEco()) {
+                                            double a = amt / it.getAmount();
+                                            it.setAmountTo(it.getAmountTo() + a);
+                                        }
 
                                     } else {
                                         if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
@@ -594,7 +621,8 @@ public class CheckoutMenu implements Listener {
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("BuyItem"));
         p.sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + t));
 
-        if (Core.isAboveEight() && Config.useTitles()) {
+
+        if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
             p.closeInventory();
 
@@ -608,5 +636,10 @@ public class CheckoutMenu implements Listener {
             OpenShop.openShopItems(null, p, shop, 1);
         }
         cart.remove(k);
+
+        if (shop.isHoloShop()) {
+            ShopHologram holo = shop.getHolographicShop();
+            holo.updateItemLines(holo.getItemLine(), false);
+        }
     }
 }

@@ -4,17 +4,20 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.Checkout;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.ItemTexts;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
-import me.moomaxie.BetterShops.Configurations.Messages;
+import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.History.History;
 import me.moomaxie.BetterShops.History.Transaction;
+import me.moomaxie.BetterShops.MySQL.DatabaseManager;
+import me.moomaxie.BetterShops.ShopTypes.Holographic.HologramManager;
+import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
+import me.moomaxie.BetterShops.ShopTypes.NPC.NPCs;
+import me.moomaxie.BetterShops.ShopTypes.NPC.ShopsNPC;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.File;
@@ -38,12 +41,12 @@ public class Shop {
     private Location l;
     private String name;
     public File file;
-    private YamlConfiguration config;
+    public YamlConfiguration config;
     private History history;
 
-    private LinkedList<ShopItem> sellItems = null;
-    private LinkedList<ShopItem> buyItems = null;
-    private LinkedList<ShopItem> items = null;
+    private LinkedList<ShopItem> sellItems = new LinkedList<>();
+    private LinkedList<ShopItem> buyItems = new LinkedList<>();
+    private LinkedList<ShopItem> items = new LinkedList<>();
 
     public boolean transLoaded = false;
 
@@ -52,6 +55,7 @@ public class Shop {
      * @param owner    - the owner of the shop
      * @param shopName - The name of the shop
      */
+
     @Deprecated
     public Shop(Player owner, String shopName) {
         name = shopName;
@@ -96,8 +100,8 @@ public class Shop {
 
                                             this.file = f;
 
+                                            loadShopItems();
                                             history = new History(this);
-
                                             loadTransactions();
 
                                             break;
@@ -130,6 +134,8 @@ public class Shop {
         p = Bukkit.getOfflinePlayer(UUID.fromString(file.getName().substring(0, file.getName().length() - 4)));
 
         l = new Location(w, x, y, z);
+
+        loadShopItems();
         history = new History(this);
         loadTransactions();
     }
@@ -137,7 +143,6 @@ public class Shop {
     /**
      * @param shopName - The name of the shop
      */
-    @Deprecated
     public Shop(String shopName) {
         name = shopName;
 
@@ -180,6 +185,8 @@ public class Shop {
                                             this.config = config;
 
                                             this.file = f;
+
+                                            loadShopItems();
                                             history = new History(this);
                                             loadTransactions();
 
@@ -198,7 +205,6 @@ public class Shop {
     /**
      * @param loc - the location of the shop (where the chest is)
      */
-    @Deprecated
     public Shop(Location loc) {
 
         File file = new File(Core.getCore().getDataFolder(), "Shops");
@@ -241,6 +247,9 @@ public class Shop {
 
                                         p = Bukkit.getOfflinePlayer(UUID.fromString(config.getString(name + ".Owner")));
 
+                                        loadShopItems();
+                                        history = new History(this);
+                                        loadTransactions();
                                         break;
                                     }
                                 }
@@ -272,6 +281,8 @@ public class Shop {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
     /**
@@ -287,9 +298,14 @@ public class Shop {
     public void setDescription(String desc) {
         config.set(name + ".Description", desc);
 
+
         try {
             config.save(file);
-        } catch (IOException e) {
+
+            if (Core.useSQL()) {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE Shops SET `Description` = '" + desc + "' WHERE `Shops`.`Name` ='" + name + "';");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -409,6 +425,28 @@ public class Shop {
     }
 
     /**
+     * @return true if an NPC shop, false if not
+     */
+    public boolean isHoloShop() {
+
+        try {
+            if (config != null) {
+                if (config.isString(name + ".Holo")) {
+                    return config.getConfigurationSection(name).getString("Holo").equals("True");
+                } else {
+                    setHoloShop(false);
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            setHoloShop(false);
+            return false;
+        }
+    }
+
+    /**
      * @return true if shop notifications are on, false if off
      */
     public boolean isNotify() {
@@ -436,6 +474,7 @@ public class Shop {
      * @param sell - true if a selling shop, false if a buying shop
      * @return true if the item is already in the shop, false if not
      */
+    @Deprecated
     public boolean alreadyBeingSold(ItemStack item, boolean sell) {
 
         boolean exists = false;
@@ -553,36 +592,68 @@ public class Shop {
     }
 
     public void loadTransactions() {
-        if (config.getConfigurationSection(name).isConfigurationSection("Transactions")) {
 
-            if (history != null) {
-                history.clearAllTransactions();
-            }
+        if (Config.useTransactions()) {
+            if (config.getConfigurationSection(name).isConfigurationSection("Transactions")) {
 
-            Object[] carl = config.getConfigurationSection(name).getConfigurationSection("Transactions").getKeys(false).toArray();
-
-            for (int i = carl.length; i > 0; i--) {
-
-                if (carl.length - i < 36) {
-
-                    String s = (String) carl[i - 1];
-
-                    Date d = new Date(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getLong("Date"));
-                    OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getString("Player")));
-                    ItemStack item = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getItemStack("Item");
-                    double price = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getDouble("Price");
-                    int amount = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getInt("Amount");
-                    boolean sell = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getBoolean("Selling");
-
-
-                    history.addTransaction(p, d, item, price, amount, sell, false);
-                } else {
-                    String s = (String) carl[i - 1];
-
-                    config.getConfigurationSection(name).getConfigurationSection("Transactions").set(s, null);
+                if (history != null) {
+                    history.clearAllTransactions();
                 }
-            }
 
+
+                Object[] carl = config.getConfigurationSection(name).getConfigurationSection("Transactions").getKeys(false).toArray();
+
+                for (int i = carl.length; i > 0; i--) {
+
+                    if (carl.length - i < 36) {
+
+                        String s = (String) carl[i - 1];
+
+
+                        ItemStack item = null;
+                        String it = "";
+                        Date d = new Date(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getLong("Date"));
+                        OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getString("Player")));
+                        if (config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).isItemStack("Item")) {
+                            item = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getItemStack("Item");
+                        } else {
+                            it = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getString("Item");
+                        }
+                        double price = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getDouble("Price");
+                        int amount = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getInt("Amount");
+                        boolean sell = config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).getBoolean("Selling");
+
+
+                        if (item != null) {
+                            ShopItem ite = ShopItem.fromItemStack(this, item, sell);
+                            if (ite != null) {
+                                history.addTransaction(p, d, ite, price, amount, sell, false);
+
+                                if (ite.getDisplayName() != null)
+                                    config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).set("Item", ite.getDisplayName());
+                                else
+                                    config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).set("Item", ite.getItem().getType().name());
+                            } else {
+                                if (item.getItemMeta().getDisplayName() != null) {
+                                    config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).set("Item", item.getItemMeta().getDisplayName());
+                                    history.addTransaction(p, d, item.getItemMeta().getDisplayName(), price, amount, sell, false);
+                                } else {
+                                    config.getConfigurationSection(name).getConfigurationSection("Transactions").getConfigurationSection(s).set("Item", item.getType().name());
+                                    history.addTransaction(p, d, item.getType().name(), price, amount, sell, false);
+                                }
+                            }
+                        } else {
+                            history.addTransaction(p, d, it, price, amount, sell, false);
+                        }
+                    } else {
+                        String s = (String) carl[i - 1];
+
+                        config.getConfigurationSection(name).getConfigurationSection("Transactions").set(s, null);
+                    }
+                }
+            } else {
+                clearTransactions();
+            }
 
         } else {
             config.getConfigurationSection(name).createSection("Transactions");
@@ -639,180 +710,7 @@ public class Shop {
             try {
                 config.save(file);
             } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
-    /**
-     * @param item - the Itemstack to add
-     * @param inv  - The current inventory open
-     * @param sell - true if a selling shop, false if a buying shop
-     */
-    public void addItem(ItemStack item, Inventory inv, boolean sell) {
-
-        ItemMeta meta = item.getItemMeta();
-        meta.setLore(getLore(item));
-        item.setItemMeta(meta);
-
-        if (!sell) {
-            if (!config.getConfigurationSection(name).isConfigurationSection("Contents")) {
-                config.getConfigurationSection(name).createSection("Contents");
-            }
-        } else {
-            if (!config.getConfigurationSection(name).isConfigurationSection("Sell")) {
-                config.getConfigurationSection(name).createSection("Sell");
-            }
-        }
-
-        if (alreadyBeingSold(item, sell)) {
-
-            if (getOwner().isOnline()) {
-                getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("AddMore"));
-            }
-
-            int amt1 = item.getAmount();
-
-            item.setAmount(1);
-
-            if (!sell) {
-
-                int amt = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock");
-
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").set("Stock", amt + 1);
-            }
-
-            try {
-                config.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            item.setAmount(amt1);
-        } else {
-
-            int amt = item.getAmount();
-
-            item.setAmount(1);
-
-            if (!sell) {
-
-                config.getConfigurationSection(name).getConfigurationSection("Contents").createSection(inv.firstEmpty() + "");
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(inv.firstEmpty() + "").set("ItemStack", item);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(inv.firstEmpty() + "").set("Name", item.getItemMeta().getDisplayName());
-
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(inv.firstEmpty() + "").set("Stock", 1);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(inv.firstEmpty() + "").set("Price", Config.getDefaultPrice());
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(inv.firstEmpty() + "").set("Amount", 1);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(inv.firstEmpty() + "").set("Infinite", "False");
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(inv.firstEmpty() + "").set("Slot", inv.firstEmpty());
-            } else {
-                config.getConfigurationSection(name).getConfigurationSection("Sell").createSection(inv.firstEmpty() + "");
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(inv.firstEmpty() + "").set("ItemStack", item);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(inv.firstEmpty() + "").set("Name", item.getItemMeta().getDisplayName());
-
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(inv.firstEmpty() + "").set("Stock", 0);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(inv.firstEmpty() + "").set("Price", Config.getDefaultPrice());
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(inv.firstEmpty() + "").set("Amount", 1);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(inv.firstEmpty() + "").set("Slot", inv.firstEmpty());
-            }
-
-            item.setAmount(amt);
-            try {
-                config.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-
-    }
-
-    /**
-     * @param item - The Itemstack to add
-     * @param slot - the slot number to add it in
-     * @param sell - true if a selling shop, false if a buying shop
-     */
-    public void addItem(ItemStack item, int slot, boolean sell) {
-
-
-        if (item != null && item.getType() != Material.AIR) {
-            ItemMeta meta = item.getItemMeta();
-            meta.setLore(getLore(item));
-            item.setItemMeta(meta);
-
-            if (!sell) {
-                if (!config.getConfigurationSection(name).isConfigurationSection("Contents")) {
-                    config.getConfigurationSection(name).createSection("Contents");
-                }
-            } else {
-                if (!config.getConfigurationSection(name).isConfigurationSection("Sell")) {
-                    config.getConfigurationSection(name).createSection("Sell");
-                }
-            }
-
-            if (alreadyBeingSold(item, sell)) {
-
-                if (getOwner().isOnline()) {
-                    getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("AddMore"));
-                }
-
-                int amt1 = item.getAmount();
-
-                item.setAmount(1);
-
-                if (!sell) {
-
-                    int amt = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock");
-
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").set("Stock", amt + 1);
-
-                }
-
-                try {
-                    config.save(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                item.setAmount(amt1);
-            } else {
-
-                int amt = item.getAmount();
-
-                item.setAmount(1);
-
-                if (!sell) {
-
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").createSection(slot + "");
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").set("ItemStack", item);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").set("Name", item.getItemMeta().getDisplayName());
-
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").set("Stock", 1);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").set("Price", Config.getDefaultPrice());
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").set("Amount", 1);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").set("Infinite", "False");
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").set("Slot", slot);
-                } else {
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").createSection(slot + "");
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").set("ItemStack", item);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").set("Name", item.getItemMeta().getDisplayName());
-
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").set("Stock", 0);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").set("Price", Config.getDefaultPrice());
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").set("Amount", 1);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").set("Slot", slot);
-                }
-
-
-                try {
-                    config.save(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                item.setAmount(amt);
             }
         }
     }
@@ -829,7 +727,11 @@ public class Shop {
 
         try {
             config.save(file);
-        } catch (IOException e) {
+
+            if (Core.useSQL()) {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE Shops SET `Open` = '" + open + "' WHERE `Shops`.`Name` ='" + name + "';");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -846,7 +748,11 @@ public class Shop {
 
         try {
             config.save(file);
-        } catch (IOException e) {
+
+            if (Core.useSQL()) {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE Shops SET `ServerShop` = '" + open + "' WHERE `Shops`.`Name` ='" + name + "';");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -863,7 +769,32 @@ public class Shop {
 
         try {
             config.save(file);
-        } catch (IOException e) {
+
+            if (Core.useSQL()) {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE Shops SET `NPCShop` = '" + open + "' WHERE `Shops`.`Name` ='" + name + "';");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param open - true if an NPC shop, false if not
+     */
+    public void setHoloShop(boolean open) {
+        if (open) {
+            config.set(name + ".Holo", "True");
+        } else {
+            config.set(name + ".Holo", "False");
+        }
+
+        try {
+            config.save(file);
+
+            if (Core.useSQL()) {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE Shops SET `HoloShop` = '" + open + "' WHERE `Shops`.`Name` ='" + name + "';");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -880,7 +811,11 @@ public class Shop {
 
         try {
             config.save(file);
-        } catch (IOException e) {
+
+            if (Core.useSQL()) {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE Shops SET `Notify` = '" + notify + "' WHERE `Shops`.`Name` ='" + name + "';");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -890,6 +825,7 @@ public class Shop {
      * @param amt  - the new price
      * @param sell - true if a selling shop, false if a buying shop
      */
+    @Deprecated
     public void setPrice(ItemStack item, double amt, boolean sell) {
 
         if (!sell) {
@@ -910,6 +846,7 @@ public class Shop {
      * @param amt  - the new stock
      * @param sell - true if a selling shop, false if a buying shop
      */
+    @Deprecated
     public void setStock(ItemStack item, int amt, boolean sell) {
 
         if (!sell) {
@@ -951,6 +888,7 @@ public class Shop {
      * @param in   - true if infinite, false if not
      * @param sell - true if a selling shop, false if a buying shop
      */
+    @Deprecated
     public void setInfinite(ItemStack item, boolean in, boolean sell) {
 
         if (!sell) {
@@ -973,6 +911,7 @@ public class Shop {
      * @param amt  - the new amount
      * @param sell - true if a selling shop, false if a buying shop
      */
+    @Deprecated
     public void setAmount(ItemStack item, int amt, boolean sell) {
         if (!sell) {
             config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").set("Amount", amt);
@@ -989,114 +928,11 @@ public class Shop {
     }
 
     /**
-     * @param item1 - the first item to compare
-     * @param item2 - the second to compare
-     * @param sell  - true if a selling shop, false if a buying shop
-     * @return true if the same, false if not
-     */
-    public boolean compareItems(ItemStack item1, ItemStack item2, boolean sell) {
-        boolean exists = false;
-
-
-        if (item1 != null && item2 != null) {
-
-            if (item1.getType() != Material.SKULL_ITEM && item2.getType() != Material.SKULL_ITEM && !item1.getType().name().contains("LEATHER_") && !item2.getType().name().contains("LEATHER_")) {
-
-                ItemMeta meta = item1.getItemMeta();
-
-
-                meta.setLore(getLore(item1));
-                item1.setItemMeta(meta);
-
-
-                ItemMeta meta2 = item2.getItemMeta();
-
-
-                meta2.setLore(getLore(item2));
-                item2.setItemMeta(meta2);
-
-                int amt = item2.getAmount();
-
-                item2.setAmount(1);
-
-                if (item1.equals(item2) || item2.equals(item1)) {
-                    exists = true;
-                }
-
-                item2.setAmount(amt);
-            }
-
-        }
-
-        if (item1 != null && item2 != null) {
-
-            if (item1.getType() == Material.SKULL_ITEM && item2.getType() == Material.SKULL_ITEM) {
-
-
-                SkullMeta meta = (SkullMeta) item1.getItemMeta();
-
-
-                meta.setLore(getLore(item1));
-                item1.setItemMeta(meta);
-
-
-                SkullMeta meta2 = (SkullMeta) item2.getItemMeta();
-
-
-                meta2.setLore(getLore(item2));
-                item2.setItemMeta(meta2);
-
-                int amt = item2.getAmount();
-
-                item2.setAmount(1);
-
-                if (item1.equals(item2) || item2.equals(item1) || item1 == item2 || item1.toString().equals(item2.toString())) {
-                    exists = true;
-                }
-
-                item2.setAmount(amt);
-            }
-
-        }
-
-        if (item1 != null && item2 != null) {
-
-            if (item1.getType().name().contains("LEATHER_") && item2.getType().name().contains("LEATHER_")) {
-
-                LeatherArmorMeta meta = (LeatherArmorMeta) item1.getItemMeta();
-
-
-                meta.setLore(getLore(item1));
-                item1.setItemMeta(meta);
-
-
-                LeatherArmorMeta meta2 = (LeatherArmorMeta) item2.getItemMeta();
-
-
-                meta2.setLore(getLore(item2));
-                item2.setItemMeta(meta2);
-
-                int amt = item2.getAmount();
-
-                item2.setAmount(1);
-
-                if (item1.equals(item2) || item2.equals(item1)) {
-                    exists = true;
-                }
-
-                item2.setAmount(amt);
-            }
-
-        }
-
-        return exists;
-    }
-
-    /**
      * @param item - item to check
      * @param sell - true if a selling shop, false if a buying shop
      * @return the price of the item as a Double
      */
+    @Deprecated
     public Double getPrice(ItemStack item, boolean sell) {
         double price = Config.getDefaultPrice();
         if (item != null) {
@@ -1132,37 +968,10 @@ public class Shop {
     }
 
     /**
-     * @param sell - true if a selling shop, false if a buying shop
-     * @return the highest non-empty slot in the shop
-     */
-    public Integer getHighestSlot(boolean sell) {
-        int higest = 18;
-        if (!sell) {
-
-            for (String s : config.getConfigurationSection(name).getConfigurationSection("Contents").getKeys(false)) {
-                int h = Integer.parseInt(s);
-
-                if (h > higest) {
-                    higest = h;
-                }
-            }
-
-        } else {
-            for (String s : config.getConfigurationSection(name).getConfigurationSection("Sell").getKeys(false)) {
-                int h = Integer.parseInt(s);
-
-                if (h > higest) {
-                    higest = h;
-                }
-            }
-        }
-        return higest;
-    }
-
-    /**
      * @param item - the item to check
      * @return the lore of the item as a String list
      */
+    @Deprecated
     public List<String> getLore(ItemStack item) {
 
         List<String> lore = null;
@@ -1324,6 +1133,7 @@ public class Shop {
      * @param sell - true if a selling shop, false if a buying shop
      * @return the stock of the item
      */
+    @Deprecated
     public Integer getStock(ItemStack item, boolean sell) {
         int price = 1;
 
@@ -1346,18 +1156,28 @@ public class Shop {
      * @param sell - true if a selling shop, false if a buying shop
      * @return true if infinite, false if not
      */
+    @Deprecated
     public boolean isInfinite(ItemStack item, boolean sell) {
-        if (alreadyBeingSold(item, sell)) {
+        if (!sell) {
+            if (alreadyBeingSold(item, sell)) {
 
-            if (config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getString("Infinite").equals("True")) {
-                return true;
+
+                assert config != null;
+                assert name != null;
+                if (config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").isString("Infinite")) {
+                    if (config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getString("Infinite").equals("True")) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
             } else {
+                setInfinite(item, false, sell);
                 return false;
             }
-        } else {
-            setInfinite(item, false, sell);
-            return false;
         }
+        return false;
 
     }
 
@@ -1366,6 +1186,7 @@ public class Shop {
      * @param sell - true if a selling shop, false if a buying shop
      * @return the amount the item sells for
      */
+    @Deprecated
     public Integer getAmount(ItemStack item, boolean sell) {
         int price = 1;
 
@@ -1381,273 +1202,38 @@ public class Shop {
 
     /**
      * @param item1 - the first item
-     * @param slot1 - the first item's current slot
      * @param item2 - the second item
-     * @param slot2 - the second item's current slot
-     * @param sell  - true if a selling shop, false if a buying shop
      */
-    public void exchangeItems(ItemStack item1, int slot1, ItemStack item2, int slot2, boolean sell) {
-        if (!sell && item2 != null && item1 != null) {
-            if (config.getConfigurationSection(name).getConfigurationSection("Contents").isConfigurationSection(slot2 + "")) {
+    public void exchangeItems(ShopItem item1, ShopItem item2) {
+        int sl1 = item1.getSlot();
+        int page1 = item1.getPage();
 
-                double price = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").getDouble("Price");
-                int amt = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").getInt("Amount");
-                int stock = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").getInt("Stock");
+        int sl2 = item2.getSlot();
+        int page2 = item2.getPage();
 
-                String inf = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").getString("Infinite");
+        item1.setSlot(sl2);
+        item1.setPage(page2);
 
-                double price2 = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").getDouble("Price");
-                int amt2 = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").getInt("Amount");
-                int stock2 = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").getInt("Stock");
+        item2.setSlot(sl1);
+        item2.setPage(page1);
 
-                String inf2 = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").getString("Infinite");
-
-
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").set("ItemStack", item1);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").set("Stock", stock);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").set("Price", price);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").set("Amount", amt);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").set("Infinite", inf);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot2 + "").set("Slot", slot2);
-
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").set("ItemStack", item2);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").set("Stock", stock2);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").set("Price", price2);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").set("Amount", amt2);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").set("Infinite", inf2);
-                config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot1 + "").set("Slot", slot1);
-
-                try {
-                    config.save(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            if (config.getConfigurationSection(name).getConfigurationSection("Sell").isConfigurationSection(slot2 + "")) {
-
-                double price = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").getDouble("Price");
-                int amt = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").getInt("Amount");
-                int stock = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").getInt("Stock");
-
-                String inf = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").getString("Infinite");
-
-                double price2 = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").getDouble("Price");
-                int amt2 = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").getInt("Amount");
-                int stock2 = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").getInt("Stock");
-
-                String inf2 = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").getString("Infinite");
-
-
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").set("ItemStack", item1);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").set("Stock", stock);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").set("Price", price);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").set("Amount", amt);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").set("Infinite", inf);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot2 + "").set("Slot", slot2);
-
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").set("ItemStack", item2);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").set("Stock", stock2);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").set("Price", price2);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").set("Amount", amt2);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").set("Infinite", inf2);
-                config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot1 + "").set("Slot", slot1);
-
-                try {
-                    config.save(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     /**
      * @param item    - the item to work with
      * @param newSlot - the new slot for the item
-     * @param sell    - true if a selling shop, false if a buying shop
      */
-    public void changePlaces(ItemStack item, int newSlot, boolean sell) {
-
-        if (!sell) {
-
-            if (!config.getConfigurationSection(name).getConfigurationSection("Contents").isConfigurationSection(newSlot + "")) {
-
-                if (config.getConfigurationSection(name).getConfigurationSection("Contents").isConfigurationSection(getSlotForItem(item, sell) + "")) {
-                    double price = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getDouble("Price");
-                    int amt = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Amount");
-                    int stock = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock");
-
-                    String inf = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getString("Infinite");
-
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").set(getSlotForItem(item, sell) + "", null);
-
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").createSection(newSlot + "");
-
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(newSlot + "").set("ItemStack", item);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(newSlot + "").set("Stock", stock);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(newSlot + "").set("Price", price);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(newSlot + "").set("Amount", amt);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(newSlot + "").set("Infinite", inf);
-                    config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(newSlot + "").set("Slot", newSlot);
-
-                    try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } else {
-            if (!config.getConfigurationSection(name).getConfigurationSection("Sell").isConfigurationSection(newSlot + "")) {
-                if (config.getConfigurationSection(name).getConfigurationSection("Sell").isConfigurationSection(getSlotForItem(item, sell) + "")) {
-
-                    double price = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(getSlotForItem(item, sell) + "").getDouble("Price");
-                    int amt = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Amount");
-                    int stock = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock");
-
-                    String inf = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(getSlotForItem(item, sell) + "").getString("Infinite");
-
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").set(getSlotForItem(item, sell) + "", null);
-
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").createSection(newSlot + "");
-
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(newSlot + "").set("ItemStack", item);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(newSlot + "").set("Stock", stock);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(newSlot + "").set("Price", price);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(newSlot + "").set("Amount", amt);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(newSlot + "").set("Infinite", inf);
-                    config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(newSlot + "").set("Slot", newSlot);
-
-                    try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
+    public void changePlaces(ShopItem item, int newSlot, int newPage) {
+        item.setSlot(newSlot);
+        item.setPage(newPage);
     }
 
-    /**
-     * @param item - the item to delete
-     * @param sell - true if a selling shop, false if a buying shop
-     */
-    public void deleteItem(ItemStack item, boolean sell) {
-
-        ItemMeta meta = item.getItemMeta();
-        List<String> lore = meta.getLore();
-
-
-        meta.setLore(getLore(item));
-        item.setItemMeta(meta);
-
-        int slot;
-
-        if (!sell) {
-
-            slot = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Slot");
-
-            config.getConfigurationSection(name).getConfigurationSection("Contents").set(slot + "", null);
-        } else {
-            slot = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Slot");
-
-            config.getConfigurationSection(name).getConfigurationSection("Sell").set(slot + "", null);
-        }
-
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-
-            for (int i = 18; i < 162; i++) {
-
-                if (i > slot && i < 54) {
-
-                    ItemStack it = getItemForSlot(i, sell);
-
-
-                    if (it != null) {
-                        changePlaces(it, i - 1, sell);
-                    }
-                }
-                if (i > slot && i >= 72 && i < 108) {
-                    ItemStack it = getItemForSlot(i, sell);
-
-                    if (it != null) {
-
-                        if (i == 72) {
-                            changePlaces(it, i - 19, sell);
-                        } else {
-                            changePlaces(it, i - 1, sell);
-                        }
-
-                    }
-                }
-
-
-                if (i > slot && i >= 126 && i < 162) {
-                    ItemStack it = getItemForSlot(i, sell);
-
-                    if (it != null) {
-                        if (i == 126) {
-                            changePlaces(it, i - 19, sell);
-                        } else {
-                            changePlaces(it, i - 1, sell);
-                        }
-                    }
-                }
-            }
-        }
-
-
-    }
-
-    /**
-     * @param item   - the item to remove
-     * @param amount - the amount to remove
-     * @param sell   - true if a selling shop, false if a buying shop
-     */
-    public void removeItem(ItemStack item, int amount, boolean sell) {
-
-        ItemMeta meta = item.getItemMeta();
-
-
-        meta.setLore(getLore(item));
-        item.setItemMeta(meta);
-
-        if (alreadyBeingSold(item, sell)) {
-
-            if (!sell) {
-
-                if (!isInfinite(item, sell)) {
-
-                    if (config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock") > amount) {
-
-                        setStock(item, getStock(item, sell) - amount, sell);
-
-                    } else if (config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock") == amount) {
-                        deleteItem(item, sell);
-                    }
-                }
-            } else {
-                if (config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock") > amount) {
-
-                    setStock(item, getStock(item, sell) - amount, sell);
-
-                } else if (config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(getSlotForItem(item, sell) + "").getInt("Stock") == amount) {
-                    deleteItem(item, sell);
-                }
-            }
-        }
-    }
 
     /**
      * @param sell - true if a selling shop, false if a buying shop
      * @return a Map of an Itemstack and it's slot number
      */
+    @Deprecated
     public HashMap<ItemStack, Integer> getShopContents(boolean sell) {
         HashMap<ItemStack, Integer> items = new HashMap<ItemStack, Integer>();
 
@@ -1705,6 +1291,7 @@ public class Shop {
      * @param sell - true if a selling shop, false if a buying shop
      * @return the slot of the item
      */
+    @Deprecated
     public Integer getSlotForItem(ItemStack item, boolean sell) {
         int slot = 18;
         if (item != null) {
@@ -1802,81 +1389,20 @@ public class Shop {
     }
 
     /**
-     * @param slot - the slot of the item
-     * @param sell - true if a selling shop, false if a buying shop
-     * @return an Itemstack for the slot
-     */
-    public ItemStack getItemForSlot(int slot, boolean sell) {
-
-        if (!sell) {
-
-            if (config.getConfigurationSection(name).getConfigurationSection("Contents").isConfigurationSection(slot + "")) {
-
-                if (config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").isItemStack("ItemStack")) {
-                    return config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(slot + "").getItemStack("ItemStack");
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } else {
-            if (config.getConfigurationSection(name).getConfigurationSection("Sell").isConfigurationSection(slot + "")) {
-                if (config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").isItemStack("ItemStack")) {
-                    return config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(slot + "").getItemStack("ItemStack");
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-    }
-
-    /**
      * @param pl            - The Player
      * @param chestLocation - The Location of the Chest
      * @return true if owner, false if not
      */
+
     public static boolean isShopOwner(Player pl, Location chestLocation) {
+        Shop shop = ShopLimits.fromLocation(chestLocation);
+
         boolean owner = false;
 
-        File file = new File(Core.getCore().getDataFolder(), "Shops");
-
-        if (file != null) {
-
-            for (File f : file.listFiles()) {
-                if (f.getName().contains(".yml")) {
-                    YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
-
-                    for (String s : config.getKeys(true)) {
-                        if (s.contains("Location")) {
-                            String c = config.getString(s);
-
-                            String[] locs = c.split(" ");
-
-                            World w = Bukkit.getWorld(locs[0]);
-
-                            double x = Double.parseDouble(locs[1]);
-                            double y = Double.parseDouble(locs[2]);
-                            double z = Double.parseDouble(locs[3]);
-
-                            if (chestLocation.getWorld().getName().equals(w.getName())) {
-                                if (chestLocation.getX() == x && chestLocation.getY() == y && chestLocation.getZ() == z) {
-
-                                    String n = s.substring(0, s.length() - 9);
-
-
-                                    Player p = Bukkit.getPlayer(UUID.fromString(config.getString(n + ".Owner")));
-
-                                    if (p == pl) {
-                                        owner = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+        if (shop != null) {
+            if (shop.getOwner() != null) {
+                if (shop.getOwner().getUniqueId().equals(pl.getUniqueId()) || shop.getOwner().getUniqueId() == pl.getUniqueId()) {
+                    owner = true;
                 }
             }
         }
@@ -1885,46 +1411,18 @@ public class Shop {
     }
 
     public static boolean isShopOwner(Player pl, String name) {
+        Shop shop = ShopLimits.fromString(name);
+
         boolean owner = false;
 
-        File file = new File(Core.getCore().getDataFolder(), "Shops");
-
-        if (file != null) {
-
-            for (File f : file.listFiles()) {
-                if (f.getName().contains(".yml")) {
-                    YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
-
-                    for (String s : config.getKeys(true)) {
-                        if (s.contains("Location")) {
-                            String c = config.getString(s);
-
-                            String[] locs = c.split(" ");
-
-                            World w = Bukkit.getWorld(locs[0]);
-
-                            double x = Double.parseDouble(locs[1]);
-                            double y = Double.parseDouble(locs[2]);
-                            double z = Double.parseDouble(locs[3]);
-
-                            if (isShopOwner(pl, new Location(w, x, y, z))) {
-
-                                String n = s.substring(0, s.length() - 9);
-
-                                Player p = Bukkit.getPlayer(UUID.fromString(config.getString(n + ".Owner")));
-
-                                if (p == pl) {
-                                    if (n.equals(name)) {
-                                        owner = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+        if (shop != null) {
+            if (shop.getOwner() != null) {
+                if (shop.getOwner().getUniqueId().equals(pl.getUniqueId()) || shop.getOwner().getUniqueId() == pl.getUniqueId()) {
+                    owner = true;
                 }
             }
         }
+
 
         return owner;
     }
@@ -1955,11 +1453,11 @@ public class Shop {
 
     public List<ShopItem> loadShopItems() {
 
-        if (config.getConfigurationSection(name).isInt("NextShopId")) {
-            config.getConfigurationSection(name).set("NextShopId", 1);
+        if (!config.getConfigurationSection(name).isInt("NextShopId")) {
+            config.getConfigurationSection(name).set("NextShopId", 0);
         }
 
-        if (config.getConfigurationSection(name).isConfigurationSection("Items")) {
+        if (!config.getConfigurationSection(name).isConfigurationSection("Items")) {
             config.getConfigurationSection(name).createSection("Items");
         }
 
@@ -1969,6 +1467,7 @@ public class Shop {
             e.printStackTrace();
         }
 
+
         if (config.getConfigurationSection(name).isConfigurationSection("Contents")) {
 
             for (String s : config.getConfigurationSection(name).getConfigurationSection("Contents").getKeys(false)) {
@@ -1976,16 +1475,8 @@ public class Shop {
                 if (config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(s).isItemStack("ItemStack")) {
                     ItemStack item = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(s).getItemStack("ItemStack");
                     int amt = config.getConfigurationSection(name).getConfigurationSection("Contents").getConfigurationSection(s).getInt("Slot");
-                    ShopItem it = new ShopItem(this, item, config.getConfigurationSection(name).getInt("NextShopId"), getPageForSlot(amt), amt, false);
-                    items.add(it);
-                    buyItems.add(it);
-                    config.getConfigurationSection(name).set("NextShopId", it.getShopItemID() + 1);
 
-                    try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    createShopItem(item, amt, getPageForSlot(amt), false);
                 }
             }
         }
@@ -1997,33 +1488,46 @@ public class Shop {
                 if (config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(s).isItemStack("ItemStack")) {
                     ItemStack item = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(s).getItemStack("ItemStack");
                     int amt = config.getConfigurationSection(name).getConfigurationSection("Sell").getConfigurationSection(s).getInt("Slot");
-                    ShopItem it = new ShopItem(this, item, config.getConfigurationSection(name).getInt("NextShopId"), getPageForSlot(amt), amt, true);
-                    items.add(it);
-                    sellItems.add(it);
-                    config.getConfigurationSection(name).set("NextShopId", it.getShopItemID() + 1);
 
-                    try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    createShopItem(item, amt, getPageForSlot(amt), true);
+
                 }
             }
         }
+
+        for (String s : config.getConfigurationSection(name).getConfigurationSection("Items").getKeys(false)) {
+            ItemStack it = config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection(s).getItemStack("ItemStack");
+            int id = config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection(s).getInt("Id");
+            int page = config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection(s).getInt("Page");
+            int slot = config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection(s).getInt("Slot");
+            boolean sell = config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection(s).getBoolean("Selling");
+
+            if (it != null) {
+                ShopItem item = new ShopItem(this, it, id, page, slot, sell);
+                items.add(item);
+
+                if (sell) {
+                    sellItems.add(item);
+                } else {
+                    buyItems.add(item);
+                }
+            }
+        }
+
 
         if (config.getConfigurationSection(name).getConfigurationSection("Items").getKeys(false).size() != items.size()) {
             saveItemsToFile();
         }
 
         //delete 'Sell' and 'Contents'
-//        config.getConfigurationSection(name).set("Contents",null);
-//        config.getConfigurationSection(name).set("Sell",null);
-//
-//        try {
-//            config.save(file);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        config.getConfigurationSection(name).set("Contents", null);
+        config.getConfigurationSection(name).set("Sell", null);
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return items;
     }
@@ -2041,10 +1545,11 @@ public class Shop {
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", getStock(item.getItem(), item.isSelling()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", getAmount(item.getItem(), item.isSelling()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Price", getPrice(item.getItem(), item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("OrigPrice", getPrice(item.getItem(), item.isSelling()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Infinite", isInfinite(item.getItem(), item.isSelling()));
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("LiveEconomy", false);
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("PriceChangePercent", 1);
-                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("DoubleAmount", 200);
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("DoubleAmount", 750);
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MinimumPrice", 0);
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MaximumPrice", Config.getMaxPrice());
                 config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", getPrice(item.getItem(), item.isSelling()));
@@ -2068,6 +1573,20 @@ public class Shop {
         } else {
             return 3;
         }
+    }
+
+    @Deprecated
+    public int getPreciseSlot(int slot) {
+        int s = slot;
+
+        if (slot >= 72 && slot < 108) {
+            s = slot - 54;
+        }
+        if (slot >= 126 && slot < 162) {
+            s = slot - 108;
+        }
+
+        return s;
     }
 
     public String getPriceAsString(ItemStack item, boolean sell) {
@@ -2142,42 +1661,83 @@ public class Shop {
         return exists;
     }
 
-    public void createShopItem(ItemStack it, int slot, int page, boolean sell) {
-        if (alreadyInShop(it, sell)) {
+    public ShopItem createShopItem(ItemStack it, int slot, int page, boolean sell) {
+        if (ShopItem.fromItemStack(this, it, sell) == null) {
             ShopItem item = new ShopItem(this, it, getNextAvailableId(), page, slot, sell);
             items.add(item);
+
+            if (!sell) {
+                buyItems.add(item);
+            } else {
+                sellItems.add(item);
+            }
 
             config.getConfigurationSection(name).getConfigurationSection("Items").createSection("" + item.getShopItemID());
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Id", item.getShopItemID());
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("ItemStack", item.getItem());
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Page", getPageForSlot(item.getSlot()));
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Slot", item.getSlot());
+            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Page", page);
+            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Slot", slot);
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Selling", item.isSelling());
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", getStock(item.getItem(), item.isSelling()));
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", getAmount(item.getItem(), item.isSelling()));
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Price", getPrice(item.getItem(), item.isSelling()));
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Infinite", isInfinite(item.getItem(), item.isSelling()));
+            if (alreadyBeingSold(it, sell)) {
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", getStock(item.getItem(), item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", getAmount(item.getItem(), item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Price", getPrice(item.getItem(), item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("OrigPrice", getPrice(item.getItem(), item.isSelling()));
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Infinite", isInfinite(item.getItem(), item.isSelling()));
+            } else {
+                if (!sell) {
+                    config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", 1);
+                } else {
+                    config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", 0);
+                }
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", 1);
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Price", Config.getDefaultPrice());
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("OrigPrice", Config.getDefaultPrice());
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Infinite", false);
+            }
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("LiveEconomy", false);
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("PriceChangePercent", 1);
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("DoubleAmount", 200);
+            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("DoubleAmount", 750);
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MinimumPrice", 0);
             config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MaximumPrice", Config.getMaxPrice());
-            config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", getPrice(item.getItem(), item.isSelling()));
-
+            if (alreadyBeingSold(it, sell)) {
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", getPrice(item.getItem(), item.isSelling()));
+            } else {
+                config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", Config.getDefaultPrice());
+            }
             config.getConfigurationSection(name).set("NextShopId", item.getShopItemID() + 1);
 
             try {
                 config.save(file);
-            } catch (IOException e) {
+
+                if (Core.useSQL()) {
+                    DatabaseManager.createTable(item);
+                    if (Core.getSQLDatabase().getConnection().getMetaData().getTables(null, null, "Shops", null).next()) {
+                        Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE Shops SET `NextShopId` = '" + (item.getShopItemID() + 1) + "' WHERE `Shops`.`Name` ='" + name + "';");
+                    }
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            //Add Stock
+
+            return item;
         }
+        return null;
     }
 
     public void deleteShopItem(ShopItem item) {
         config.getConfigurationSection(name).getConfigurationSection("Items").set("" + item.getShopItemID(), null);
+
+        items.remove(item);
+        if (item.isSelling()) {
+            sellItems.remove(item);
+        } else {
+            buyItems.remove(item);
+        }
+
+        if (Core.useSQL()) {
+            DatabaseManager.deleteItemTable(item);
+        }
 
         try {
             config.save(file);
@@ -2185,10 +1745,71 @@ public class Shop {
             e.printStackTrace();
         }
 
-        items.remove(item);
     }
 
     public int getNextAvailableId() {
         return config.getConfigurationSection(name).getInt("NextShopId");
+    }
+
+    public boolean pageFull(int page, boolean sell) {
+        return getNumberOfItemsOnPage(page, sell) == 36;
+    }
+
+    public int getNumberOfItemsOnPage(int page, boolean sell) {
+        int i = 0;
+        for (ShopItem item : getShopItems(sell)) {
+            if (item.getPage() == page) {
+                i++;
+            }
+        }
+        return i;
+    }
+
+    public int getNextAvailablePage(boolean sell) {
+        int page = 0;
+
+        for (int i = 1; i < 1000; i++) {
+            if (!pageFull(i, sell)) {
+                page = i;
+                break;
+            }
+        }
+
+        return page;
+    }
+
+    public int getNextSlotForPage(int page, boolean sell) {
+        List<Integer> slots = new ArrayList<>();
+        for (ShopItem item : getShopItems(sell)) {
+            if (item.getPage() == page) {
+                slots.add(item.getSlot());
+            }
+        }
+
+        if (slots.size() > 0) {
+            for (int i = 18; i < 54; i++) {
+                if (!slots.contains(i)) {
+                    return i;
+                }
+            }
+        }
+
+        return 18;
+    }
+
+    public void saveConfig() {
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ShopHologram getHolographicShop() {
+        return HologramManager.getShopHolograms().get(this);
+    }
+
+    public ShopsNPC getNPCShop() {
+        return NPCs.getShopNPCs().get(this);
     }
 }

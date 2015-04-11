@@ -1,4 +1,4 @@
-package me.moomaxie.BetterShops.NPC;
+package me.moomaxie.BetterShops.ShopTypes.NPC;
 
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;

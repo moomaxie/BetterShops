@@ -1,11 +1,11 @@
 package BetterShops.Dev.API.Events;
 
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * ***********************************************************************
@@ -20,9 +20,9 @@ public class ShopBuyItemEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private Shop shop;
-    private ItemStack item;
+    private ShopItem item;
 
-    public ShopBuyItemEvent(ItemStack item, Shop shop) {
+    public ShopBuyItemEvent(ShopItem item, Shop shop) {
         this.shop = shop;
         this.item = item;
     }
@@ -31,7 +31,7 @@ public class ShopBuyItemEvent extends Event {
         return shop;
     }
 
-    public ItemStack getItem(){
+    public ShopItem getItem(){
         return item;
     }
 

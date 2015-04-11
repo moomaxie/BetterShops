@@ -26,9 +26,9 @@ public class ShopLimits {
 
     private static HashMap<UUID, Integer> limit = new HashMap<UUID, Integer>();
     public static List<Shop> shops = new ArrayList<>();
-
     public static HashMap<Location, Shop> locs = new HashMap<>();
     public static HashMap<String, Shop> names = new HashMap<>();
+    public static HashMap<UUID, List<Shop>> playerShops = new HashMap<>();
 
     public static int loadShops() {
 
@@ -36,12 +36,13 @@ public class ShopLimits {
         shops.clear();
         names.clear();
         locs.clear();
+        playerShops.clear();
 
         int ss = 0;
 
         File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Shops");
 
-        if (!file.exists()){
+        if (!file.exists()) {
             file.mkdirs();
         }
 
@@ -57,13 +58,20 @@ public class ShopLimits {
                     limit.put(id, amt);
                     ss = ss + amt;
                 }
+
+                List<Shop> shops1 = new ArrayList<>();
+
                 for (String s : config.getKeys(false)) {
                     Shop shop = new Shop(s, config, f);
+
+                    shops1.add(shop);
 
                     shops.add(shop);
                     locs.put(shop.getLocation(), shop);
                     names.put(shop.getName(), shop);
                 }
+
+                playerShops.put(id, shops1);
             }
 
         }
@@ -72,6 +80,14 @@ public class ShopLimits {
 
     public static HashMap<UUID, Integer> getLimits() {
         return limit;
+    }
+
+    public static HashMap<UUID, List<Shop>> getPlayerShops(){
+        return playerShops;
+    }
+
+    public static List<Shop> getShopsForPlayer(OfflinePlayer p){
+        return playerShops.get(p.getUniqueId());
     }
 
     public static boolean atLimit(OfflinePlayer p) {

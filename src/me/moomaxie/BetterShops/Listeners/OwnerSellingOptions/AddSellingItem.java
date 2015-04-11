@@ -3,17 +3,19 @@ package me.moomaxie.BetterShops.Listeners.OwnerSellingOptions;
 import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
+import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.Misc.ChatMessages;
-import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
+import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -35,93 +37,74 @@ import java.util.Map;
  */
 public class AddSellingItem implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onAddItem(final InventoryClickEvent e) {
-
-        if (e.getInventory().getType() == InventoryType.CHEST) {
-            if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
-                ItemStack ite = e.getCurrentItem();
-
-
-               final Player p = (Player) e.getWhoClicked();
-
-                if (e.isLeftClick()) {
-
-                    if (p.getInventory().contains(ite)) {
-                        if (p.getOpenInventory() != null && p.getOpenInventory().getTopInventory().getName().contains("§7[Shop]")) {
-
-                            String name = p.getOpenInventory().getTopInventory().getName();
-                            name = name.substring(11);
-
-                            final Shop shop = ShopLimits.fromString(p, name);
-
-                            int slot = e.getSlot();
-
-                            if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-
-
-                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling")) && Config.useSellingShop()) {
-
-                                    ItemStack item = ite.clone();
-
-                                    if (!shop.alreadyBeingSold(ite, true)) {
-                                        if (shop.getHighestSlot(true) < 161) {
-
-                                            if (shop.getHighestSlot(true) == 53) {
-                                                shop.addItem(item, 72, true);
-                                            } else if (shop.getHighestSlot(true) == 107) {
-                                                shop.addItem(item, 126, true);
-                                            } else if (e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-                                                if (e.getInventory().firstEmpty() >= 18) {
-                                                    shop.addItem(item, p.getOpenInventory().getTopInventory(), true);
-                                                } else {
-                                                    shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                }
-                                            } else {
-                                                shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                            }
-
-                                            p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
-
-                                            int am = ite.getAmount();
-
-
-                                                    if (shop.isServerShop()){
-                                                        OpenSellShop.openSellerShop(e.getInventory(),p,shop,1);
-                                                    } else {
-                                                        OpenSellingOptions.openShopSellingOptions(e.getInventory(),p,shop,1);
-                                                    }
-
-
-
-                                            if (am > 0) {
-                                                ite.setAmount(am);
-                                            } else {
-                                                p.getInventory().setItem(slot, new ItemStack(Material.AIR));
-                                            }
-
-                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
-
-
-                                        } else {
-                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
-                                        }
-                                    } else {
-                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    @EventHandler(priority = EventPriority.LOWEST)
+//    public void onAddItem(final InventoryClickEvent e) {
+//
+//        if (e.getInventory().getType() == InventoryType.CHEST) {
+//            if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
+//                ItemStack ite = e.getCurrentItem();
+//
+//
+//               final Player p = (Player) e.getWhoClicked();
+//
+//                if (e.isLeftClick()) {
+//
+//                    if (p.getInventory().contains(ite)) {
+//                        if (p.getOpenInventory() != null && p.getOpenInventory().getTopInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
+//
+//                            String name = p.getOpenInventory().getTopInventory().getName();
+//                            name = name.substring(11);
+//
+//                            final Shop shop = ShopLimits.fromString(p, name);
+//
+//                            int slot = e.getSlot();
+//
+//                            if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
+//
+//
+//                                if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling")) && Config.useSellingShop()) {
+//
+//                                    ItemStack item = ite.clone();
+//
+//                                    item.setAmount(1);
+//
+//                                    if (!Blacklist.isBlacklisted(item) || Blacklist.isBlacklisted(item) && Permissions.hasBlacklistPerm(p)) {
+//
+//                                        if (ShopItem.fromItemStack(shop, item, true) == null) {
+//                                            int page = shop.getNextAvailablePage(true);
+//                                            int s = shop.getNextSlotForPage(page, true);
+//
+//                                            ShopItem sItem = shop.createShopItem(item, s, page, true);
+//
+//                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+//                                            p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
+//
+//
+//                                            if (shop.isServerShop()) {
+//                                                OpenSellShop.openSellerShop(e.getInventory(), p, shop, page);
+//                                            } else {
+//                                                OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, page);
+//                                            }
+//
+//                                        } else {
+//                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
+//                                        }
+//                                    } else {
+//                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("Blacklist"));
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     @EventHandler
     public void onAdd(final InventoryClickEvent e) {
         final Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
 
             if (e.getInventory().getType() == InventoryType.CHEST) {
@@ -132,7 +115,7 @@ public class AddSellingItem implements Listener {
                     final Shop shop = ShopLimits.fromString(p, name);
 
 
-                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals("§e§lAdd Item")) {
+                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("AddItem"))) {
 
                         if (Config.useAnvil()) {
 
@@ -158,44 +141,23 @@ public class AddSellingItem implements Listener {
 
                                                         ItemStack item = new ItemStack(amt);
 
-                                                        if (item != null) {
-                                                            if (!shop.alreadyBeingSold(item, true)) {
+                                                        if (shop != null) {
+                                                            if (ShopItem.fromItemStack(shop, item, true) == null) {
+                                                                int page = shop.getNextAvailablePage(true);
+                                                                int s = shop.getNextSlotForPage(page, true);
 
-                                                                if (!shop.alreadyBeingSold(item, true)) {
-                                                                    if (shop.getHighestSlot(true) < 161) {
+                                                                ShopItem sItem = shop.createShopItem(item, s, page, true);
 
-                                                                        if (shop.getHighestSlot(true) == 53) {
-                                                                            shop.addItem(item, 72, true);
-                                                                        } else if (shop.getHighestSlot(true) == 107) {
-                                                                            shop.addItem(item, 126, true);
-                                                                        } else if (e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-                                                                            if (e.getInventory().firstEmpty() >= 18) {
-                                                                                if (e.getInventory().firstEmpty() == 18) {
-                                                                                    shop.addItem(item, 18, true);
-                                                                                } else {
-                                                                                    shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                                }
-                                                                            } else {
-                                                                                shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                            }
-                                                                        } else {
-                                                                            shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                        }
+                                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+                                                                p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                                                        p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                                                        p.closeInventory();
-
-                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
-
-                                                                        can = true;
-
-                                                                    } else {
-                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
-                                                                    }
+                                                                if (shop.isServerShop()) {
+                                                                    OpenShop.openShopItems(e.getInventory(), p, shop, page);
                                                                 } else {
-                                                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
+                                                                    OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, page);
                                                                 }
+
                                                             } else {
                                                                 can = true;
                                                             }
@@ -207,90 +169,52 @@ public class AddSellingItem implements Listener {
                                                         if (Material.getMaterial(name.toUpperCase()) != null) {
                                                             ItemStack item = new ItemStack(Material.valueOf(name.toUpperCase()));
 
-                                                            if (!shop.alreadyBeingSold(item, true)) {
+                                                            if (shop != null) {
+                                                                if (ShopItem.fromItemStack(shop, item, true) == null) {
+                                                                    int page = shop.getNextAvailablePage(true);
+                                                                    int s = shop.getNextSlotForPage(page, true);
 
-                                                                if (!shop.alreadyBeingSold(item, true)) {
-                                                                    if (shop.getHighestSlot(true) < 161) {
+                                                                    ShopItem sItem = shop.createShopItem(item, s, page, true);
 
-                                                                        if (shop.getHighestSlot(true) == 53) {
-                                                                            shop.addItem(item, 72, true);
-                                                                        } else if (shop.getHighestSlot(true) == 107) {
-                                                                            shop.addItem(item, 126, true);
-                                                                        } else if (e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-                                                                            if (e.getInventory().firstEmpty() >= 18) {
-                                                                                if (e.getInventory().firstEmpty() == 18) {
-                                                                                    shop.addItem(item, 18, true);
-                                                                                } else {
-                                                                                    shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                                }
-                                                                            } else {
-                                                                                shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                            }
-                                                                        } else {
-                                                                            shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                        }
+                                                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+                                                                    p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                                                        p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                                                        p.closeInventory();
-
-                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
-
-                                                                        can = true;
-
+                                                                    if (shop.isServerShop()) {
+                                                                        OpenShop.openShopItems(e.getInventory(), p, shop, page);
                                                                     } else {
-                                                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
+                                                                        OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, page);
                                                                     }
+
                                                                 } else {
-                                                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
+                                                                    can = true;
                                                                 }
-                                                            } else {
-                                                                can = true;
                                                             }
                                                         } else {
                                                             for (Material m : Material.values()) {
                                                                 if (m.name().contains(name.toUpperCase().replaceAll(" ", "_"))) {
                                                                     ItemStack item = new ItemStack(m);
 
-                                                                    if (!shop.alreadyBeingSold(item, true)) {
+                                                                    if (shop != null) {
+                                                                        if (ShopItem.fromItemStack(shop, item, true) == null) {
+                                                                            int page = shop.getNextAvailablePage(true);
+                                                                            int s = shop.getNextSlotForPage(page, true);
 
-                                                                        if (!shop.alreadyBeingSold(item, true)) {
-                                                                            if (shop.getHighestSlot(true) < 161) {
+                                                                            ShopItem sItem = shop.createShopItem(item, s, page, true);
 
-                                                                                if (shop.getHighestSlot(true) == 53) {
-                                                                                    shop.addItem(item, 72, true);
-                                                                                } else if (shop.getHighestSlot(true) == 107) {
-                                                                                    shop.addItem(item, 126, true);
-                                                                                } else if (e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-                                                                                    if (e.getInventory().firstEmpty() >= 18) {
-                                                                                        if (e.getInventory().firstEmpty() == 18) {
-                                                                                            shop.addItem(item, 18, true);
-                                                                                        } else {
-                                                                                            shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                                        }
-                                                                                    } else {
-                                                                                        shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                                    }
-                                                                                } else {
-                                                                                    shop.addItem(item, shop.getHighestSlot(true) + 1, true);
-                                                                                }
+                                                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+                                                                            p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                                                                p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
 
-                                                                                p.closeInventory();
-
-                                                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
-
-                                                                                can = true;
-                                                                                break;
+                                                                            if (shop.isServerShop()) {
+                                                                                OpenShop.openShopItems(e.getInventory(), p, shop, page);
                                                                             } else {
-                                                                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
+                                                                                OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, page);
                                                                             }
+
                                                                         } else {
-                                                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
+                                                                            can = true;
                                                                         }
-                                                                    } else {
-                                                                        can = true;
                                                                     }
                                                                 }
                                                             }
@@ -313,7 +237,7 @@ public class AddSellingItem implements Listener {
 
                             ItemStack it = new ItemStack(Material.PAPER);
                             ItemMeta meta = it.getItemMeta();
-                            meta.setDisplayName("Type Item Name");
+                            meta.setDisplayName(SearchEngine.getString("ItemName"));
                             it.setItemMeta(meta);
 
                             gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);

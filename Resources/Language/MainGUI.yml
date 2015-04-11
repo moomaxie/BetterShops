@@ -7,9 +7,10 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.5
+Version: 1.6.0 Beta 10
 
 ShopCreate: '[Shop]'
+ShopHeader: '&7[Shop] &a'
 
 ShopInfoDisplayNameOpen: '&a&lOPEN'
 ShopInfoDisplayNameClosed: '&c&lCLOSED'
@@ -20,7 +21,7 @@ Keepers: '&eKeepers:'
 OpenShopSettings: '&e&lRight Click &7to open &dShop Settings'
 ArrangementMode: '&e&lShift Click &7to start &aArrangement Mode'
 ToggleOpenAndClosed: '&e&lLeft Click &7to Toggle &aOpen&7/&cClosed'
-AddItemToShop: '&e&lLeft Click &7an &aInventory Item &7to add it to the shop'
+AddItemToShop: '&e&lLeft Click &7an &aInventory Item &7to add it'
 ManageItems: '&e&lLeft Click &7an &aItem &7to manage it'
 TurnOffServerShop: '&e&lLeft Click &7to turn &cOff &dServer Shop Mode'
 ClickAddItem: '&e&lLeft Click &aAdd Item &7to select an item'
@@ -76,3 +77,5 @@ SignLine2: '&aShop'
 SignLine3Open: '&aOpen'
 SignLine3Closed: '&cClosed'
 SignLine4: '&b&k**************'
+
+NoDescription: 'No Description'

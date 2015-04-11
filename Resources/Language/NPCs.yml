@@ -1,0 +1,32 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "NPCs" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.6.0 Beta 10
+
+BabyOn: '&eBaby &7- &aON'
+BabyOff: '&eBaby &7- &cOFF'
+
+ShearedOn: '&eSheared &7- &aON'
+ShearedOff: '&eSheared &7- &cOFF'
+
+VillagerOn: '&eVillager &7- &aON'
+VillagerOff: '&eVillager &7- &cOFF'
+
+Toggle: '&eClick &7to toggle'
+Choose: '&eClick &7to choose'
+
+SkeletonType: '&eSkeleton Type:'
+OcelotType: '&eOcelot Type:'
+RabbitType: '&eRabbit Type:'
+Style: '&eStyle:'
+Variant: '&eVariant:'
+Color: '&eColor:'
+DyeColor: '&eDye Color:'
+Profession: '&eProfession:'
+Size: '&eSize:'

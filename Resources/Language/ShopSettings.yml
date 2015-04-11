@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 
-Version: 1.5.5
+Version: 1.6.0 Beta 10
 
 NotificationsOn: '&a&lNotifications &7- &aOn'
 NotificationsOff: '&a&lNotifications &7- &cOff'
@@ -25,3 +25,7 @@ NPCShopOff: '&a&lNPC Shop &7- &cOff'
 Warning: '&4WARNING:'
 DeletedChest: '&cThe Chest &4Will &cBe Deleted'
 NPCLore: '&e&lLeft Click &7to change &dNPC Shop Mode'
+
+HolographicOn: '&a&lHolographic Shop &7- &aOn'
+HolographicOff: '&a&lHolographic Shop &7- &cOff'
+HolographicLore: '&e&lLeft Click &7to change &dHolographic Shop Mode'

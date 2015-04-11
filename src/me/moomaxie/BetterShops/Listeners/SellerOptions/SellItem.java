@@ -8,7 +8,9 @@ import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
+import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -43,7 +45,7 @@ public class SellItem implements Listener {
 
         if (inv == null) {
             b = true;
-            inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+            inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
         } else {
             inv.clear();
         }
@@ -61,6 +63,12 @@ public class SellItem implements Listener {
         buyMeta.setDisplayName(BuyingAndSelling.getString("SellItem"));
         buyMeta.setLore(Arrays.asList(BuyingAndSelling.getString("SellItemLore")));
         buy.setItemMeta(buyMeta);
+
+        ItemStack all = new ItemStack(Material.WOOL, 1, (byte) 1);
+        ItemMeta allMeta = all.getItemMeta();
+        allMeta.setDisplayName(BuyingAndSelling.getString("SellAll"));
+        allMeta.setLore(Arrays.asList(BuyingAndSelling.getString("SellAllLore")));
+        all.setItemMeta(allMeta);
 
         ItemStack cancel = new ItemStack(Material.WOOL, 1, (byte) 14);
         ItemMeta cancelMeta = cancel.getItemMeta();
@@ -128,23 +136,26 @@ public class SellItem implements Listener {
             }
         }
 
+        ShopItem shopItem = ShopItem.fromItemStack(shop, it, true);
 
-        if (i != null && can && Core.getEconomy().hasAccount(Bukkit.getOfflinePlayer(p.getUniqueId())) && Core.getEconomy().hasAccount(shop.getOwner())) {
-            if (Core.getEconomy().getBalance(shop.getOwner()) >= shop.getPrice(it, true) && i.getAmount() >= shop.getAmount(it, true) || shop.isServerShop() && i.getAmount() >= shop.getAmount(it, true) || Stocks.getNumberInInventory(it, p, shop) >= shop.getAmount(it, true)) {
+        if (i != null && Core.getEconomy().hasAccount(Bukkit.getOfflinePlayer(p.getUniqueId())) && Core.getEconomy().hasAccount(shop.getOwner())) {
+            if (Core.getEconomy().getBalance(shop.getOwner()) >= shopItem.getPrice() && i.getAmount() >= shopItem.getAmount() || shop.isServerShop() && i.getAmount() >= shopItem.getAmount() || Stocks.getNumberInInventory(it, p, shop) >= shopItem.getAmount()) {
 
                 inv.setItem(18, buy);
                 inv.setItem(19, buy);
+
+                inv.setItem(22, all);
             } else {
-                if (i.getAmount() < shop.getAmount(it, true) || Stocks.getNumberInInventory(it, p, shop) < shop.getAmount(it, true)) {
+                if (i.getAmount() < shopItem.getAmount() || Stocks.getNumberInInventory(it, p, shop) < shopItem.getAmount()) {
 
                     if (Stocks.getNumberInInventory(it, p, shop) == 0) {
                         inv.setItem(18, enough);
                         inv.setItem(19, enough);
                     } else {
 
-                        double price = shop.getPrice(it, true);
+                        double price = shopItem.getPrice();
 
-                        int amt = shop.getAmount(it, true);
+                        int amt = shopItem.getAmount();
 
                         double pr = price / amt;
 
@@ -156,7 +167,7 @@ public class SellItem implements Listener {
                         ItemStack adjust = new ItemStack(Material.WOOL, 1, (byte) 5);
                         ItemMeta adjustMeta = adjust.getItemMeta();
                         adjustMeta.setDisplayName(BuyingAndSelling.getString("AdjustedPrice"));
-                        adjustMeta.setLore(Arrays.asList(BuyingAndSelling.getString("AdjustedPriceLore").replaceAll("<Amount>","" + adj)));
+                        adjustMeta.setLore(Arrays.asList(BuyingAndSelling.getString("AdjustedPriceLore").replaceAll("<Amount>", "" + adj)));
                         adjust.setItemMeta(adjustMeta);
 
                         inv.setItem(18, adjust);
@@ -188,162 +199,208 @@ public class SellItem implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onSettingsClick(final InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
 
             if (e.getInventory().getType() == InventoryType.CHEST) {
-                if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
+                if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR && e.getCurrentItem().getItemMeta() != null) {
                     String name = e.getInventory().getName();
                     name = name.substring(11);
 
                     final Shop shop = ShopLimits.fromString(p, name);
 
-                    if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(BuyingAndSelling.getString("SellCancelLore"))) {
-                        OpenSellShop.openSellerShop(e.getInventory(), p, shop, 1);
-                    }
+                    ShopItem shopItem = ShopItem.fromItemStack(shop, e.getInventory().getItem(4), true);
 
-                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("SellItem"))) {
-                        ItemStack item = e.getInventory().getItem(4);
+                    if (shopItem != null) {
 
-                        for (String s : item.getItemMeta().getLore()){
-                            if (s.contains(MainGUI.getString("AskingPrice"))){
-                                double pr = Double.parseDouble(s.substring(MainGUI.getString("AskingPrice").length() + 3));
+                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(BuyingAndSelling.getString("SellCancelLore"))) {
+                            OpenSellShop.openSellerShop(e.getInventory(), p, shop, shopItem.getPage());
+                            return;
+                        }
 
-                                if (pr != shop.getPrice(item,true)){
+                        if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("SellItem"))) {
+                            ItemStack item = e.getInventory().getItem(4);
+
+                            if (item.getItemMeta() != null && item.getItemMeta().getLore() != null) {
+                                for (String s : item.getItemMeta().getLore()) {
+                                    if (s.contains(MainGUI.getString("AskingPrice"))) {
+                                        double pr = Double.parseDouble(s.substring(MainGUI.getString("AskingPrice").length() + 3));
+
+                                        if (pr != shopItem.getPrice()) {
+                                            p.closeInventory();
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("Fraud"));
+
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+
+                            int price = shopItem.getAmount();
+
+                            double pric = shopItem.getPrice();
+
+                            if (shopItem.getLimit() == 0 || shopItem.getStock() < shopItem.getLimit()) {
+
+                                if (shopItem.getLimit() != 0 && shopItem.getAmount() + shopItem.getStock() >= shopItem.getLimit()) {
+                                    price = shopItem.getLimit() - shopItem.getStock();
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellLimit").replaceAll("<Amount>", "" + price));
+                                }
+
+                                double pri = pric / shopItem.getAmount();
+
+                                double pr = pri * price;
+
+                                shopItem.setStock(shopItem.getStock() + price);
+
+                                if (!shop.isServerShop()) {
+                                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+
+
+                                    if (shop.isNotify()) {
+                                        if (shop.getOwner() != null && shop.getOwner().isOnline()) {
+                                            shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                            shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
+
+                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+
+                                                Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
+                                                Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                                Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
+
+
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                                }
+
+                                Stocks.removeItemsFromInventory(shopItem, p, shop, price);
+
+                                OpenSellShop.openSellerShop(null, p, shop, shopItem.getPage());
+
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellItem"));
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
+
+                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+
+                                    Core.getTitleManager().setTimes(p, 20, 60, 20);
+                                    Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
+                                    Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
+
+
                                     p.closeInventory();
-                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("Fraud"));
+                                    p.closeInventory();
 
-                                    return;
                                 }
+                                if (shop.getHistory() == null) {
+                                    shop.loadTransactions();
+                                }
+                                shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
+
+                                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop);
+
+                                Bukkit.getPluginManager().callEvent(ev);
+
+                                if (shopItem.getLiveEco()) {
+                                    shopItem.setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                                }
+                                if (shop.isHoloShop()) {
+                                    ShopHologram holo = shop.getHolographicShop();
+                                    holo.updateItemLines(holo.getItemLine(), true);
+                                }
+                            } else {
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("LimitReached"));
                             }
                         }
+                        if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("AdjustedPrice")) || e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("SellAll"))) {
 
-                        int price = shop.getAmount(item, true);
+                            double pric = shopItem.getPrice();
 
-                        double pr = shop.getPrice(item, true);
+                            int amt = shopItem.getAmount();
 
-                        shop.setStock(item, shop.getStock(item, true) + price, true);
+                            int a = Stocks.getNumberInInventory(e.getInventory().getItem(4), p, shop);
 
-                        if (!shop.isServerShop()) {
-                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                            if (shopItem.getLimit() == 0 || shopItem.getStock() < shopItem.getLimit()) {
+
+                                if (shopItem.getLimit() != 0 && a + shopItem.getStock() >= shopItem.getLimit()){
+                                    a = shopItem.getLimit() - shopItem.getStock();
+                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellLimit").replaceAll("<Amount>","" + a));
+                                }
+
+                                double pri = pric / amt;
+
+                                double pr = pri * a;
+
+                                int price = a;
+
+                                shopItem.setStock(shopItem.getStock() + price);
+
+                                if (!shop.isServerShop()) {
+                                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
 
 
-                            if (shop.isNotify()) {
-                                if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
+                                    if (shop.isNotify()) {
+                                        if (shop.getOwner() != null && shop.getOwner().isOnline()) {
+                                            shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                            shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
 
-                                    if (Core.isAboveEight() && Config.useTitles()) {
+                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
-                                            Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
-                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
+                                                Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
+                                                Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                                Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
 
 
+                                            }
+                                        }
                                     }
+                                } else {
+                                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                                 }
-                            }
-                        } else {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
-                        }
 
-                        Stocks.removeItemsFromInventory(item, p, shop, price);
+                                Stocks.removeItemsFromInventory(shopItem, p, shop, price);
 
-                        OpenSellShop.openSellerShop(null, p, shop, 1);
+                                OpenSellShop.openSellerShop(null, p, shop, shopItem.getPage());
 
-                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellItem"));
-                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellItem"));
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
 
-                        if (Core.isAboveEight() && Config.useTitles()) {
+                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
-                                Core.getTitleManager().setTimes(p, 20, 60, 20);
-                                Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
-                                Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
+                                    Core.getTitleManager().setTimes(p, 20, 60, 20);
+                                    Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
+                                    Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
 
+                                    p.closeInventory();
 
-                                p.closeInventory();
-                                p.closeInventory();
-
-                        }
-                        if (shop.getHistory() == null){
-                            shop.loadTransactions();
-                        }
-                        shop.getHistory().addTransaction(p,new Date(),item,pr,price,true,true);
-
-                        ShopSellItemEvent ev = new ShopSellItemEvent(item,shop);
-
-                        Bukkit.getPluginManager().callEvent(ev);
-                    }
-                    if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(BuyingAndSelling.getString("AdjustedPrice"))) {
-
-                        double pric = shop.getPrice(e.getInventory().getItem(4), true);
-
-                        int amt = shop.getAmount(e.getInventory().getItem(4), true);
-
-                        double pri = pric / amt;
-
-                        int a = Stocks.getNumberInInventory(e.getInventory().getItem(4), p, shop);
-
-                        double pr = pri * a;
-
-
-                        ItemStack item = e.getInventory().getItem(4);
-
-                        int price = Stocks.getNumberInInventory(item, p, shop);
-
-                        shop.setStock(item, shop.getStock(item, true) + price, true);
-
-                        if (!shop.isServerShop()) {
-                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
-
-
-                            if (shop.isNotify()) {
-                                if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
-                                    shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
-
-                                    if (Core.isAboveEight() && Config.useTitles()) {
-
-                                            Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifySell").replaceAll("<Player>", p.getDisplayName()));
-                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("TakenAmount").replaceAll("<Amount>", "" + pr));
-
-
-                                    }
                                 }
+
+                                if (shop.getHistory() == null) {
+                                    shop.loadTransactions();
+                                }
+                                shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
+
+                                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop);
+
+                                Bukkit.getPluginManager().callEvent(ev);
+
+                                if (shopItem.getLiveEco()) {
+                                    double o = price / shopItem.getAmount();
+                                    shopItem.setAmountTo(shopItem.getSister().getAmountTo() - (o * 2));
+                                }
+
+                                if (shop.isHoloShop()) {
+                                    ShopHologram holo = shop.getHolographicShop();
+                                    holo.updateItemLines(holo.getItemLine(), true);
+                                }
+                            } else {
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("LimitReached"));
                             }
-                        } else {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                         }
-
-                        Stocks.removeItemsFromInventory(item, p, shop, price);
-
-                        OpenSellShop.openSellerShop(null, p, shop, 1);
-
-                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellItem"));
-                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
-
-                        if (Core.isAboveEight() && Config.useTitles()) {
-
-                                Core.getTitleManager().setTimes(p, 20, 60, 20);
-                                Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
-                                Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
-
-
-                                p.closeInventory();
-
-                        }
-
-                        if (shop.getHistory() == null){
-                            shop.loadTransactions();
-                        }
-                        shop.getHistory().addTransaction(p,new Date(),item,pr,price,true,true);
-
-                        ShopSellItemEvent ev = new ShopSellItemEvent(item,shop);
-
-                        Bukkit.getPluginManager().callEvent(ev);
                     }
                 }
             }

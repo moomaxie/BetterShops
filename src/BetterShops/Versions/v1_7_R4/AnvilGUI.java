@@ -338,7 +338,9 @@ public class AnvilGUI implements me.moomaxie.BetterShops.Configurations.AnvilGUI
         handler = null;
         items = null;
 
-        HandlerList.unregisterAll(listener);
+        if (listener != null) {
+            HandlerList.unregisterAll(listener);
+        }
 
         listener = null;
     }

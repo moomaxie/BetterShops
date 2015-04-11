@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.5
+Version: 1.6.0 Beta 10
 
 SearchBuyItems: '&a&lSearch Buying Items'
 SearchSellItems: '&a&lSearch Selling Items'
@@ -26,3 +26,12 @@ SearchPriceLore: '&e&lLeft Click &7to &aSearch &7by &dItem Price'
 
 Return: '&e&lReturn to Shop'
 ReturnLore: '&e&lClick &7to return'
+
+BetterSearch: 'Better Search'
+NewAmount: 'Type New Amount'
+NewPrice: 'Type New Price'
+HowMuch: 'How Much?'
+NewData: 'New Data'
+EnterName: 'Enter Name'
+ItemName: 'Type Item or id'
+NewDescription: 'Type Description'

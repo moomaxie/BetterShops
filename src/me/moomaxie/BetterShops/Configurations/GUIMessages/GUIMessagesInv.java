@@ -19,25 +19,25 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class GUIMessagesInv {
 
-    public static void openGUIMessagesInv(Player p){
+    public static void openGUIMessagesInv(Player p) {
         Inventory inv = Bukkit.createInventory(p, 54, "§7[BetterShops] §dLanguages");
 
         //Glass
-        ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte) 7);
+        org.bukkit.inventory.ItemStack glass = new org.bukkit.inventory.ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.setDisplayName(" ");
         glass.setItemMeta(glassMeta);
 
-        for (int i = 0; i < 9;i++) {
-            inv.setItem(i,glass);
+        for (int i = 0; i < 9; i++) {
+            inv.setItem(i, glass);
         }
 
-        for (int i = 8; i < 54;i= i+9) {
-            inv.setItem(i,glass);
+        for (int i = 8; i < 54; i = i + 9) {
+            inv.setItem(i, glass);
         }
 
-        for (int i = 0; i < 54;i= i+9) {
-            inv.setItem(i,glass);
+        for (int i = 0; i < 54; i = i + 9) {
+            inv.setItem(i, glass);
         }
 
         ItemStack main = new ItemStack(Material.ENDER_CHEST);
@@ -85,15 +85,27 @@ public class GUIMessagesInv {
         chatMeta.setDisplayName("§eChat Messages");
         chat.setItemMeta(chatMeta);
 
-        inv.setItem(10,main);
-        inv.setItem(11,checkout);
-        inv.setItem(12,BAS);
-        inv.setItem(13,itemTexts);
-        inv.setItem(14,searchEngine);
-        inv.setItem(15,shopKeeper);
-        inv.setItem(16,shopSettings);
-        inv.setItem(19,history);
+        ItemStack NPCs = new ItemStack(Material.MONSTER_EGG);
+        ItemMeta NPCsMeta = NPCs.getItemMeta();
+        NPCsMeta.setDisplayName("§eNPC Messages");
+        NPCs.setItemMeta(NPCsMeta);
+
+        ItemStack LiveEco = new ItemStack(Material.EMERALD_ORE);
+        ItemMeta LiveEcoMeta = LiveEco.getItemMeta();
+        LiveEcoMeta.setDisplayName("§eLive Economy Messages");
+        LiveEco.setItemMeta(LiveEcoMeta);
+
+        inv.setItem(10, main);
+        inv.setItem(11, checkout);
+        inv.setItem(12, BAS);
+        inv.setItem(13, itemTexts);
+        inv.setItem(14, searchEngine);
+        inv.setItem(15, shopKeeper);
+        inv.setItem(16, shopSettings);
+        inv.setItem(19, history);
         inv.setItem(20, chat);
+        inv.setItem(21, NPCs);
+        inv.setItem(22, LiveEco);
 
         p.openInventory(inv);
     }

@@ -1,8 +1,8 @@
 name: BetterShops
 main: me.moomaxie.BetterShops.Core
-version: 1.5.5
+version: 1.6.0 Beta 10
 author: moomaxie
-softdepend: [WorldGuard, Vault]
+softdepend: [WorldGuard, Vault, HolographicDisplays]
 description: >
              Better Shops Plugin
 commands:
@@ -25,6 +25,9 @@ permissions:
             bettershops.shop.owneruse: true
             bettershops.shop.NPC: true
             bettershops.shop.creationcost: true
+            bettershops.shop.liveeco: true
+            bettershops.shop.holograms: true
+            bettershops.shop.blacklist: true
             bettershops.npc.*: true
             bettershops.command.*: true
     bettershops.shop.create:
@@ -51,16 +54,29 @@ permissions:
     bettershops.shop.creationcost:
         description: Allows ability to bypass creation costs
         default: op
+    bettershops.shop.liveeco:
+        description: Allows ability to use Live Economy
+        default: true
+    bettershops.shop.holograms:
+        description: Allows ability to create Holographic Shops
+        default: op
+    bettershops.shop.blacklist:
+        description: Allows ability to bypass the blacklist
+        default: op
     bettershops.command.*:
         description: Access to all BetterShops Commands
         default: op
         children:
+            bettershops.command.update: true
             bettershops.command.config: true
             bettershops.command.language: true
             bettershops.command.open: true
             bettershops.command.remove: true
-            bettershops.command.claim: true
-            bettershops.command.unclaim: true
+            bettershops.command.blacklist: true
+            bettershops.command.list: true
+    bettershops.command.update:
+        description: Allows ability to use the /bs update command
+        default: op
     bettershops.command.config:
         description: Allows ability to use the Config GUI
         default: op
@@ -70,9 +86,15 @@ permissions:
     bettershops.command.open:
         description: Allows ability to use the /bs open <Shop> command
         default: op
+    bettershops.command.list:
+        description: Allows ability to use the /bs list <Player> command
+        default: op
     bettershops.command.remove:
         description: Allows ability to use the /bs remove <Shop> command
         default: true
+    bettershops.command.blacklist:
+        description: Allows ability to use the /bs blacklist command
+        default: op
     bettershops.npc.*:
         description: Access to all NPC types
         default: op

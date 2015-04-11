@@ -1,11 +1,17 @@
 package me.moomaxie.BetterShops.Listeners.ManagerOptions;
 
+import me.moomaxie.BetterShops.Configurations.Blacklist;
+import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
+import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
+import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.OpenSellingOptions;
+import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -40,8 +46,10 @@ public class AddItemManager implements Listener {
                     if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("Stock")) && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("Amount")) && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("Price"))) {
                         return;
                     }
-                    if (p.getInventory().contains(ite)) {
-                        if (p.getOpenInventory() != null && p.getOpenInventory().getTopInventory().getName().contains("§7[Shop]")) {
+
+                    if (p.getInventory().contains(ite) && e.getRawSlot() >= 54) {
+
+                        if (p.getOpenInventory() != null && p.getOpenInventory().getTopInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
 
                             String name = p.getOpenInventory().getTopInventory().getName();
                             name = name.substring(11);
@@ -56,23 +64,15 @@ public class AddItemManager implements Listener {
 
                                     ItemStack item = ite.clone();
 
-                                    if (!shop.alreadyBeingSold(ite, false)) {
-                                        if (shop.getHighestSlot(false) < 161) {
+                                    item.setAmount(1);
 
-                                            if (shop.getHighestSlot(false) == 53) {
-                                                shop.addItem(item, 72, false);
-                                            } else if (shop.getHighestSlot(false) == 107) {
-                                                shop.addItem(item, 126, false);
-                                            } else if (e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-                                                if (e.getInventory().firstEmpty() >= 18) {
-                                                    shop.addItem(item, p.getOpenInventory().getTopInventory(), false);
-                                                } else {
-                                                    shop.addItem(item, shop.getHighestSlot(false) + 1, false);
-                                                }
-                                            } else {
-                                                shop.addItem(item, shop.getHighestSlot(false) + 1, false);
-                                            }
+                                    if (!Blacklist.isBlacklisted(item) || Blacklist.isBlacklisted(item) && Permissions.hasBlacklistPerm(p)) {
 
+                                        if (ShopItem.fromItemStack(shop, item, false) == null) {
+                                            int page = shop.getNextAvailablePage(false);
+                                            int s = shop.getNextSlotForPage(page, false);
+
+                                            ShopItem sItem = shop.createShopItem(item, s, page, false);
 
                                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
                                             p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
@@ -81,9 +81,9 @@ public class AddItemManager implements Listener {
                                             int am = ite.getAmount() - 1;
 
                                             if (shop.isServerShop()) {
-                                                OpenShop.openShopItems(e.getInventory(), p, shop, 1);
+                                                OpenShop.openShopItems(e.getInventory(), p, shop, page);
                                             } else {
-                                                OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, 1);
+                                                OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, page);
                                             }
 
 
@@ -92,18 +92,49 @@ public class AddItemManager implements Listener {
                                             } else {
                                                 p.getInventory().setItem(slot, new ItemStack(Material.AIR));
                                             }
-
-
                                         } else {
-                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopFull"));
+
+                                            ShopItem shopItem = ShopItem.fromItemStack(shop, item, false);
+                                            Stocks.addAll(shopItem, shop, p);
+                                            if (shop.isServerShop()) {
+                                                OpenShop.openShopItems(e.getInventory(), p, shop, shopItem.getPage());
+                                            } else {
+                                                OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, shopItem.getPage());
+                                            }
+                                            p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
                                         }
                                     } else {
-                                        Stocks.addAll(item, shop, p);
-                                        if (shop.isServerShop()) {
-                                            OpenShop.openShopItems(e.getInventory(), p, shop, 1);
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("Blacklist"));
+                                    }
+                                } else if (e.getInventory().getItem(3).getItemMeta().getDisplayName() != null && e.getInventory().getItem(3).getItemMeta().getDisplayName().equals(MainGUI.getString("Selling")) && Config.useSellingShop()) {
+
+                                    ItemStack item = ite.clone();
+
+                                    item.setAmount(1);
+
+                                    if (!Blacklist.isBlacklisted(item) || Blacklist.isBlacklisted(item) && Permissions.hasBlacklistPerm(p)) {
+
+                                        if (ShopItem.fromItemStack(shop, item, true) == null) {
+                                            int page = shop.getNextAvailablePage(true);
+                                            int s = shop.getNextSlotForPage(page, true);
+
+                                            ShopItem sItem = shop.createShopItem(item, s, page, true);
+
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AddItem"));
+                                            p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
+
+
+                                            if (shop.isServerShop()) {
+                                                OpenSellShop.openSellerShop(e.getInventory(), p, shop, page);
+                                            } else {
+                                                OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, page);
+                                            }
+
                                         } else {
-                                            OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), p, shop, 1);
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyHave"));
                                         }
+                                    } else {
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("Blacklist"));
                                     }
                                 }
                             }

@@ -106,6 +106,12 @@ public class LanguageInventory implements Listener {
         if (file.equals("Messages")) {
             config = Messages.config;
         }
+        if (file.equals("NPCs")) {
+            config = NPCs.config;
+        }
+        if (file.equals("LiveEconomy")) {
+            config = LiveEconomy.config;
+        }
 
         if (config != null) {
             int maxPage = (int) Math.ceil((double) (config.getKeys(false).size() - 1) / 45);
@@ -227,6 +233,12 @@ public class LanguageInventory implements Listener {
                     }
                     if (file.equals("Messages")) {
                         Messages.setString(title, e.getMessage());
+                    }
+                    if (file.equals("NPCs")) {
+                        NPCs.setString(title, e.getMessage());
+                    }
+                    if (file.equals("LiveEconomy")) {
+                        LiveEconomy.setString(title, e.getMessage());
                     }
 
                     if (title.equals("SignLine1")) {

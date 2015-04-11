@@ -17,5 +17,5 @@ public interface TitleManager {
 
     public void sendSubTitle(Player p, String message);
 
-    public void setTimes(Player p, int fadein, int amt, int fadeout);
+    public void setTimes(Player p, int fadein,int amt, int fadeout);
 }

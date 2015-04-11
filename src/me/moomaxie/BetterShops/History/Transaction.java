@@ -1,7 +1,7 @@
 package me.moomaxie.BetterShops.History;
 
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Date;
 
@@ -17,13 +17,25 @@ import java.util.Date;
 public class Transaction {
 
     private OfflinePlayer p;
-    private ItemStack item;
+    private String item;
     private double price;
     private int amount;
     private Date date;
     private boolean sell;
 
-    public Transaction(OfflinePlayer p, Date date, ItemStack item, double price, int amount, boolean sell) {
+    public Transaction(OfflinePlayer p, Date date, ShopItem item, double price, int amount, boolean sell) {
+        this.p = p;
+        this.amount = amount;
+        if (item.getDisplayName() != null)
+            this.item = item.getDisplayName();
+        else
+            this.item = item.getItem().getType().name();
+        this.price = price;
+        this.date = date;
+        this.sell = sell;
+    }
+
+    public Transaction(OfflinePlayer p, Date date, String item, double price, int amount, boolean sell) {
         this.p = p;
         this.amount = amount;
         this.item = item;
@@ -40,7 +52,7 @@ public class Transaction {
         return price;
     }
 
-    public ItemStack getItem() {
+    public String getItem() {
         return item;
     }
 
@@ -52,7 +64,7 @@ public class Transaction {
         return date;
     }
 
-    public boolean isSell(){
+    public boolean isSell() {
         return sell;
     }
 }

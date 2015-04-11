@@ -1,0 +1,32 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Live Economy" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 1.6.0 Beta 10
+
+LiveEcoOn: '&e&lLive Economy &7- &aOn'
+LiveEcoOff: '&e&lLive Economy &7- &cOff'
+LiveEcoLore: '&3&lClick &7to toggle'
+
+Information: '&d&l&nInformation'
+Info1: '&7If enabled, the following will occur'
+Info2: '&7Prices will adjust automatically'
+Info3: '&7More Buying = Higher Prices'
+Info4: '&7More Selling = Lower Prices'
+Info5: '&7This item will also appear in the &eSelling Shop'
+Info6: '&7Selling price = &a1/2 &7Buying'
+Info7: '&7Remember, This option is in beta'
+
+VariableAmount: '&e&lSecret Economic Variable &7- &d<Value>'
+VariableLore: '&e&lClick &7to Change'
+
+PriceChange: '&e&lPrice Change Percent &7- &d<Value>'
+
+AffectPrice: '&7This will affect the current price'
+LowNumber: '&8Low Number = More Price Fluctuation'
+HighNumber: '&8High Number = Less Price Fluctuation'

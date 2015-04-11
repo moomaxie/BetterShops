@@ -7,13 +7,16 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.5.5
+Version: 1.6.0 Beta 10
 
 BuyItem: '&a&lBuy Item'
 BuyItemLore: '&e&lLeft Click &7to &aBuy &7this item'
 
 SellItem: '&a&lSell'
 SellItemLore: '&e&lLeft Click &7to &aSell &7this item'
+
+SellAll: '&a&lSell All'
+SellAllLore: '&e&lLeft Click &7to &aSell All &7of your items'
 
 Cancel: '&c&lCancel'
 CancelLore: '&e&lLeft Click &7to &cCancel'

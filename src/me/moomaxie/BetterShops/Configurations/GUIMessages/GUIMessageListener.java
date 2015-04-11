@@ -52,6 +52,12 @@ public class GUIMessageListener implements Listener{
                 if (e.getCurrentItem().getItemMeta().getDisplayName().equals("§eChat Messages")){
                     LanguageInventory.openLanguageInventory("Messages",p,1);
                 }
+                if (e.getCurrentItem().getItemMeta().getDisplayName().equals("§eNPC Messages")){
+                    LanguageInventory.openLanguageInventory("NPCs",p,1);
+                }
+                if (e.getCurrentItem().getItemMeta().getDisplayName().equals("§eLive Economy Messages")){
+                    LanguageInventory.openLanguageInventory("LiveEconomy",p,1);
+                }
             }
         }
     }

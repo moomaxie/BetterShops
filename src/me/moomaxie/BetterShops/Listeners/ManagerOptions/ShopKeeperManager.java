@@ -40,7 +40,7 @@ public class ShopKeeperManager implements Listener {
     @EventHandler
     public void onSettings(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
 
             if (e.getInventory().getType() == InventoryType.CHEST) {
@@ -52,8 +52,9 @@ public class ShopKeeperManager implements Listener {
                     Shop shop = ShopLimits.fromString(p, name);
 
                     if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
+
                         if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("ShopKeepersDisplayName"))) {
-                            if (e.getAction() == InventoryAction.PICKUP_ALL) {
+                                if (e.getAction() == InventoryAction.PICKUP_ALL) {
                                 openKeeperManager(p, shop);
                             }
                         }
@@ -64,7 +65,7 @@ public class ShopKeeperManager implements Listener {
     }
 
     public static void openKeeperManager(Player p, Shop shop) {
-        Inventory inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+        Inventory inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
 
         ItemStack item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
         ItemMeta m = item.getItemMeta();
@@ -124,7 +125,7 @@ public class ShopKeeperManager implements Listener {
     @EventHandler
     public void onSettingsClick(final InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
 
             if (e.getInventory().getType() == InventoryType.CHEST) {
@@ -165,7 +166,7 @@ public class ShopKeeperManager implements Listener {
                                                             ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("AddedKeeper"));
                                                             openKeeperManager((Player) e.getWhoClicked(), shop);
                                                         } else {
-                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + "§cAlready a shop keeper");
+                                                            ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("AlreadyAKeeper"));
                                                             openKeeperManager((Player) e.getWhoClicked(), shop);
                                                         }
                                                     } else {

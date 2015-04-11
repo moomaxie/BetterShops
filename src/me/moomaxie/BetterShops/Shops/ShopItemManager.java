@@ -1,11 +1,12 @@
 package me.moomaxie.BetterShops.Shops;
 
-import org.bukkit.configuration.ConfigurationSection;
+import me.moomaxie.BetterShops.Core;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 
 /**
  * ***********************************************************************
@@ -18,17 +19,27 @@ import java.math.BigDecimal;
  */
 public class ShopItemManager {
 
-    private static File file;
-    private static YamlConfiguration config;
     private ShopItem item;
-    private ConfigurationSection section;
+    private String name;
+    private YamlConfiguration config;
+    private File file;
 
     protected ShopItemManager(ShopItem item) {
-        file = item.getShop().file;
-        config = YamlConfiguration.loadConfiguration(file);
+        
         this.item = item;
-        String name = item.getShop().getName();
-        section = config.getConfigurationSection(name).getConfigurationSection("" + item.getShopItemID());
+        this.name = item.getShop().getName();
+        this.config = item.getShop().config;
+        this.file = item.getShop().file;
+
+        if (!config.getConfigurationSection(name).getConfigurationSection("Items").isConfigurationSection("" + item.getShopItemID())) {
+            config.getConfigurationSection(name).getConfigurationSection("Items").createSection("" + item.getShopItemID());
+
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public ShopItem getItem() {
@@ -36,21 +47,61 @@ public class ShopItemManager {
     }
 
     public void setStock(int amt) {
-        section.set("Stock", amt);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Stock", amt);
         saveConfig();
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `Stock` = '" + amt + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getStock() {
-        return section.getInt("Stock");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("Stock");
     }
 
-    public void setPrice(double amt) {
-        section.set("Price", amt);
+    public void setLimit(int amt) {
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Limit", amt);
         saveConfig();
     }
 
+    public int getLimit() {
+        if (config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).isInt("Limit")) {
+            return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("Limit");
+        } else {
+            setLimit(0);
+            return 0;
+        }
+    }
+
+    public void setPrice(double amt) {
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Price", amt);
+        saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `Price` = '" + amt + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public double getPrice() {
-        return section.getDouble("Price");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getDouble("Price");
+    }
+
+    public double getOrigPrice() {
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getDouble("OrigPrice");
+    }
+
+    public void setOrigPrice(double amt) {
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("OrigPrice", amt);
+        saveConfig();
     }
 
     public String getPriceAsString() {
@@ -58,103 +109,184 @@ public class ShopItemManager {
     }
 
     public void setAmount(int amt) {
-        section.set("Amount", amt);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Amount", amt);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `Amount` = '" + amt + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getAmount() {
-        return section.getInt("Amount");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("Amount");
     }
 
     public void setPage(int page) {
-        section.set("Page", page);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Page", page);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `Page` = '" + page + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getPage() {
-        return section.getInt("Page");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("Page");
     }
 
     public void setSlot(int slot) {
-        section.set("Slot", slot);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Slot", slot);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `Slot` = '" + slot + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getSlot() {
-        return section.getInt("Slot");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("Slot");
     }
 
     public void setSelling(boolean b) {
-        section.set("Selling", b);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Selling", b);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `Selling` = '" + b + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean isSelling() {
-        return section.getBoolean("Selling");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getBoolean("Selling");
     }
 
     public void setInfinite(boolean b) {
-        section.set("Infinite", b);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("Infinite", b);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `Infinite` = '" + b + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean isInfinite() {
-        return section.getBoolean("Infinite");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getBoolean("Infinite");
     }
 
     public void setLiveEco(boolean b) {
-        section.set("LiveEconomy", b);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("LiveEconomy", b);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `LiveEconomy` = '" + b + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean isLiveEco() {
-        return section.getBoolean("LiveEconomy");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getBoolean("LiveEconomy");
     }
 
     public void setPriceChangePercent(double amt) {
-        section.set("PriceChangePercent", amt);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("PriceChangePercent", amt);
         saveConfig();
     }
 
     public double getPriceChangePercent() {
-        return section.getDouble("PriceChangePercent");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getDouble("PriceChangePercent");
     }
 
     public void setDoubleAmount(int amt) {
-        section.set("DoubleAmount", amt);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("DoubleAmount", amt);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `SpecialEcoNumber` = '" + amt + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getDoubleAmount() {
-        return section.getInt("DoubleAmount");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("DoubleAmount");
     }
 
     public void setMinimumPrice(int amt) {
-        section.set("MinimumPrice", amt);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MinimumPrice", amt);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `MinPrice` = '" + amt + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getMinimumPrice() {
-        return section.getInt("MinimumPrice");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("MinimumPrice");
     }
 
     public void setMaximumPrice(int amt) {
-        section.set("MaximumPrice", amt);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("MaximumPrice", amt);
         saveConfig();
+
+        if (Core.useSQL()) {
+            try {
+                Core.getSQLDatabase().getConnection().createStatement().executeUpdate("UPDATE " + item.getShop().getName() + "_Items SET" +
+                        " `MaxPrice` = '" + amt + "' WHERE `" + item.getShop().getName() + "_Items`.`ID` ='" + item.getShopItemID() + "';");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getMaximumPrice() {
-        return section.getInt("MaximumPrice");
+        return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getInt("MaximumPrice");
     }
 
     public void setAdjustedPrice(double amt) {
-        section.set("AdjustedPrice", amt);
+        config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).set("AdjustedPrice", amt);
         saveConfig();
     }
 
     public double getAdjustedPrice() {
         if (isLiveEco())
-            return section.getDouble("AdjustedPrice");
+            return config.getConfigurationSection(name).getConfigurationSection("Items").getConfigurationSection("" + item.getShopItemID()).getDouble("AdjustedPrice");
         else
             return getPrice();
     }

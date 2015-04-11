@@ -1,8 +1,6 @@
-package me.moomaxie.BetterShops.NPC;
+package me.moomaxie.BetterShops.ShopTypes.NPC;
 
 import org.bukkit.Bukkit;
-
-import java.util.List;
 
 /**
  * ***********************************************************************
@@ -15,21 +13,15 @@ import java.util.List;
  */
 public class ReturnNPC {
 
-    static List<ShopsNPC> npcs;
-
     public static void startReturnNPC() {
 
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             public void run() {
 
-                npcs = NPCs.getNPCs();
+                for (ShopsNPC npc : NPCs.getNPCs()) {
 
-                for (int i = 0; i < npcs.size(); i++) {
-
-                    ShopsNPC npc = npcs.get(i);
-                    if (npc.getShop() != null && npc.getShop().isNPCShop()) {
-
+                    if (npc.getShop() != null) {
                         npc.returnNPC();
                     } else {
                         NPCs.removeNPC(npc);

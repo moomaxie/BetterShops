@@ -2,6 +2,7 @@ package me.moomaxie.BetterShops.Listeners.SellerOptions;
 
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,7 +31,7 @@ public class OpenSellShop implements Listener {
         boolean same = true;
         if (inv == null) {
             same = false;
-            inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+            inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
         } else {
             inv.clear();
         }
@@ -50,7 +51,7 @@ public class OpenSellShop implements Listener {
         optionsMeta.setDisplayName("§a§l" + shop.getName());
 
         if (!shop.isServerShop()) {
-            optionsMeta.setLore(Arrays.asList("§7" + shop.getDescription(), " ", MainGUI.getString("Owner")+ " §a§l" + shop.getOwner().getName(),
+            optionsMeta.setLore(Arrays.asList("§7" + shop.getDescription(), " ", MainGUI.getString("Owner") + " §a§l" + shop.getOwner().getName(),
                     MainGUI.getString("Keepers") + " §7" + shop.getManagers().size()));
             options.setItemMeta(optionsMeta);
         } else {
@@ -59,7 +60,7 @@ public class OpenSellShop implements Listener {
                         MainGUI.getString("Keepers") + " §7" + shop.getManagers().size()));
                 options.setItemMeta(optionsMeta);
             } else {
-                optionsMeta.setLore(Arrays.asList( "§7" + shop.getDescription(), " ", MainGUI.getString("SellingShop"), " ", MainGUI.getString("Owner") + " " + MainGUI.getString("Server"),
+                optionsMeta.setLore(Arrays.asList("§7" + shop.getDescription(), " ", MainGUI.getString("SellingShop"), " ", MainGUI.getString("Owner") + " " + MainGUI.getString("Server"),
                         MainGUI.getString("Keepers") + " §7" + shop.getManagers().size(), " ", MainGUI.getString("OpenShopSettings"), " ", MainGUI.getString("TurnOffServerShop")));
                 options.setItemMeta(optionsMeta);
             }
@@ -89,138 +90,47 @@ public class OpenSellShop implements Listener {
 
         ItemStack pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
         ItemMeta pg1Meta = pg1.getItemMeta();
-        pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
+        pg1Meta.setDisplayName(MainGUI.getString("Page") + " §7" + page);
         pg1.setItemMeta(pg1Meta);
 
-        ItemStack pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-        ItemMeta pg2Meta = pg2.getItemMeta();
-        pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
-        pg2.setItemMeta(pg2Meta);
-
-        ItemStack pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-        ItemMeta pg3Meta = pg3.getItemMeta();
-        pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
-        pg3.setItemMeta(pg3Meta);
-
-        if (page == 1) {
-            inv.setItem(8, arrow);
-        }
-
-        if (page == 2) {
-            pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg1Meta = pg1.getItemMeta();
-            pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
-            pg1.setItemMeta(pg1Meta);
-
-            pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
-            pg2Meta = pg2.getItemMeta();
-            pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
-            pg2.setItemMeta(pg2Meta);
-
-            pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg3Meta = pg3.getItemMeta();
-            pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
-            pg3.setItemMeta(pg3Meta);
-
-            inv.setItem(0, barrow);
-            inv.setItem(8, arrow);
-        }
-
-        if (page == 3) {
-            pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg1Meta = pg1.getItemMeta();
-            pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
-            pg1.setItemMeta(pg1Meta);
-
-            pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg2Meta = pg2.getItemMeta();
-            pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
-            pg2.setItemMeta(pg2Meta);
-
-            pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
-            pg3Meta = pg3.getItemMeta();
-            pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
-            pg3.setItemMeta(pg3Meta);
-
-            inv.setItem(0, barrow);
-        }
 
         inv.setItem(3, info);
         inv.setItem(4, cart);
         inv.setItem(5, options);
 
-        inv.setItem(12, pg1);
-        inv.setItem(13, pg2);
-        inv.setItem(14, pg3);
+        inv.setItem(13, pg1);
 
-        for (ItemStack it : shop.getShopContents(true).keySet()) {
-            int slot = shop.getShopContents(true).get(it);
+        if (page > 1) {
+            inv.setItem(0, barrow);
+        }
 
-            if (page == 1) {
-                if (slot >= 18 && slot < 54) {
-                    it.setAmount(1);
-                    ItemMeta meta = it.getItemMeta();
-                    List<String> lore;
-                    if (shop.getLore(it) != null) {
-                        lore = shop.getLore(it);
-                    } else {
-                        lore = new ArrayList<String>();
+        inv.setItem(8, arrow);
+
+        for (ShopItem it : shop.getShopItems(true)) {
+            if (it.getPage() == page) {
+                ItemStack itemStack = it.getItem().clone();
+                List<String> lore = new ArrayList<>();
+                ItemMeta meta = itemStack.getItemMeta();
+                if (it.getLore() != null) {
+                    for (String s : it.getLore()) {
+                        lore.add(s);
                     }
-
-                    lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
-                    lore.add(" ");
-                    lore.add(MainGUI.getString("SellItem"));
-
-                    meta.setLore(lore);
-                    it.setItemMeta(meta);
-
-                    inv.setItem(slot, it);
                 }
-            } else if (page == 2) {
-                if (slot >= 72 && slot < 108) {
-                    it.setAmount(1);
-                    ItemMeta meta = it.getItemMeta();
-                    List<String> lore;
-                    if (shop.getLore(it) != null) {
-                        lore = shop.getLore(it);
+                lore.add(MainGUI.getString("AskingAmount") + " §7" + it.getAmount());
+                if (!it.getLiveEco()) {
+                    lore.add(MainGUI.getString("AskingPrice") + " §7" + it.getPriceAsString());
+                } else {
+                    if (it.getAdjustedPrice() != it.getOrigPrice()) {
+                        lore.add(MainGUI.getString("AskingPrice") + " §c§m" + it.getOrigPrice() + " §a" + it.getAdjustedPriceAsString());
                     } else {
-                        lore = new ArrayList<String>();
+                        lore.add(MainGUI.getString("AskingPrice") + " §7" + it.getPriceAsString());
                     }
-
-                    lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
-                    lore.add(" ");
-                    lore.add(MainGUI.getString("SellItem"));
-                    meta.setLore(lore);
-                    it.setItemMeta(meta);
-
-                    slot = slot - 54;
-
-                    inv.setItem(slot, it);
                 }
-            } else if (page == 3) {
-                if (slot >= 126 && slot < 162) {
-                    it.setAmount(1);
-                    ItemMeta meta = it.getItemMeta();
-                    List<String> lore;
-                    if (shop.getLore(it) != null) {
-                        lore = shop.getLore(it);
-                    } else {
-                        lore = new ArrayList<String>();
-                    }
-
-                    lore.add(MainGUI.getString("AskingAmount") + " §7" + shop.getAmount(it, true));
-                    lore.add(MainGUI.getString("AskingPrice") + " §7" + shop.getPriceAsString(it, true));
-                    lore.add(" ");
-                    lore.add(MainGUI.getString("SellItem"));
-                    meta.setLore(lore);
-                    it.setItemMeta(meta);
-
-                    slot = slot - 108;
-
-                    inv.setItem(slot, it);
-                }
+                lore.add(" ");
+                lore.add(MainGUI.getString("SellItem"));
+                meta.setLore(lore);
+                itemStack.setItemMeta(meta);
+                inv.setItem(it.getSlot(), itemStack);
             }
         }
 

@@ -1,6 +1,9 @@
-package me.moomaxie.BetterShops.NPC;
+package me.moomaxie.BetterShops.ShopTypes.NPC;
+
+import me.moomaxie.BetterShops.Shops.Shop;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -16,15 +19,21 @@ public class NPCs {
 
     private static List<ShopsNPC> npcs = new ArrayList<>();
 
+    private static HashMap<Shop,ShopsNPC> shopNPCs = new HashMap<>();
+
     public static void addNPC(ShopsNPC npc){
         npcs.add(npc);
+        shopNPCs.put(npc.getShop(),npc);
     }
 
     public static void removeNPC(ShopsNPC npc){
         npcs.remove(npc);
+        shopNPCs.remove(npc.getShop());
     }
 
     public static List<ShopsNPC> getNPCs(){
         return npcs;
     }
+
+    public static HashMap<Shop,ShopsNPC> getShopNPCs(){return shopNPCs;}
 }

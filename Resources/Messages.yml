@@ -8,7 +8,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 1.5.5
+Version: 1.6.0 Beta 10
 
 Prefix: '&b&lBetterShops &7&l» &d'
 
@@ -29,9 +29,9 @@ BuyItem: '&aSuccessfully Bought Item.'
 SellItem: '&aSuccessfully Sold Item.'
 
 # <Player> is the name of the player who used the shop
-NotifySell: '&e<Player> &aSold an Item to you!'
+NotifySell: '&e<Player> &dSold an Item to you!'
 
-NotifyBuy: '&e<Player> &aBought an item from your shop!'
+NotifyBuy: '&e<Player> &dBought an item from your shop!'
 
 ShopFull: '&eThe Shop is &cFull.'
 
@@ -52,7 +52,7 @@ ChangeData: '&aChanged Data.'
 LowStock: '&cStock is not high enough.'
 
 # <Value> is the value of infinite stock (On/Off)
-InfiniteStock: '&7Turned &e<Value> &7Infinite Stock.'
+InfiniteStock: '&dTurned &e<Value> &dInfinite Stock.'
 
 NotEnoughItems: '&cNot enough items for that stock.'
 
@@ -66,9 +66,9 @@ ReceivedAmount: '&dYou have gained &e<Amount> &dDollars.'
 
 TakenAmount: '&e<Amount> &dDollars has been taken from your account.'
 
-ServerShop: '&7Turned &e<Value> &7Server Shop Mode.'
+ServerShop: '&dTurned &e<Value> &dServer Shop Mode.'
 
-NPCShop: '&7Turned &e<Value> &7NPC Shop Mode.'
+NPCShop: '&dTurned &e<Value> &dNPC Shop Mode.'
 
 ChatMessage: '&aType a Name/Amount in your chat. Type &cCancel &ato cancel.'
 
@@ -110,17 +110,17 @@ NoOwner: '&cThis Shop has no Owner!'
 
 NonExistingItem: '&cNon-Existing Item'
 
-HighAmount: '&cMust be between &70 &cand &72034'
+HighAmount: '&cMust be between 0 and 2034'
 
-Zero: '&cMust be greater than &70'
+Zero: '&cMust be greater than 0'
 
 HighPrice: '&cThat price is too high'
 
-Cancelled: '&cCancelled'
+Cancelled: '&cCanceled'
 
 ChangeDescription: '&aChanged Shop Description!'
 
-LongDescription: '&cThat description is too long. &7(Max: 26 Characters)'
+LongDescription: '&cThat description is too long.'
 
 ShopOption: '&aYour Shop is now &e<Value>'
 
@@ -128,7 +128,7 @@ AlreadyAKeeper: '&cAlready a shop keeper'
 
 OutOfStock: '&cRan out of stock for &d'
 
-ImproperDescription: '&cNot an acceptable description.'
+ImproperDescription: '&cNot an acceptable description. &7(Max: 26 Characters)'
 
 AddedKeeper: '&aAdded shop keeper'
 
@@ -140,8 +140,22 @@ CannotAfford: '&cCould Not Afford &d'
 
 CanOnlyBuy: '&cCan only buy &e'
 
-PriceChange: '&cThe price of &e<Item> &chas just been changed. You have exited the shop to avoid fraud.'
+PriceChange: '&cThe price of &e<Item> has just been changed. You have exited the shop to avoid fraud.'
 
 Fraud: '&cThe price of this item has just been changed. You have exited the shop to avoid fraud.'
 
 ClearHistoryLimit: '&cPlease wait until more transactions occur in order to Clear History.'
+
+Blacklist: '&cYou are prohibited from adding this item'
+
+TooFew: '&cYour shop needs to contain at least 1 item'
+
+InvalidShop: '&cThis shop either does not exist or something went wrong...'
+
+Updated: '&aUpdated the plugin from an Outside Source'
+
+ChangeLimit: '&aChanged the Selling Limit'
+
+SellLimit: '&aOnly able to sell &e<Amount>'
+
+LimitReached: '&cThe sell limit for this item has been reached'

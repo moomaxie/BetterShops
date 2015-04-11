@@ -1,0 +1,12 @@
+#
+#                 Better Shop's Blacklist File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#     Lines starting with # are comments and will be ignored.
+#
+# How to add to the list:
+# Please perform the command '/bs blacklist'
+# This will bring up a menu that you can easily add items to
+
+NextId: 0

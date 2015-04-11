@@ -531,7 +531,7 @@ public class Metrics {
      * @param json
      * @param key
      * @param value
-     * @throws java.io.UnsupportedEncodingException
+     * @throws UnsupportedEncodingException
      */
     private static void appendJSONPair(StringBuilder json, String key, String value) throws UnsupportedEncodingException {
         boolean isValueNumeric = false;

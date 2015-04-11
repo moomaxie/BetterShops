@@ -4,6 +4,7 @@ import BetterShops.Dev.API.Events.ShopCreateEvent;
 import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
@@ -12,21 +13,18 @@ import me.moomaxie.BetterShops.Listeners.CreationCost.CreationCost;
 import me.moomaxie.BetterShops.Listeners.Misc.ChatMessages;
 import me.moomaxie.BetterShops.Shops.AddShop;
 import me.moomaxie.BetterShops.Shops.Shop;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import me.moomaxie.BetterShops.Shops.ShopItem;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.io.File;
 
 /**
  * ***********************************************************************
@@ -62,7 +60,7 @@ public class ShopCreate implements Listener {
 
                 if (e.getBlock().getType() == Material.WALL_SIGN) {
 
-                    Sign sign = (Sign) e.getBlock().getState();
+                    org.bukkit.block.Sign sign = (org.bukkit.block.Sign) e.getBlock().getState();
 
                     Block face = e.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
@@ -116,19 +114,8 @@ public class ShopCreate implements Listener {
                                                         Long = true;
                                                     }
 
-                                                    if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
-
-                                                        for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
-                                                            if (file.getName().contains(".yml")) {
-                                                                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-                                                                for (String s : config.getKeys(false)) {
-                                                                    if (s.equals(name)) {
-                                                                        can = false;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
+                                                    if (ShopLimits.fromString(name) != null){
+                                                        can = false;
                                                     }
 
                                                     if (can && !Long) {
@@ -142,16 +129,18 @@ public class ShopCreate implements Listener {
                                                             e.setLine(2, MainGUI.getString("SignLine3Closed"));
                                                             e.setLine(3, MainGUI.getString("SignLine4"));
 
-                                                            Sign s = (Sign) e.getBlock().getState();
+                                                            if (e.getBlock().getState() instanceof Sign) {
+                                                                org.bukkit.block.Sign s = (org.bukkit.block.Sign) e.getBlock().getState();
 
-                                                            s.setLine(0, MainGUI.getString("SignLine1"));
-                                                            s.setLine(1, MainGUI.getString("SignLine2"));
-                                                            s.setLine(2, MainGUI.getString("SignLine3Closed"));
-                                                            s.setLine(3, MainGUI.getString("SignLine4"));
+                                                                s.setLine(0, MainGUI.getString("SignLine1"));
+                                                                s.setLine(1, MainGUI.getString("SignLine2"));
+                                                                s.setLine(2, MainGUI.getString("SignLine3Closed"));
+                                                                s.setLine(3, MainGUI.getString("SignLine4"));
 
-                                                            s.update();
+                                                                s.update();
+                                                            }
 
-                                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -180,29 +169,19 @@ public class ShopCreate implements Listener {
 
                                                                             items.setAmount(1);
 
-                                                                            if (!shop.getShopContents(false).containsKey(items)) {
-                                                                                if (i < 53) {
-                                                                                    shop.addItem(items, i, false);
-                                                                                    i++;
-                                                                                } else {
-                                                                                    if (i == 53) {
-                                                                                        shop.addItem(items, i, false);
-                                                                                        i = 72;
-                                                                                    } else {
-                                                                                        shop.addItem(items, i, false);
-                                                                                        i++;
-                                                                                    }
-                                                                                }
-                                                                            } else {
-                                                                                shop.addItem(items, i, false);
-                                                                            }
+                                                                            int page = shop.getNextAvailablePage(false);
+                                                                            int sl = shop.getNextSlotForPage(page, false);
+
+                                                                            ShopItem shopItem = shop.createShopItem(items, sl, page, false);
 
                                                                             items.setAmount(am);
 
                                                                             if (items.getAmount() > 1) {
                                                                                 int amt = items.getAmount();
 
-                                                                                shop.setStock(items, ((shop.getStock(items, false) + amt) - 1), false);
+                                                                                amt = amt - 1;
+
+                                                                                shopItem.setStock(shopItem.getStock() + amt);
 
                                                                                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                                                                     public void run() {
@@ -246,7 +225,7 @@ public class ShopCreate implements Listener {
                                                             e.setLine(1, " ");
                                                             e.setLine(2, " ");
                                                             e.setLine(3, " ");
-                                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
                                                                 Core.getTitleManager().sendTitle(p, Messages.getString("LongName"));
@@ -260,7 +239,7 @@ public class ShopCreate implements Listener {
                                                             e.setLine(1, " ");
                                                             e.setLine(2, " ");
                                                             e.setLine(3, " ");
-                                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -276,7 +255,7 @@ public class ShopCreate implements Listener {
                                                     e.setLine(1, " ");
                                                     e.setLine(2, " ");
                                                     e.setLine(3, " ");
-                                                    if (Core.isAboveEight() && Config.useTitles()) {
+                                                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                         Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -293,7 +272,7 @@ public class ShopCreate implements Listener {
                                             e.setLine(1, " ");
                                             e.setLine(2, " ");
                                             e.setLine(3, " ");
-                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -310,7 +289,7 @@ public class ShopCreate implements Listener {
                                         e.setLine(1, " ");
                                         e.setLine(2, " ");
                                         e.setLine(3, " ");
-                                        if (Core.isAboveEight() && Config.useTitles()) {
+                                        if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
                                             Core.getTitleManager().sendTitle(p, Messages.getString("CreationCancelled"));
@@ -326,7 +305,7 @@ public class ShopCreate implements Listener {
 
                         ItemStack it = new ItemStack(Material.PAPER);
                         ItemMeta meta = it.getItemMeta();
-                        meta.setDisplayName("Enter Name");
+                        meta.setDisplayName(SearchEngine.getString("EnterName"));
                         it.setItemMeta(meta);
 
                         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -344,7 +323,7 @@ public class ShopCreate implements Listener {
                     e.setLine(1, " ");
                     e.setLine(2, " ");
                     e.setLine(3, " ");
-                    if (Core.isAboveEight() && Config.useTitles()) {
+                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                         Core.getTitleManager().setTimes(p, 20, 40, 20);
                         Core.getTitleManager().sendSubTitle(p, Messages.getString("Sorry"));
@@ -358,7 +337,7 @@ public class ShopCreate implements Listener {
                 e.setLine(1, " ");
                 e.setLine(2, " ");
                 e.setLine(3, " ");
-                if (Core.isAboveEight() && Config.useTitles()) {
+                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                     Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -370,16 +349,82 @@ public class ShopCreate implements Listener {
         }
     }
 
-    public boolean isAlphaNumeric(String str) {
+    public static boolean isAlphaNumeric(String str) {
         if (str.trim().length() < 1) {
             return false;
         }
-        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 ";
+        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 &/$";
         for (int i = 0; i < str.length(); i++) {
             if (!acceptable.contains(str.substring(i, i + 1).toLowerCase())) {
                 return false;
             }
         }
         return true;
+    }
+
+    public static void createShopExternally(Location loc, String name, OfflinePlayer owner) {
+        if (isAlphaNumeric(name)) {
+            boolean can = true;
+            boolean Long = false;
+
+            if (name.length() > 16) {
+                Long = true;
+            }
+
+            if (ShopLimits.fromString(name) != null){
+                can = false;
+            }
+
+            if (can && !Long) {
+
+                new AddShop(owner, loc, name);
+                loc.getBlock().setType(Material.CHEST);
+
+                Chest chest = (Chest) loc.getBlock().getState();
+
+                org.bukkit.material.Chest c = (org.bukkit.material.Chest) chest.getData();
+
+                BlockFace face = c.getFacing();
+
+                c.setFacingDirection(face.getOppositeFace());
+
+                chest.setData(c);
+
+                chest.update();
+
+                Block b = chest.getBlock().getRelative(face.getOppositeFace());
+
+                if (b != null) {
+
+                    b.setType(Material.WALL_SIGN);
+
+
+                    if (b.getState() instanceof Sign) {
+                        Sign s = (Sign) b.getState();
+
+                        org.bukkit.material.Sign sign = (org.bukkit.material.Sign) s.getData();
+
+                        sign.setFacingDirection(face.getOppositeFace());
+
+                        s.setData(sign);
+
+                        s.setLine(0, MainGUI.getString("SignLine1"));
+                        s.setLine(1, MainGUI.getString("SignLine2"));
+                        s.setLine(2, MainGUI.getString("SignLine3Closed"));
+
+                        s.setLine(3, MainGUI.getString("SignLine4"));
+
+                        s.update();
+                    }
+                }
+
+                ShopCreateEvent e = new ShopCreateEvent(ShopLimits.fromLocation(loc));
+
+                Bukkit.getPluginManager().callEvent(e);
+
+
+            }
+
+        }
     }
 }

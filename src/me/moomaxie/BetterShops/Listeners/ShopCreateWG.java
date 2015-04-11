@@ -5,6 +5,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
@@ -13,21 +14,19 @@ import me.moomaxie.BetterShops.Listeners.CreationCost.CreationCost;
 import me.moomaxie.BetterShops.Listeners.Misc.ChatMessages;
 import me.moomaxie.BetterShops.Shops.AddShop;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.io.File;
 
 /**
  * ***********************************************************************
@@ -82,7 +81,7 @@ public class ShopCreateWG implements Listener {
 
                     if (e.getBlock().getType() == Material.WALL_SIGN) {
 
-                        Sign sign = (Sign) e.getBlock().getState();
+                        org.bukkit.block.Sign sign = (org.bukkit.block.Sign) e.getBlock().getState();
 
                         Block face = e.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
@@ -115,68 +114,58 @@ public class ShopCreateWG implements Listener {
 
                 if (finalChest != null && ShopLimits.fromLocation(finalChest.getLocation()) == null) {
 
-                if (Config.useAnvil()) {
+                    if (Config.useAnvil()) {
 
-                    AnvilGUI gui = Core.getAnvilGUI();
+                        AnvilGUI gui = Core.getAnvilGUI();
 
-                    gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {
-                        @Override
-                        public void onAnvilClick(AnvilGUI.AnvilClickEvent ev) {
-                            if (ev.getSlot() == 2) {
-                                ev.setWillClose(true);
-                                ev.setWillDestroy(true);
+                        gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {
+                            @Override
+                            public void onAnvilClick(AnvilGUI.AnvilClickEvent ev) {
+                                if (ev.getSlot() == 2) {
+                                    ev.setWillClose(true);
+                                    ev.setWillDestroy(true);
 
 
-                                if (ev.getCurrentItem().getType() == Material.PAPER) {
-                                    if (ev.getCurrentItem().hasItemMeta()) {
-                                        if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
-                                            String name = ev.getCurrentItem().getItemMeta().getDisplayName();
+                                    if (ev.getCurrentItem().getType() == Material.PAPER) {
+                                        if (ev.getCurrentItem().hasItemMeta()) {
+                                            if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                                                String name = ev.getCurrentItem().getItemMeta().getDisplayName();
 
-                                            if (isAlphaNumeric(name)) {
-                                                boolean can = true;
-                                                boolean Long = false;
+                                                if (isAlphaNumeric(name)) {
+                                                    boolean can = true;
+                                                    boolean Long = false;
 
-                                                if (name.length() > 16) {
-                                                    Long = true;
-                                                }
-
-                                                if (new File(Core.getCore().getDataFolder(), "Shops").listFiles() != null) {
-
-                                                    for (File file : new File(Core.getCore().getDataFolder(), "Shops").listFiles()) {
-                                                        if (file.getName().contains(".yml")) {
-                                                            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-                                                            for (String s : config.getKeys(false)) {
-                                                                if (s.equals(name)) {
-                                                                    can = false;
-                                                                }
-                                                            }
-                                                        }
+                                                    if (name.length() > 16) {
+                                                        Long = true;
                                                     }
-                                                }
 
-                                                if (can && !Long) {
-                                                    if (CreationCost.useCost(p)) {
+                                                    if (ShopLimits.fromString(name) != null) {
+                                                        can = false;
+                                                    }
+
+                                                    if (can && !Long) {
+                                                        if (CreationCost.useCost(p)) {
 
                                                             new AddShop(e.getPlayer(), finalChest, name);
                                                             e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("CreateShop"));
 
-                                                        e.setLine(0, MainGUI.getString("SignLine1"));
-                                                        e.setLine(1, MainGUI.getString("SignLine2"));
-                                                        e.setLine(2, MainGUI.getString("SignLine3Closed"));
-                                                        e.setLine(3, MainGUI.getString("SignLine4"));
+                                                            e.setLine(0, MainGUI.getString("SignLine1"));
+                                                            e.setLine(1, MainGUI.getString("SignLine2"));
+                                                            e.setLine(2, MainGUI.getString("SignLine3Closed"));
+                                                            e.setLine(3, MainGUI.getString("SignLine4"));
 
+                                                            if (e.getBlock().getState() instanceof Sign) {
+                                                                org.bukkit.block.Sign s = (org.bukkit.block.Sign) e.getBlock().getState();
 
-                                                        Sign s = (Sign) e.getBlock().getState();
+                                                                s.setLine(0, MainGUI.getString("SignLine1"));
+                                                                s.setLine(1, MainGUI.getString("SignLine2"));
+                                                                s.setLine(2, MainGUI.getString("SignLine3Closed"));
+                                                                s.setLine(3, MainGUI.getString("SignLine4"));
 
-                                                        s.setLine(0, MainGUI.getString("SignLine1"));
-                                                        s.setLine(1, MainGUI.getString("SignLine2"));
-                                                        s.setLine(2, MainGUI.getString("SignLine3Closed"));
-                                                        s.setLine(3, MainGUI.getString("SignLine4"));
+                                                                s.update();
+                                                            }
 
-                                                        s.update();
-
-                                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -186,9 +175,9 @@ public class ShopCreateWG implements Listener {
                                                             }
 
 
-                                                                ShopCreateEvent e = new ShopCreateEvent(ShopLimits.fromLocation(finalChest.getLocation()));
+                                                            ShopCreateEvent e = new ShopCreateEvent(ShopLimits.fromLocation(finalChest.getLocation()));
 
-                                                                Bukkit.getPluginManager().callEvent(e);
+                                                            Bukkit.getPluginManager().callEvent(e);
 
 
                                                             if (Config.autoAddItems()) {
@@ -203,29 +192,19 @@ public class ShopCreateWG implements Listener {
 
                                                                             items.setAmount(1);
 
-                                                                            if (!shop.getShopContents(false).containsKey(items)) {
-                                                                                if (i < 53) {
-                                                                                    shop.addItem(items, i, false);
-                                                                                    i++;
-                                                                                } else {
-                                                                                    if (i == 53) {
-                                                                                        shop.addItem(items, i, false);
-                                                                                        i = 72;
-                                                                                    } else {
-                                                                                        shop.addItem(items, i, false);
-                                                                                        i++;
-                                                                                    }
-                                                                                }
-                                                                            } else {
-                                                                                shop.addItem(items, i, false);
-                                                                            }
+                                                                            int page = shop.getNextAvailablePage(false);
+                                                                            int sl = shop.getNextSlotForPage(page, false);
+
+                                                                            ShopItem shopItem = shop.createShopItem(items, sl, page, false);
 
                                                                             items.setAmount(am);
 
                                                                             if (items.getAmount() > 1) {
                                                                                 int amt = items.getAmount();
 
-                                                                                shop.setStock(items, ((shop.getStock(items, false) + amt) - 1), false);
+                                                                                amt = amt - 1;
+
+                                                                                shopItem.setStock(shopItem.getStock() + amt);
 
                                                                                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                                                                     public void run() {
@@ -261,44 +240,61 @@ public class ShopCreateWG implements Listener {
                                                                 }
                                                             }
 
+                                                        }
+                                                    } else {
+                                                        if (Long) {
+                                                            e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("LongName"));
+                                                            e.setLine(0, " ");
+                                                            e.setLine(1, " ");
+                                                            e.setLine(2, " ");
+                                                            e.setLine(3, " ");
+                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+
+                                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                                Core.getTitleManager().sendTitle(p, Messages.getString("LongName"));
+
+                                                            }
+                                                        }
+
+                                                        if (!can) {
+                                                            e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NameTaken"));
+                                                            e.setLine(0, " ");
+                                                            e.setLine(1, " ");
+                                                            e.setLine(2, " ");
+                                                            e.setLine(3, " ");
+                                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+
+
+                                                                Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                                Core.getTitleManager().sendTitle(p, Messages.getString("NameTaken"));
+
+                                                            }
+                                                        }
                                                     }
                                                 } else {
-                                                    if (Long) {
-                                                        e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("LongName"));
-                                                        e.setLine(0, " ");
-                                                        e.setLine(1, " ");
-                                                        e.setLine(2, " ");
-                                                        e.setLine(3, " ");
-                                                        if (Core.isAboveEight() && Config.useTitles()) {
+                                                    e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperName"));
+                                                    e.setLine(0, " ");
+                                                    e.setLine(1, " ");
+                                                    e.setLine(2, " ");
+                                                    e.setLine(3, " ");
+                                                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
-                                                            Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, Messages.getString("LongName"));
 
-                                                        }
+                                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
+                                                        Core.getTitleManager().sendSubTitle(p, Messages.getString("ImproperName"));
+
+
                                                     }
-
-                                                    if (!can) {
-                                                        e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NameTaken"));
-                                                        e.setLine(0, " ");
-                                                        e.setLine(1, " ");
-                                                        e.setLine(2, " ");
-                                                        e.setLine(3, " ");
-                                                        if (Core.isAboveEight() && Config.useTitles()) {
-
-
-                                                            Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                            Core.getTitleManager().sendTitle(p, Messages.getString("NameTaken"));
-
-                                                        }
-                                                    }
+                                                    e.setCancelled(true);
                                                 }
+
                                             } else {
                                                 e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ImproperName"));
                                                 e.setLine(0, " ");
                                                 e.setLine(1, " ");
                                                 e.setLine(2, " ");
                                                 e.setLine(3, " ");
-                                                if (Core.isAboveEight() && Config.useTitles()) {
+                                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                     Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -308,81 +304,64 @@ public class ShopCreateWG implements Listener {
                                                 }
                                                 e.setCancelled(true);
                                             }
-
                                         } else {
-                                            e.getPlayer().sendMessage(Messages.getString("Prefix") + "§cPlease type a name.");
+                                            e.getPlayer().sendMessage(Messages.getString("Prefix") + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
                                             e.setLine(0, " ");
                                             e.setLine(1, " ");
                                             e.setLine(2, " ");
                                             e.setLine(3, " ");
-                                            if (Core.isAboveEight() && Config.useTitles()) {
+                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                                                 Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                                Core.getTitleManager().sendSubTitle(p, "§cPlease type a name.");
+                                                Core.getTitleManager().sendTitle(p, Messages.getString("Error"));
+                                                Core.getTitleManager().sendSubTitle(p, "§cMalfunction with Shop Name Creating, is the plugin updated?");
 
 
                                             }
                                             e.setCancelled(true);
                                         }
                                     } else {
-                                        e.getPlayer().sendMessage(Messages.getString("Prefix") + "§4ERROR: §cMalfunction with Shop Name Creating, is the plugin updated?");
+                                        e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("CreationCancelled"));
                                         e.setLine(0, " ");
                                         e.setLine(1, " ");
                                         e.setLine(2, " ");
                                         e.setLine(3, " ");
-                                        if (Core.isAboveEight() && Config.useTitles()) {
-
+                                        if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                                             Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                            Core.getTitleManager().sendTitle(p, Messages.getString("Error"));
-                                            Core.getTitleManager().sendSubTitle(p, "§cMalfunction with Shop Name Creating, is the plugin updated?");
-
+                                            Core.getTitleManager().sendTitle(p, Messages.getString("CreationCancelled"));
 
                                         }
-                                        e.setCancelled(true);
                                     }
                                 } else {
-                                    e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("CreationCancelled"));
-                                    e.setLine(0, " ");
-                                    e.setLine(1, " ");
-                                    e.setLine(2, " ");
-                                    e.setLine(3, " ");
-                                    if (Core.isAboveEight() && Config.useTitles()) {
-
-                                        Core.getTitleManager().setTimes(p, 20, 40, 20);
-                                        Core.getTitleManager().sendTitle(p, Messages.getString("CreationCancelled"));
-
-                                    }
+                                    ev.setWillClose(false);
+                                    ev.setWillDestroy(false);
                                 }
-                            } else {
-                                ev.setWillClose(false);
-                                ev.setWillDestroy(false);
                             }
-                        }
-                    });
+                        });
 
-                    ItemStack it = new ItemStack(Material.PAPER);
-                    ItemMeta meta = it.getItemMeta();
-                    meta.setDisplayName("Enter Name");
-                    it.setItemMeta(meta);
+                        ItemStack it = new ItemStack(Material.PAPER);
+                        ItemMeta meta = it.getItemMeta();
+                        meta.setDisplayName(SearchEngine.getString("EnterName"));
+                        it.setItemMeta(meta);
 
-                    gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
+                        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
 
-                    gui.open();
-                } else {
-                    ChatMessages.shopCreate.put(p, finalChest);
-                    ChatMessages.shopCreate2.put(p, e.getBlock());
-                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
+                        gui.open();
+                    } else {
+                        ChatMessages.shopCreate.put(p, finalChest);
+                        ChatMessages.shopCreate2.put(p, e.getBlock());
+                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
 
-                }
+                    }
                 } else {
                     e.getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("LocationTaken"));
                     e.setLine(0, " ");
                     e.setLine(1, " ");
                     e.setLine(2, " ");
                     e.setLine(3, " ");
-                    if (Core.isAboveEight() && Config.useTitles()) {
+                    if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
                         Core.getTitleManager().setTimes(p, 20, 40, 20);
                         Core.getTitleManager().sendSubTitle(p, Messages.getString("Sorry"));
@@ -396,7 +375,7 @@ public class ShopCreateWG implements Listener {
                 e.setLine(1, " ");
                 e.setLine(2, " ");
                 e.setLine(3, " ");
-                if (Core.isAboveEight() && Config.useTitles()) {
+                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
 
 
                     Core.getTitleManager().setTimes(p, 20, 40, 20);
@@ -412,7 +391,7 @@ public class ShopCreateWG implements Listener {
         if (str.trim().length() < 1) {
             return false;
         }
-        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 ";
+        String acceptable = "abcdefghijklmnopqrstuvwxyz0123456789 &/$";
         for (int i = 0; i < str.length(); i++) {
             if (!acceptable.contains(str.substring(i, i + 1).toLowerCase())) {
                 return false;

@@ -19,7 +19,7 @@ import java.util.HashMap;
  */
 public class ShopSettings {
 
-    private static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/ShopSettings.yml");
+    public static File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Language/ShopSettings.yml");
     public static YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
     public static String getString(String name){
@@ -60,7 +60,7 @@ public class ShopSettings {
 
         if (!found3) {
 
-            File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+            File fil = Core.getCore().getFile();
 
             java.util.jar.JarFile jar = null;
             try {
@@ -73,7 +73,7 @@ public class ShopSettings {
             while (enumEntries.hasMoreElements()) {
                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                 if (file.getName().equals("Language/ShopSettings.yml")) {
-                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                     try {
                         ShopSettings.file.createNewFile();
                     } catch (IOException e) {
@@ -122,7 +122,7 @@ public class ShopSettings {
 
                     if (!d.equals(Core.getCore().getDescription().getVersion())) {
                         if (file.delete()) {
-                            File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                            File fil = Core.getCore().getFile();
 
                             java.util.jar.JarFile jar = null;
                             try {
@@ -135,7 +135,7 @@ public class ShopSettings {
                             while (enumEntries.hasMoreElements()) {
                                 java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                                 if (file.getName().equals("Language/ShopSettings.yml")) {
-                                    File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                                     try {
                                         ShopSettings.file.createNewFile();
                                     } catch (IOException e) {
@@ -176,7 +176,7 @@ public class ShopSettings {
 
                     file.delete();
 
-                    File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                    File fil = Core.getCore().getFile();
 
                     java.util.jar.JarFile jar = null;
                     try {
@@ -189,7 +189,7 @@ public class ShopSettings {
                     while (enumEntries.hasMoreElements()) {
                         java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
                         if (file.getName().equals("Language/ShopSettings.yml")) {
-                            File f = new File(Core.getCore().getDataFolder() + File.separator + file.getName());
+                            java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
                             try {
                                 ShopSettings.file.createNewFile();
                             } catch (IOException e) {

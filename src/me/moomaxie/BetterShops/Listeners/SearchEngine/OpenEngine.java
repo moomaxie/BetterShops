@@ -35,7 +35,7 @@ public class OpenEngine implements Listener {
     @EventHandler
     public void onEngine(final InventoryClickEvent e) {
         final Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
 
             if (e.getInventory().getType() == InventoryType.CHEST) {
@@ -66,7 +66,7 @@ public class OpenEngine implements Listener {
         boolean same = true;
         if (inv == null) {
             same = false;
-            inv = Bukkit.createInventory(p, 54, "§7[Shop]" + " §a" + shop.getName());
+            inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + " §a" + shop.getName());
         } else {
             inv.clear();
         }
@@ -180,7 +180,7 @@ public class OpenEngine implements Listener {
 
         ItemStack it = new ItemStack(Material.PAPER);
         ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("Better Search");
+        meta.setDisplayName(SearchEngine.getString("BetterSearch"));
         it.setItemMeta(meta);
 
         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -235,7 +235,7 @@ public class OpenEngine implements Listener {
 
         ItemStack it = new ItemStack(Material.PAPER);
         ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("Better Search");
+        meta.setDisplayName(SearchEngine.getString("BetterSearch"));
         it.setItemMeta(meta);
 
         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -291,7 +291,7 @@ public class OpenEngine implements Listener {
 
         ItemStack it = new ItemStack(Material.PAPER);
         ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("Better Search");
+        meta.setDisplayName(SearchEngine.getString("BetterSearch"));
         it.setItemMeta(meta);
 
         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -347,7 +347,7 @@ public class OpenEngine implements Listener {
 
         ItemStack it = new ItemStack(Material.PAPER);
         ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("Better Search");
+        meta.setDisplayName(SearchEngine.getString("BetterSearch"));
         it.setItemMeta(meta);
 
         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);

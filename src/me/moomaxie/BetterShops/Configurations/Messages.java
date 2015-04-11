@@ -24,13 +24,17 @@ public class Messages {
 
     public static String getString(String name) {
         if (config.isString(name)) {
-            return config.getString(name).replaceAll("&", "§").replaceAll("»", "»").replaceAll("Â", "");
+
+            String s = config.getString(name);
+
+            return s.replaceAll("&", "§").replaceAll("»", "»");
         } else {
             return "";
         }
     }
 
     public static void setString(String name, String msg) {
+
         config.set(name, msg);
         try {
             config.save(file);
@@ -56,7 +60,7 @@ public class Messages {
 
         if (!found3) {
 
-            File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+            File fil = Core.getCore().getFile();
 
             java.util.jar.JarFile jar = null;
             try {
@@ -106,7 +110,7 @@ public class Messages {
 
                 if (!d.equals(Core.getCore().getDescription().getVersion())) {
                     file.delete();
-                    File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                    File fil = Core.getCore().getFile();
 
                     java.util.jar.JarFile jar = null;
                     try {
@@ -132,7 +136,7 @@ public class Messages {
                                 }
                                 fos.close();
                                 is.close();
-                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the messages file to it's new version");
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the Messages file.");
 
                             } catch (Exception e) {
 
@@ -145,7 +149,7 @@ public class Messages {
 
                 file.delete();
 
-                File fil = new File(Core.getCore().getDataFolder().getParent(), "BetterShops.jar");
+                File fil = Core.getCore().getFile();
 
                 java.util.jar.JarFile jar = null;
                 try {
@@ -171,7 +175,7 @@ public class Messages {
                             }
                             fos.close();
                             is.close();
-                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the messages file to it's new version");
+                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eChanged the Messages file.");
 
                         } catch (Exception e) {
 

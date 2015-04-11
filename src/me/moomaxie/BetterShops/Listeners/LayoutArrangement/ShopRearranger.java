@@ -4,10 +4,12 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
+import me.moomaxie.BetterShops.Listeners.ManagerOptions.OwnerPages;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
 import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.OpenSellingOptions;
 import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -34,12 +36,12 @@ public class ShopRearranger implements Listener {
 
     public HashMap<UUID, Map<Shop, ItemStack>> arrange = new HashMap<>();
 
-    public void openShopArranger(Inventory inv, Player p, Shop shop, int page, boolean sell) {
+    public static void openShopArranger(Inventory inv, Player p, Shop shop, int page, boolean sell) {
         boolean same = true;
 
         if (inv == null) {
             same = false;
-            inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+            inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
         } else {
             inv.clear();
         }
@@ -70,142 +72,65 @@ public class ShopRearranger implements Listener {
         optionsMeta.setLore(Arrays.asList(MainGUI.getString("ArrangementLore")));
         options.setItemMeta(optionsMeta);
 
+        ItemStack arrow = new ItemStack(Material.ARROW);
+        ItemMeta arrowMeta = arrow.getItemMeta();
+        arrowMeta.setDisplayName(MainGUI.getString("NextPage"));
+        arrow.setItemMeta(arrowMeta);
+
+        ItemStack barrow = new ItemStack(Material.ARROW);
+        ItemMeta barrowMeta = barrow.getItemMeta();
+        barrowMeta.setDisplayName(MainGUI.getString("PreviousPage"));
+        barrow.setItemMeta(barrowMeta);
 
         ItemStack pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
         ItemMeta pg1Meta = pg1.getItemMeta();
-        pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
+        pg1Meta.setDisplayName(MainGUI.getString("Page") + " §7" + page);
         pg1.setItemMeta(pg1Meta);
 
-        ItemStack pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-        ItemMeta pg2Meta = pg2.getItemMeta();
-        pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
-        pg2.setItemMeta(pg2Meta);
-
-        ItemStack pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-        ItemMeta pg3Meta = pg3.getItemMeta();
-        pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
-        pg3.setItemMeta(pg3Meta);
-
-        if (page == 2) {
-            pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg1Meta = pg1.getItemMeta();
-            pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
-            pg1.setItemMeta(pg1Meta);
-
-            pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
-            pg2Meta = pg2.getItemMeta();
-            pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
-            pg2.setItemMeta(pg2Meta);
-
-            pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg3Meta = pg3.getItemMeta();
-            pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
-            pg3.setItemMeta(pg3Meta);
-
-        }
-
-        if (page == 3) {
-            pg1 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg1Meta = pg1.getItemMeta();
-            pg1Meta.setDisplayName(MainGUI.getString("Page") + " 1");
-            pg1.setItemMeta(pg1Meta);
-
-            pg2 = new ItemStack(Material.INK_SACK, 1, (byte) 8);
-            pg2Meta = pg2.getItemMeta();
-            pg2Meta.setDisplayName(MainGUI.getString("Page") + " 2");
-            pg2.setItemMeta(pg2Meta);
-
-            pg3 = new ItemStack(Material.INK_SACK, 1, (byte) 10);
-            pg3Meta = pg3.getItemMeta();
-            pg3Meta.setDisplayName(MainGUI.getString("Page") + " 3");
-            pg3.setItemMeta(pg3Meta);
-
-        }
 
         inv.setItem(3, info);
         inv.setItem(5, options);
 
-//        inv.setItem(12, pg1);
-//        inv.setItem(13, pg2);
-//        inv.setItem(14, pg3);
+        inv.setItem(13, pg1);
 
-        for (ItemStack it : shop.getShopContents(sell).keySet()) {
-            int slot = shop.getShopContents(sell).get(it);
-
-            if (page == 1) {
-                if (slot >= 18 && slot < 54) {
-                    it.setAmount(1);
-                    ItemMeta meta = it.getItemMeta();
-                    List<String> lore;
-                    if (shop.getLore(it) != null) {
-                        lore = shop.getLore(it);
-                    } else {
-                        lore = new ArrayList<String>();
-                    }
-                    if (!lore.contains(MainGUI.getString("Arrange"))) {
-                        lore.add(" ");
-                        lore.add(MainGUI.getString("Arrange"));
-                        meta.setLore(lore);
-                        it.setItemMeta(meta);
-                    }
-                    inv.setItem(slot, it);
-                }
-            } else if (page == 2) {
-                if (slot >= 72 && slot < 108) {
-                    it.setAmount(1);
-                    ItemMeta meta = it.getItemMeta();
-                    List<String> lore;
-                    if (shop.getLore(it) != null) {
-                        lore = shop.getLore(it);
-                    } else {
-                        lore = new ArrayList<String>();
-                    }
-                    if (!lore.contains(MainGUI.getString("Arrange"))) {
-                        lore.add(" ");
-                        lore.add(MainGUI.getString("Arrange"));
-                        meta.setLore(lore);
-                        it.setItemMeta(meta);
-                    }
-                    slot = slot - 54;
-
-                    inv.setItem(slot, it);
-                }
-            } else if (page == 3) {
-                if (slot >= 126 && slot < 162) {
-                    it.setAmount(1);
-                    ItemMeta meta = it.getItemMeta();
-                    List<String> lore;
-                    if (shop.getLore(it) != null) {
-                        lore = shop.getLore(it);
-                    } else {
-                        lore = new ArrayList<String>();
-                    }
-
-                    if (!lore.contains(MainGUI.getString("Arrange"))) {
-
-                        lore.add(" ");
-                        lore.add(MainGUI.getString("Arrange"));
-
-                        meta.setLore(lore);
-                        it.setItemMeta(meta);
-                    }
-
-                    slot = slot - 108;
-
-                    inv.setItem(slot, it);
-                }
-            }
-
-            if (!same)
-                p.openInventory(inv);
+        if (page > 1) {
+            inv.setItem(0, barrow);
         }
+
+        inv.setItem(8, arrow);
+
+        for (ShopItem it : shop.getShopItems(sell)) {
+            if (it.getPage() == page) {
+                ItemStack itemStack = it.getItem().clone();
+                ItemMeta meta = itemStack.getItemMeta();
+
+                List<String> lore = new ArrayList<>();
+                if (it.getLore() != null) {
+                    for (String s : it.getLore()){
+                        lore.add(s);
+                    }
+                }
+                if (!lore.contains(MainGUI.getString("Arrange"))) {
+                    lore.add(" ");
+                    lore.add(MainGUI.getString("Arrange"));
+                }
+                meta.setLore(lore);
+                itemStack.setItemMeta(meta);
+                inv.setItem(it.getSlot(), itemStack);
+            }
+        }
+
+
+        if (!same)
+            p.openInventory(inv);
+
     }
 
 
     @EventHandler
     public void onArrange(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
@@ -223,26 +148,12 @@ public class ShopRearranger implements Listener {
                             if (it != null && it.getItemMeta().getDisplayName() != null) {
                                 String n = it.getItemMeta().getDisplayName();
 
+                                int page = OwnerPages.getPage(e.getInventory());
+
                                 if (n.contains(MainGUI.getString("Buying"))) {
-                                    if (e.getInventory().getItem(12) != null && e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-                                        openShopArranger(e.getInventory(), p, shop, 1, false);
-                                    }
-                                    if (e.getInventory().getItem(13) != null && e.getInventory().getItem(13).getData().getData() == (byte) 10) {
-                                        openShopArranger(e.getInventory(), p, shop, 2, false);
-                                    }
-                                    if (e.getInventory().getItem(14) != null && e.getInventory().getItem(14).getData().getData() == (byte) 10) {
-                                        openShopArranger(e.getInventory(), p, shop, 3, false);
-                                    }
+                                    openShopArranger(e.getInventory(), p, shop, page, false);
                                 } else {
-                                    if (e.getInventory().getItem(12) != null && e.getInventory().getItem(12).getData().getData() == (byte) 10) {
-                                        openShopArranger(e.getInventory(), p, shop, 1, true);
-                                    }
-                                    if (e.getInventory().getItem(13) != null && e.getInventory().getItem(13).getData().getData() == (byte) 10) {
-                                        openShopArranger(e.getInventory(), p, shop, 2, true);
-                                    }
-                                    if (e.getInventory().getItem(14) != null && e.getInventory().getItem(14).getData().getData() == (byte) 10) {
-                                        openShopArranger(e.getInventory(), p, shop, 3, true);
-                                    }
+                                    openShopArranger(e.getInventory(), p, shop, page, true);
                                 }
                             }
                             //Leave Arrangement Mode
@@ -251,24 +162,24 @@ public class ShopRearranger implements Listener {
                                 ItemStack it = e.getInventory().getItem(3);
                                 if (it != null && it.getItemMeta().getDisplayName() != null) {
                                     String n = it.getItemMeta().getDisplayName();
-                                    arrange.remove(p.getUniqueId());
+                                    int page = OwnerPages.getPage(e.getInventory());
                                     if (n.contains(MainGUI.getString("ArrangeBuying"))) {
                                         if (shop.isServerShop()) {
-                                            OpenShop.openShopItems(null, p, shop, 1);
+                                            OpenShop.openShopItems(null, p, shop, page);
                                         } else {
-                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, page);
                                         }
-                                    } else if (Config.useSellingShop()){
+                                    } else if (Config.useSellingShop()) {
                                         if (shop.isServerShop()) {
-                                            OpenSellShop.openSellerShop(null, p, shop, 1);
+                                            OpenSellShop.openSellerShop(null, p, shop, page);
                                         } else {
-                                            OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                                            OpenSellingOptions.openShopSellingOptions(null, p, shop, page);
                                         }
                                     } else {
                                         if (shop.isServerShop()) {
-                                            OpenShop.openShopItems(null, p, shop, 1);
+                                            OpenShop.openShopItems(null, p, shop, page);
                                         } else {
-                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, page);
                                         }
                                     }
                                 }
@@ -280,12 +191,10 @@ public class ShopRearranger implements Listener {
         }
     }
 
-    //TODO: slot numbers for different pages
-
     @EventHandler
     public void onUseArrange(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
             if (e.getInventory().getType() == InventoryType.CHEST) {
 
@@ -306,6 +215,7 @@ public class ShopRearranger implements Listener {
                             arrange.put(p.getUniqueId(), map);
 
                             List<String> lore = e.getCurrentItem().getItemMeta().getLore();
+
                             lore.remove(MainGUI.getString("Arrange"));
                             lore.add(MainGUI.getString("Selected"));
 
@@ -334,22 +244,26 @@ public class ShopRearranger implements Listener {
 
                                     if (ite != null) {
 
+                                        int page = OwnerPages.getPage(e.getInventory());
+
                                         ItemStack it = e.getInventory().getItem(3);
                                         if (it != null && it.getItemMeta().getDisplayName() != null) {
                                             String n = it.getItemMeta().getDisplayName();
                                             if (n.contains(MainGUI.getString("ArrangeBuying"))) {
-                                                int slot = e.getSlot();
-                                                int old = shop.getSlotForItem(ite, false);
 
-                                                shop.exchangeItems(ite, old, e.getCurrentItem(), slot, false);
+                                                ShopItem shopItem1 = ShopItem.fromItemStack(shop,ite,false);
+                                                ShopItem shopItem2 = ShopItem.fromItemStack(shop,e.getCurrentItem(),false);
+
+                                                shop.exchangeItems(shopItem1, shopItem2);
 //
-                                                openShopArranger(e.getInventory(), p, shop, 1, false);
+                                                openShopArranger(e.getInventory(), p, shop, page, false);
                                             } else {
-                                                int slot = e.getSlot();
-                                                int old = shop.getSlotForItem(ite, true);
-                                                shop.exchangeItems(ite, old, e.getCurrentItem(), slot, true);
+                                                ShopItem shopItem1 = ShopItem.fromItemStack(shop, ite, true);
+                                                ShopItem shopItem2 = ShopItem.fromItemStack(shop, e.getCurrentItem(), true);
+
+                                                shop.exchangeItems(shopItem1, shopItem2);
 //
-                                                openShopArranger(e.getInventory(), p, shop, 1, true);
+                                                openShopArranger(e.getInventory(), p, shop, page, true);
                                             }
                                             arrange.remove(p.getUniqueId());
                                         }
@@ -372,16 +286,17 @@ public class ShopRearranger implements Listener {
                                 ItemStack it = e.getInventory().getItem(3);
                                 if (it != null && it.getItemMeta().getDisplayName() != null) {
                                     String n = it.getItemMeta().getDisplayName();
-
+                                    int page = OwnerPages.getPage(e.getInventory());
                                     if (n.contains(MainGUI.getString("ArrangeBuying"))) {
-                                        shop.changePlaces(ite, e.getSlot(), false);
+                                        ShopItem shopItem = ShopItem.fromItemStack(shop,ite,false);
+                                        shop.changePlaces(shopItem,e.getSlot(),page);
 //
-                                        openShopArranger(e.getInventory(), p, shop, 1, false);
+                                        openShopArranger(e.getInventory(), p, shop, page, false);
                                     } else {
-                                        shop.changePlaces(ite, e.getSlot(), true);
+                                        ShopItem shopItem = ShopItem.fromItemStack(shop,ite,true);
+                                        shop.changePlaces(shopItem,e.getSlot(),page);
 
-//
-                                        openShopArranger(e.getInventory(), p, shop, 1, true);
+                                        openShopArranger(e.getInventory(), p, shop, page, true);
                                     }
 
                                     arrange.remove(p.getUniqueId());

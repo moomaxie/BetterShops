@@ -2,6 +2,7 @@ package me.moomaxie.BetterShops.Configurations.ConfigMenu;
 
 import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Metrics.Metrics;
@@ -33,29 +34,38 @@ public class ConfigMenuListener implements Listener{
         if (e.getInventory().getName().equals("§7[BetterShops] §dConfig")){
             if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR){
                 e.setCancelled(true);
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains(MainGUI.getString("NextPage"))){
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),2);
+                }
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains(MainGUI.getString("PreviousPage"))){
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
+                }
+
+                //PAGE 1
+
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eAuto Add §7-")){
                     Config.setAutoAddItems(!Config.autoAddItems());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§ePermissions §7-")){
                     Config.setPermissions(!Config.usePerms());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eAnvil §7-")){
                     Config.setAnvil(!Config.useAnvil());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eUse Shop When Closed §7-")){
                     Config.setUseOnClose(!Config.useWhenClosed());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eTitles §7-")){
                     Config.setTitles(!Config.useTitles());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eDelete By Break §7-")){
                     Config.setDeleteByBreak(!Config.useDeleteByBreak());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eMetrics §7-")){
                     Config.setMetrics(!Config.useMetrics());
@@ -75,51 +85,51 @@ public class ConfigMenuListener implements Listener{
                             Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §4Error: §cCould not enable §eMetrics");
                         }
                     }
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eCreation Limit §7-")){
                     Config.setCreationLimit(!Config.useLimit());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eCreation Limit Amount:")){
                     setLimit((Player) e.getWhoClicked());
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eCost On Shops §7-")){
                     Config.setCostOnShops(!Config.useCreationCost());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eCost On Shops Amount:")){
                     setCost((Player) e.getWhoClicked());
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eNPCs §7-")){
                     Config.setEnableNPC(!Config.useNPCs());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eChoose NPCs")){
                     NPCChooser.openNPCConfigChooser((Player) e.getWhoClicked());
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eAllow-Shop Flag §7-")){
                     Config.setEnableAllowShopsFlag(!Config.useAllowFlag());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eNPC Override §7-")){
                     Config.setNPCOverride(!Config.useNPCOverride());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
 
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eSelling Shop §7-")){
                     Config.setUseSellingShops(!Config.useSellingShop());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
 
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eUse Transactions §7-")){
                     Config.setUseTransactions(!Config.useTransactions());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
 
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eUse Chests §7-")){
                     Config.setAllowChests(!Config.getAllowChest());
-                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),1);
                 }
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eDefault Price:")){
                     setDefaultPrice((Player) e.getWhoClicked());
@@ -127,6 +137,18 @@ public class ConfigMenuListener implements Listener{
                 if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eMaximum Price:")){
                     setMaxPrice((Player) e.getWhoClicked());
                 }
+
+                //PAGE 2
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eUse Live Economy §7-")){
+                    Config.setUseLiveEco(!Config.useLiveEco());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),2);
+                }
+
+                if (e.getCurrentItem().getItemMeta().getDisplayName().contains("§eUse Holographic Shops §7-")){
+                    Config.setUseHoloShops(!Config.useHoloShops());
+                    ConfigMenu.openConfigMenu(e.getInventory(),(Player) e.getWhoClicked(),2);
+                }
+
             }
         }
     }
@@ -160,14 +182,14 @@ public class ConfigMenuListener implements Listener{
                                     Config.setLimit(amt);
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 } else {
                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 }
@@ -222,14 +244,14 @@ public class ConfigMenuListener implements Listener{
                                     Config.setDefaultPrice(amt);
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 } else {
                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 }
@@ -284,14 +306,14 @@ public class ConfigMenuListener implements Listener{
                                     Config.setMaxPrice(amt);
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 } else {
                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 }
@@ -344,14 +366,14 @@ public class ConfigMenuListener implements Listener{
                                     Config.setCostForShops(amt);
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 } else {
                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                         public void run() {
-                                            ConfigMenu.openConfigMenu(null,p);
+                                            ConfigMenu.openConfigMenu(null,p,1);
                                         }
                                     }, 1L);
                                 }

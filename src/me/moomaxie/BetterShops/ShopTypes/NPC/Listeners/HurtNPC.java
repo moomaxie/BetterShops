@@ -1,8 +1,8 @@
-package me.moomaxie.BetterShops.NPC.Listeners;
+package me.moomaxie.BetterShops.ShopTypes.NPC.Listeners;
 
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
-import me.moomaxie.BetterShops.NPC.NPCs;
-import me.moomaxie.BetterShops.NPC.ShopsNPC;
+import me.moomaxie.BetterShops.ShopTypes.NPC.NPCs;
+import me.moomaxie.BetterShops.ShopTypes.NPC.ShopsNPC;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -33,13 +33,18 @@ public class HurtNPC implements Listener {
                 if (ent.getCustomName() != null) {
                     if (ent.getCustomName().equals(npc.getEntity().getCustomName())) {
 
-                        if (npc.getShop() != null) {
-                            if (npc.getShop().isNPCShop()) {
+                        Shop shop = ShopLimits.fromString(ent.getCustomName().substring(4));
+
+                        if (shop != null) {
+                            if (shop.isNPCShop() || shop.getNPCShop() != null) {
                                 e.setCancelled(true);
+                                break;
+                            } else {
+                                e.setCancelled(false);
                                 break;
                             }
                         } else {
-                            ent.remove();
+                            e.setCancelled(false);
                         }
                     }
                 }

@@ -26,10 +26,10 @@ import java.util.Arrays;
 public class NPCChooser implements Listener {
 
     public static void openNPCConfigChooser(Player p) {
-        Inventory inv = Bukkit.createInventory(p, 54, "§7[Shop] §dChoose NPCs");
+        Inventory inv = Bukkit.createInventory(p, 54, "§7[BetterShops] §dChoose NPCs");
 
         //Glass
-        ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
+        org.bukkit.inventory.ItemStack glass = new org.bukkit.inventory.ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.setDisplayName(" ");
         glass.setItemMeta(glassMeta);
@@ -39,13 +39,13 @@ public class NPCChooser implements Listener {
         }
 
         for (EntityType type : Config.getAllNPCs()) {
-            ItemStack item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
+            ItemStack item = new ItemStack(Material.MONSTER_EGG, 1, type.getTypeId());
             ItemMeta meta = item.getItemMeta();
             if (Config.useNPC(type)) {
                 meta.setDisplayName("§e" + type.name().replaceAll("_", " "));
                 meta.setLore(Arrays.asList("§aON" , "§e§lClick §7to Toggle"));
             } else {
-                item = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+                item = new ItemStack(Material.MAGMA_CREAM);
                 meta.setDisplayName("§e" + type.name().replaceAll("_", " "));
                 meta.setLore(Arrays.asList("§cOFF" , "§e§lClick §7to Toggle"));
             }
@@ -60,7 +60,7 @@ public class NPCChooser implements Listener {
 
     @EventHandler
     public void onToggleUseNPC(InventoryClickEvent e){
-        if (e.getInventory().getName().equals("§7[Shop] §dChoose NPCs")){
+        if (e.getInventory().getName().equals("§7[BetterShops] §dChoose NPCs")){
             if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR){
                 e.setCancelled(true);
 

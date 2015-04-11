@@ -4,6 +4,7 @@ import me.moomaxie.BetterShops.Configurations.AnvilGUI;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.ItemTexts;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
+import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.ShopLimits;
 import me.moomaxie.BetterShops.Core;
@@ -11,7 +12,10 @@ import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
 import me.moomaxie.BetterShops.Listeners.Misc.ChatMessages;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
+import me.moomaxie.BetterShops.ShopTypes.Holographic.DeleteHoloShop;
+import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
 import me.moomaxie.BetterShops.Shops.Shop;
+import me.moomaxie.BetterShops.Shops.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,7 +46,7 @@ public class SellingItemManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMan(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
@@ -52,9 +56,12 @@ public class SellingItemManager implements Listener {
 
                     Shop shop = ShopLimits.fromString(p, name);
 
-                    if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-                        if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("SellOptions"))) {
-                            openItemManager(e.getInventory(), p, shop, e.getCurrentItem());
+                    if (shop != null) {
+
+                        if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
+                            if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("SellOptions"))) {
+                                openItemManager(e.getInventory(), p, shop, e.getCurrentItem());
+                            }
                         }
                     }
                 }
@@ -62,11 +69,11 @@ public class SellingItemManager implements Listener {
         }
     }
 
-    public void openItemManager(Inventory inv, Player p, Shop shop, ItemStack it) {
+    public static void openItemManager(Inventory inv, Player p, Shop shop, ItemStack it) {
         boolean same = true;
         if (inv == null) {
             same = false;
-            inv = Bukkit.createInventory(p, 54, "§7[Shop] §a" + shop.getName());
+            inv = Bukkit.createInventory(p, 54, MainGUI.getString("ShopHeader") + shop.getName());
         } else {
             inv.clear();
         }
@@ -103,6 +110,12 @@ public class SellingItemManager implements Listener {
         amountMeta.setLore(Arrays.asList(ItemTexts.getString("ChangeAskingAmountLore")));
         amount.setItemMeta(amountMeta);
 
+        ItemStack limit = new ItemStack(Material.NAME_TAG);
+        ItemMeta limitMeta = limit.getItemMeta();
+        limitMeta.setDisplayName(ItemTexts.getString("SellLimit").replaceAll("<Amount>", "" + ShopItem.fromItemStack(shop, it, true).getLimit()));
+        limitMeta.setLore(Arrays.asList(ItemTexts.getString("SellLimitLore")));
+        limit.setItemMeta(limitMeta);
+
         ItemStack data = new ItemStack(Material.STAINED_CLAY, 1, (byte) 9);
         ItemMeta dataMeta = data.getItemMeta();
         dataMeta.setDisplayName(ItemTexts.getString("ItemDataDisplayName"));
@@ -120,6 +133,7 @@ public class SellingItemManager implements Listener {
         inv.setItem(0, back);
 
         inv.setItem(4, it);
+        inv.setItem(8, limit);
 
         inv.setItem(inv.firstEmpty(), nam);
         inv.setItem(inv.firstEmpty(), desc);
@@ -134,7 +148,7 @@ public class SellingItemManager implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onSettingsClick(final InventoryClickEvent e) {
         final Player p = (Player) e.getWhoClicked();
-        if (e.getInventory().getName().contains("§7[Shop]")) {
+        if (e.getInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
             e.setCancelled(true);
 
             if (e.getInventory().getType() == InventoryType.CHEST) {
@@ -146,13 +160,15 @@ public class SellingItemManager implements Listener {
 
                     final ItemStack ite = e.getInventory().getItem(4);
 
-                    if (e.getInventory().getSize() > 9) {
+                    final ShopItem shopItem = ShopItem.fromItemStack(shop, ite, true);
+
+                    if (shopItem != null) {
 
                         if (e.getInventory().getItem(4) != null && e.getInventory().getItem(4).getType() != Material.AIR && e.getInventory().getItem(4).hasItemMeta() && e.getInventory().getItem(4).getItemMeta().getLore() != null && e.getInventory().getItem(4).getItemMeta().getLore().contains(MainGUI.getString("SellOptions")) && e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("BackArrow"))) {
                             if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-                                OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, 1);
+                                OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, shopItem.getPage());
                             } else {
-                                OpenShop.openShopItems(e.getInventory(), p, shop, 1);
+                                OpenShop.openShopItems(e.getInventory(), p, shop, shopItem.getPage());
                             }
                         }
 
@@ -183,13 +199,17 @@ public class SellingItemManager implements Listener {
                                                         }
 
                                                         BigDecimal bd = new BigDecimal(amt);
-                                                        bd = bd.setScale(2,BigDecimal.ROUND_UP);
+                                                        bd = bd.setScale(2, BigDecimal.ROUND_UP);
                                                         amt = bd.doubleValue();
 
                                                         if (can) {
                                                             if (amt > 0) {
                                                                 if (amt <= Config.getMaxPrice()) {
-                                                                    shop.setPrice(ite, amt, true);
+                                                                    shopItem.setPrice(amt);
+                                                                    if (shop.isHoloShop()) {
+                                                                        ShopHologram h = shop.getHolographicShop();
+                                                                        h.updateItemLines(h.getItemLine(), true);
+                                                                    }
                                                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangePrice"));
                                                                 } else {
                                                                     if (String.valueOf(Config.getMaxPrice()).contains("E")) {
@@ -202,7 +222,7 @@ public class SellingItemManager implements Listener {
                                                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("Zero"));
                                                             }
                                                         }
-                                                        OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
+                                                        OpenSellingOptions.openShopSellingOptions(e.getInventory(), (Player) e.getWhoClicked(), shop, shopItem.getPage());
                                                     }
                                                 }
                                             }
@@ -216,7 +236,7 @@ public class SellingItemManager implements Listener {
 
                                 ItemStack it = new ItemStack(Material.PAPER);
                                 ItemMeta meta = it.getItemMeta();
-                                meta.setDisplayName("Type New Price");
+                                meta.setDisplayName(SearchEngine.getString("NewPrice"));
                                 it.setItemMeta(meta);
 
                                 gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -224,8 +244,8 @@ public class SellingItemManager implements Listener {
                                 gui.open();
                             } else {
                                 p.closeInventory();
-                                Map<Shop, ItemStack> map = new HashMap<>();
-                                map.put(shop, ite);
+                                Map<Shop, ShopItem> map = new HashMap<>();
+                                map.put(shop, shopItem);
 
                                 ChatMessages.setSellPrice.put(p, map);
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
@@ -258,13 +278,20 @@ public class SellingItemManager implements Listener {
 
                                                         if (can) {
                                                             if (amt > 0 && amt < 2304) {
-                                                                shop.setAmount(ite, amt, true);
+                                                                shopItem.setAmount(amt);
+                                                                if (shopItem.getLiveEco()) {
+                                                                    shopItem.getSister().setAmount(amt);
+                                                                }
+                                                                if (shop.isHoloShop()) {
+                                                                    ShopHologram h = shop.getHolographicShop();
+                                                                    h.updateItemLines(h.getItemLine(), true);
+                                                                }
                                                                 ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeAmount"));
                                                             } else {
                                                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("HighAmount"));
                                                             }
                                                         }
-                                                        OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
+                                                        OpenSellingOptions.openShopSellingOptions(e.getInventory(), (Player) e.getWhoClicked(), shop, shopItem.getPage());
                                                     }
                                                 }
                                             }
@@ -278,7 +305,7 @@ public class SellingItemManager implements Listener {
 
                                 ItemStack it = new ItemStack(Material.PAPER);
                                 ItemMeta meta = it.getItemMeta();
-                                meta.setDisplayName("Type New Amount");
+                                meta.setDisplayName(SearchEngine.getString("NewAmount"));
                                 it.setItemMeta(meta);
 
                                 gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -286,8 +313,8 @@ public class SellingItemManager implements Listener {
                                 gui.open();
                             } else {
                                 p.closeInventory();
-                                Map<Shop, ItemStack> map = new HashMap<>();
-                                map.put(shop, ite);
+                                Map<Shop, ShopItem> map = new HashMap<>();
+                                map.put(shop, shopItem);
 
                                 ChatMessages.setSellAmount.put(p, map);
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
@@ -313,19 +340,23 @@ public class SellingItemManager implements Listener {
                                                             amt = Integer.parseInt(name);
                                                         } catch (Exception ex) {
                                                             if (name.equalsIgnoreCase("all")) {
-                                                                Stocks.collectAll(ite, shop, p);
+                                                                Stocks.collectAll(shopItem, shop, p);
+                                                                if (shop.isHoloShop()) {
+                                                                    ShopHologram h = shop.getHolographicShop();
+                                                                    h.updateItemLines(h.getItemLine(), true);
+                                                                }
                                                                 return;
                                                             } else {
                                                                 ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
-                                                                OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, 1);
+                                                                OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, shopItem.getPage());
                                                                 return;
                                                             }
                                                         }
 
-                                                        Stocks.collectStock(ite, amt, p, shop);
+                                                        Stocks.collectStock(shopItem, amt, p, shop);
 
                                                     }
-                                                    OpenShopOptions.openShopOwnerOptionsInventory(e.getInventory(), (Player) e.getWhoClicked(), shop, 1);
+                                                    OpenSellingOptions.openShopSellingOptions(e.getInventory(), (Player) e.getWhoClicked(), shop, shopItem.getPage());
                                                 }
                                             }
 
@@ -340,7 +371,7 @@ public class SellingItemManager implements Listener {
 
                                 ItemStack it = new ItemStack(Material.PAPER);
                                 ItemMeta meta = it.getItemMeta();
-                                meta.setDisplayName("How Much?");
+                                meta.setDisplayName(SearchEngine.getString("HowMuch"));
                                 it.setItemMeta(meta);
 
                                 gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -349,36 +380,52 @@ public class SellingItemManager implements Listener {
 
                             } else {
                                 p.closeInventory();
-                                Map<Shop, ItemStack> map = new HashMap<>();
-                                map.put(shop, ite);
+                                Map<Shop, ShopItem> map = new HashMap<>();
+                                map.put(shop, shopItem);
 
                                 ChatMessages.collectStock.put(p, map);
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                             }
                         } else if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(ItemTexts.getString("SellRemoveItemDisplayName"))) {
 
-                            ItemStack item = null;
-
-
-                            for (ItemStack it : shop.getShopContents(true).keySet()) {
-                                if (shop.compareItems(ite, it, true)) {
-                                    item = it;
-                                }
-                            }
-
+                            ShopItem item = ShopItem.fromItemStack(shop, ite, true);
 
                             if (item != null) {
-                                if (shop.getStock(item, true) > 0) {
-                                    Stocks.removeAllOfDeletedItem(item, shop, p, true);
-                                    shop.deleteItem(ite, true);
-                                    OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
-                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("RemoveItem"));
-                                } else {
-                                    shop.deleteItem(ite, true);
-                                    OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
-                                    ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("RemoveItem"));
+                                int page = item.getPage();
+                                Stocks.removeAllOfDeletedItem(item, shop, p, true);
+
+                                boolean cal = false;
+
+                                if (shop.isHoloShop()) {
+                                    ShopHologram h = shop.getHolographicShop();
+                                    if (h.getItemLine().getItemStack().equals(item.getItem())) {
+                                        cal = true;
+                                    }
                                 }
+
+                                shop.deleteShopItem(item);
+
+                                if (cal) {
+                                    ShopHologram h = shop.getHolographicShop();
+                                    if (shop.getShopItems(true).size() > 0) {
+                                        h.getItemLine().setItemStack(shop.getShopItems(true).get(0).getItem());
+                                    } else {
+                                        if (shop.getShopItems(false).size() > 0) {
+                                            h.getItemLine().setItemStack(shop.getShopItems(false).get(0).getItem());
+                                            h.getShopLine().setText(MainGUI.getString("Buying"));
+                                        } else {
+                                            DeleteHoloShop.deleteHologramShop(h);
+                                            shop.setHoloShop(false);
+                                        }
+                                    }
+                                }
+                                OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, page);
+
+
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("RemoveItem"));
+
                             } else {
+                                p.closeInventory();
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("NonExistingItem"));
                             }
 
@@ -410,24 +457,23 @@ public class SellingItemManager implements Listener {
 
                                                         if (can) {
 
-                                                            int am = shop.getAmount(ite, true);
-                                                            double price = shop.getPrice(ite, true);
+                                                            boolean cal = false;
 
-                                                            int slot = shop.getSlotForItem(ite, true);
+                                                            if (shop.isHoloShop()) {
+                                                                ShopHologram h = shop.getHolographicShop();
+                                                                if (h.getItemLine().getItemStack().equals(shopItem.getItem())) {
+                                                                    cal = true;
+                                                                }
+                                                            }
 
-                                                            Material mat = ite.getType();
+                                                            shopItem.setData((byte) amt);
 
-                                                            shop.deleteItem(ite, true);
-
-                                                            ItemStack it = new ItemStack(mat, 1, (byte) amt);
-
-                                                            shop.addItem(it, slot, true);
-
-                                                            shop.setAmount(it, am, true);
-                                                            shop.setPrice(it, price, true);
+                                                            if (cal) {
+                                                                ShopHologram h = shop.getHolographicShop();
+                                                                h.getItemLine().setItemStack(shopItem.getItem());
+                                                            }
 
                                                             ((Player) e.getWhoClicked()).sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeData"));
-
                                                         }
                                                         OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, 1);
                                                     }
@@ -443,7 +489,7 @@ public class SellingItemManager implements Listener {
 
                                 ItemStack it = new ItemStack(Material.PAPER);
                                 ItemMeta meta = it.getItemMeta();
-                                meta.setDisplayName("New Data");
+                                meta.setDisplayName(SearchEngine.getString("NewData"));
                                 it.setItemMeta(meta);
 
                                 gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
@@ -451,10 +497,70 @@ public class SellingItemManager implements Listener {
                                 gui.open();
                             } else {
                                 p.closeInventory();
-                                Map<Shop, ItemStack> map = new HashMap<>();
-                                map.put(shop, ite);
+                                Map<Shop, ShopItem> map = new HashMap<>();
+                                map.put(shop, shopItem);
 
                                 ChatMessages.changeData.put(p, map);
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
+                            }
+                        } else if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(ItemTexts.getString("SellLimitLore"))) {
+                            if (Config.useAnvil()) {
+                                AnvilGUI gui = Core.getAnvilGUI();
+                                gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {
+                                    @Override
+                                    public void onAnvilClick(AnvilGUI.AnvilClickEvent ev) {
+                                        if (ev.getSlot() == 2) {
+                                            ev.setWillClose(true);
+                                            ev.setWillDestroy(true);
+
+
+                                            if (ev.getCurrentItem().getType() == Material.PAPER) {
+                                                if (ev.getCurrentItem().hasItemMeta()) {
+                                                    if (ev.getCurrentItem().getItemMeta().getDisplayName() != null) {
+                                                        String name = ev.getCurrentItem().getItemMeta().getDisplayName();
+
+                                                        boolean can;
+                                                        int amt = 0;
+                                                        try {
+                                                            amt = Integer.parseInt(name);
+                                                            can = true;
+                                                        } catch (Exception ex) {
+                                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("InvalidNumber"));
+                                                            can = false;
+                                                        }
+
+                                                        if (can) {
+
+                                                            shopItem.setLimit(amt);
+
+                                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChangeLimit"));
+                                                        }
+                                                        OpenSellingOptions.openShopSellingOptions(e.getInventory(), p, shop, 1);
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            ev.setWillClose(true);
+                                            ev.setWillDestroy(true);
+                                        }
+                                    }
+                                });
+
+
+                                ItemStack it = new ItemStack(Material.PAPER);
+                                ItemMeta meta = it.getItemMeta();
+                                meta.setDisplayName(SearchEngine.getString("NewAmount"));
+                                it.setItemMeta(meta);
+
+                                gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
+
+                                gui.open();
+                            } else {
+                                p.closeInventory();
+                                Map<Shop, ShopItem> map = new HashMap<>();
+                                map.put(shop, shopItem);
+
+                                ChatMessages.setLimit.put(p, map);
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("ChatMessage"));
                             }
                         }
