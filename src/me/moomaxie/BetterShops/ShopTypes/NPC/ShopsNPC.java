@@ -5,7 +5,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.*;
@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class ShopsNPC {
 
-    LivingEntity entity;
+    public LivingEntity entity;
     Shop shop;
     Location l;
 
@@ -948,7 +948,7 @@ public class ShopsNPC {
     }
 
     public Shop getShop() {
-        return ShopLimits.fromString(shop.getName());
+        return ShopManager.fromString(shop.getName());
     }
 
     public static void addChest(Location l) {

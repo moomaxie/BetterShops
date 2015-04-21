@@ -2,7 +2,7 @@ package me.moomaxie.BetterShops.ShopTypes.NPC.Listeners;
 
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
 import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.OpenSellingOptions;
@@ -10,11 +10,13 @@ import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
 import me.moomaxie.BetterShops.ShopTypes.NPC.NPCs;
 import me.moomaxie.BetterShops.ShopTypes.NPC.ShopsNPC;
 import me.moomaxie.BetterShops.Shops.Shop;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 
 /**
  * ***********************************************************************
@@ -33,15 +35,16 @@ public class OpenNPCShop implements Listener {
         if (e.getRightClicked() instanceof LivingEntity) {
             LivingEntity ent = (LivingEntity) e.getRightClicked();
 
-            if (ent.getCustomName() != null) {
+            if (ent.getCustomName() != null && ent.getCustomName().contains("§a§l")) {
 
-                Shop shop = ShopLimits.fromString(ent.getCustomName().substring(4));
+                Shop shop = ShopManager.fromString(ent.getCustomName().substring(4));
 
                 if (shop != null) {
 
-                    if (!shop.isNPCShop()) {
+                    if (!shop.isNPCShop() || shop.getNPCShop() == null) {
                         shop.setNPCShop(true);
-                        ShopsNPC n = new ShopsNPC(ent,shop);
+                        ShopsNPC n = new ShopsNPC(ent, shop);
+                        n.removeChest();
                         n.returnNPC();
                         NPCs.addNPC(n);
                     }
@@ -49,49 +52,76 @@ public class OpenNPCShop implements Listener {
 
                     Player p = e.getPlayer();
 
-                    if (shop.getOwner() != null) {
-                        if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop() || shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) && !shop.isServerShop() || shop.getOwner() != null && shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop()) {
-                            e.setCancelled(true);
-                            if (shop.getShopItems(false).size() >= shop.getShopItems(true).size()) {
+
+                    if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop() || shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) && !shop.isServerShop() || shop.getOwner() != null && shop.getOwner().getUniqueId().equals(p.getUniqueId()) && !shop.isServerShop()) {
+                        if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
+                            OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                        } else {
+                            if (Config.useSellingShop()) {
+                                OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                            } else {
                                 OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
+                            }
+                        }
+                    } else {
+                        if (shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) || shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
+                            if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
+                                OpenShop.openShopItems(null, p, shop, 1);
                             } else {
                                 if (Config.useSellingShop()) {
-                                    OpenSellingOptions.openShopSellingOptions(null, p, shop, 1);
+                                    OpenSellShop.openSellerShop(null, p, shop, 1);
                                 } else {
-                                    OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
-                                }
-                            }
-                        } else {
-                            if (shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) || shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-                                e.setCancelled(true);
-                                if (shop.getShopItems(false).size() >= shop.getShopItems(true).size()) {
                                     OpenShop.openShopItems(null, p, shop, 1);
-                                } else {
-                                    if (Config.useSellingShop()) {
-                                        OpenSellShop.openSellerShop(null, p, shop, 1);
-                                    } else {
-                                        OpenShop.openShopItems(null, p, shop, 1);
-                                    }
                                 }
                             }
                         }
+                    }
 
-                        if (!shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) && !shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
-                            if (shop.isOpen()) {
-                                e.setCancelled(true);
-                                if (shop.getShopItems(false).size() >= shop.getShopItems(true).size()) {
-                                    OpenShop.openShopItems(null, p, shop, 1);
-                                } else {
-                                    if (Config.useSellingShop()) {
-                                        OpenSellShop.openSellerShop(null, p, shop, 1);
-                                    } else {
-                                        OpenShop.openShopItems(null, p, shop, 1);
-                                    }
-                                }
-                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("OpenShop"));
+                    if (!shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) && !shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
+                        if (shop.isOpen()) {
+                            if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
+                                OpenShop.openShopItems(null, p, shop, 1);
                             } else {
-                                e.setCancelled(true);
-                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
+                                if (Config.useSellingShop()) {
+                                    OpenSellShop.openSellerShop(null, p, shop, 1);
+                                } else {
+                                    OpenShop.openShopItems(null, p, shop, 1);
+                                }
+                            }
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("OpenShop"));
+                        } else {
+                            p.closeInventory();
+                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntity(ChunkLoadEvent e) {
+        if (!e.isNewChunk()) {
+            for (Entity ent : e.getChunk().getEntities()) {
+                if (ent instanceof LivingEntity) {
+                    if (ent.getCustomName() != null) {
+                        if (ent.getCustomName().contains("§a§l")) {
+
+                            Shop shop = ShopManager.fromString(ent.getCustomName().substring(4));
+
+                            if (shop != null) {
+
+                                if (!shop.isNPCShop() || shop.getNPCShop() == null) {
+                                    shop.setNPCShop(true);
+                                    ShopsNPC n = new ShopsNPC((LivingEntity) ent, shop);
+                                    n.removeChest();
+                                    n.returnNPC();
+                                    NPCs.addNPC(n);
+                                } else {
+                                    shop.getNPCShop().entity.remove();
+                                    shop.getNPCShop().entity = (LivingEntity) ent;
+                                    shop.getNPCShop().returnNPC();
+                                }
                             }
                         }
                     }

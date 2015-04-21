@@ -1,7 +1,7 @@
 package me.moomaxie.BetterShops.Configurations.GUIMessages;
 
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -242,7 +242,7 @@ public class LanguageInventory implements Listener {
                     }
 
                     if (title.equals("SignLine1")) {
-                        for (Shop shop : ShopLimits.getAllShops()) {
+                        for (Shop shop : ShopManager.getAllShops()) {
                             Block b = shop.getLocation().getBlock();
 
                             if (b.getRelative(1, 0, 0).getState() instanceof Sign) {
@@ -269,7 +269,7 @@ public class LanguageInventory implements Listener {
                     }
 
                     if (title.equals("SignLine2")) {
-                        for (Shop shop : ShopLimits.getAllShops()) {
+                        for (Shop shop : ShopManager.getAllShops()) {
                             Block b = shop.getLocation().getBlock();
 
                             if (b.getRelative(1, 0, 0).getState() instanceof Sign) {
@@ -296,7 +296,7 @@ public class LanguageInventory implements Listener {
                     }
 
                     if (title.equals("SignLine4")) {
-                        for (Shop shop : ShopLimits.getAllShops()) {
+                        for (Shop shop : ShopManager.getAllShops()) {
                             Block b = shop.getLocation().getBlock();
 
                             if (b.getRelative(1, 0, 0).getState() instanceof Sign) {

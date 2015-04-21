@@ -4,7 +4,7 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.History;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
 import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
@@ -27,9 +27,9 @@ import java.util.List;
 
 /**
  * ***********************************************************************
- * Copyright me.moomaxie (c) 2014. All Rights Reserved.
+ * Copyright Max Hubbard (c) 2014. All Rights Reserved.
  * Any code contained within this document, and any associated documents with similar branding
- * are the sole property of me.moomaxie. Distribution, reproduction, taking snippets, or
+ * are the sole property of Max. Distribution, reproduction, taking snippets, or
  * claiming any contents as your own will break the terms of the license, and void any
  * agreements with you, the third party.
  * ************************************************************************
@@ -46,9 +46,9 @@ public class OpenSellingOptions implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    Shop shop = ShopLimits.fromString(p, name);
+                    Shop shop = ShopManager.fromString(p, name);
 
                     if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("ToggleShop"))) {
 

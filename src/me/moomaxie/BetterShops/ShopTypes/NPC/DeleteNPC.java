@@ -1,7 +1,7 @@
 package me.moomaxie.BetterShops.ShopTypes.NPC;
 
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -29,9 +29,9 @@ public class DeleteNPC {
 
                 if (npc.getEntity().getCustomName() != null && npc.getEntity().getCustomName().equals("§a§l" + npc.getShop().getName())) {
 
-//                    ShopLimits.loadShops();
+//                    ShopManager.loadShops();
 
-                    Shop shop = ShopLimits.fromString(npc.getEntity().getCustomName().substring(4));
+                    Shop shop = ShopManager.fromString(npc.getEntity().getCustomName().substring(4));
 
                     NPCs.removeNPC(npc);
                     npc.getEntity().remove();

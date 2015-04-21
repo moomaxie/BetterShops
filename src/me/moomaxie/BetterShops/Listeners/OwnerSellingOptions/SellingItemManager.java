@@ -6,7 +6,7 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.ItemTexts;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
@@ -35,9 +35,9 @@ import java.util.Map;
 
 /**
  * ***********************************************************************
- * Copyright me.moomaxie (c) 2014. All Rights Reserved.
+ * Copyright Max Hubbard (c) 2014. All Rights Reserved.
  * Any code contained within this document, and any associated documents with similar branding
- * are the sole property of me.moomaxie. Distribution, reproduction, taking snippets, or
+ * are the sole property of Max. Distribution, reproduction, taking snippets, or
  * claiming any contents as your own will break the terms of the license, and void any
  * agreements with you, the third party.
  * ************************************************************************
@@ -52,9 +52,9 @@ public class SellingItemManager implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    Shop shop = ShopLimits.fromString(p, name);
+                    Shop shop = ShopManager.fromString(p, name);
 
                     if (shop != null) {
 
@@ -154,9 +154,9 @@ public class SellingItemManager implements Listener {
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
                     final ItemStack ite = e.getInventory().getItem(4);
 
@@ -203,7 +203,7 @@ public class SellingItemManager implements Listener {
                                                         amt = bd.doubleValue();
 
                                                         if (can) {
-                                                            if (amt > 0) {
+                                                            if (amt >= 0) {
                                                                 if (amt <= Config.getMaxPrice()) {
                                                                     shopItem.setPrice(amt);
                                                                     if (shop.isHoloShop()) {

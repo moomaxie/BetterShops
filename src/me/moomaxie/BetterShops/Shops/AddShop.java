@@ -1,7 +1,7 @@
 package me.moomaxie.BetterShops.Shops;
 
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,9 +20,9 @@ import java.util.UUID;
 
 /**
  * ***********************************************************************
- * Copyright me.moomaxie (c) 2014. All Rights Reserved.
+ * Copyright Max Hubbard (c) 2014. All Rights Reserved.
  * Any code contained within this document, and any associated documents with similar branding
- * are the sole property of me.moomaxie. Distribution, reproduction, taking snippets, or
+ * are the sole property of Max. Distribution, reproduction, taking snippets, or
  * claiming any contents as your own will break the terms of the license, and void any
  * agreements with you, the third party.
  * ************************************************************************
@@ -33,6 +33,7 @@ public class AddShop {
     private YamlConfiguration config;
     private String n;
     private Chest chest;
+    private Shop shop;
 
     public AddShop(Player p, Chest c, String name) {
         file = new File(Core.getCore().getDataFolder(), "Shops/" + p.getUniqueId().toString() + ".yml");
@@ -53,6 +54,7 @@ public class AddShop {
         setServerShop(false);
         setNPC(false);
         setHoloShop(false);
+//        setSignShop(false);
 
         if (!config.getConfigurationSection(n).isConfigurationSection("Items")) {
             config.getConfigurationSection(n).createSection("Items");
@@ -68,18 +70,18 @@ public class AddShop {
 
         }
 
-        if (ShopLimits.fromString(name) == null) {
-            Shop shop = new Shop(name, config, file);
-            ShopLimits.shops.add(shop);
-            ShopLimits.locs.put(chest.getLocation(), shop);
-            ShopLimits.names.put(name, shop);
-            List<Shop> l = ShopLimits.getShopsForPlayer(p);
+        if (ShopManager.fromString(name) == null) {
+            shop = new Shop(name, config, file);
+            ShopManager.shops.add(shop);
+            ShopManager.locs.put(chest.getLocation(), shop);
+            ShopManager.names.put(name, shop);
+            List<Shop> l = ShopManager.getShopsForPlayer(p);
             if (l == null){
                 l = new ArrayList<>();
             }
             l.add(shop);
-            ShopLimits.playerShops.put(p.getUniqueId(),l);
-            ShopLimits.getLimits().put(p.getUniqueId(),l.size());
+            ShopManager.playerShops.put(p.getUniqueId(),l);
+            ShopManager.getLimits().put(p.getUniqueId(),l.size());
 
             if (Core.useSQL()) {
                 try {
@@ -142,6 +144,7 @@ public class AddShop {
         setServerShop(false);
         setNPC(false);
         setHoloShop(false);
+//        setSignShop(false);
 
         if (!config.getConfigurationSection(n).isConfigurationSection("Items")) {
             config.getConfigurationSection(n).createSection("Items");
@@ -157,18 +160,18 @@ public class AddShop {
 
         }
 
-        if (ShopLimits.fromString(name) == null) {
-            Shop shop = new Shop(name, config, file);
-            ShopLimits.shops.add(shop);
-            ShopLimits.locs.put(chest.getLocation(), shop);
-            ShopLimits.names.put(name, shop);
-            List<Shop> li = ShopLimits.getShopsForPlayer(p);
+        if (ShopManager.fromString(name) == null) {
+            shop = new Shop(name, config, file);
+            ShopManager.shops.add(shop);
+            ShopManager.locs.put(chest.getLocation(), shop);
+            ShopManager.names.put(name, shop);
+            List<Shop> li = ShopManager.getShopsForPlayer(p);
             if (li == null){
                 li = new ArrayList<>();
             }
             li.add(shop);
-            ShopLimits.playerShops.put(p.getUniqueId(),li);
-            ShopLimits.getLimits().put(p.getUniqueId(), li.size());
+            ShopManager.playerShops.put(p.getUniqueId(),li);
+            ShopManager.getLimits().put(p.getUniqueId(), li.size());
 
             if (Core.useSQL()) {
                 try {
@@ -228,6 +231,20 @@ public class AddShop {
             config.set(n + ".Open", "True");
         } else {
             config.set(n + ".Open", "False");
+        }
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setSignShop(boolean open) {
+        if (open) {
+            config.set(n + ".Sign", "True");
+        } else {
+            config.set(n + ".Sign", "False");
         }
 
         try {
@@ -382,5 +399,9 @@ public class AddShop {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Shop getShop(){
+        return shop;
     }
 }

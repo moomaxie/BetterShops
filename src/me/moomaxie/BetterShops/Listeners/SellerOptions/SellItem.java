@@ -5,7 +5,7 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.BuyingAndSelling;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
 import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
@@ -205,9 +205,9 @@ public class SellItem implements Listener {
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR && e.getCurrentItem().getItemMeta() != null) {
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
                     ShopItem shopItem = ShopItem.fromItemStack(shop, e.getInventory().getItem(4), true);
 
@@ -300,7 +300,7 @@ public class SellItem implements Listener {
                                 }
                                 shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
 
-                                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop);
+                                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop,p);
 
                                 Bukkit.getPluginManager().callEvent(ev);
 
@@ -369,24 +369,25 @@ public class SellItem implements Listener {
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("SellItem"));
                                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
 
-                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
-
-                                    Core.getTitleManager().setTimes(p, 20, 60, 20);
-                                    Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
-                                    Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
-
-                                    p.closeInventory();
-
-                                }
+//                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+//
+//                                    Core.getTitleManager().setTimes(p, 20, 60, 20);
+//                                    Core.getTitleManager().sendTitle(p, Messages.getString("SellItem"));
+//                                    Core.getTitleManager().sendSubTitle(p, Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + pr));
+//
+//
+//                                }
 
                                 if (shop.getHistory() == null) {
                                     shop.loadTransactions();
                                 }
                                 shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
 
-                                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop);
+                                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop,p);
 
                                 Bukkit.getPluginManager().callEvent(ev);
+
+                                OpenSellShop.openSellerShop(e.getInventory(),p,shop,shopItem.getPage());
 
                                 if (shopItem.getLiveEco()) {
                                     double o = price / shopItem.getAmount();

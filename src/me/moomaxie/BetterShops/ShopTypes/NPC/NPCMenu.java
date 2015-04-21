@@ -4,7 +4,7 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -82,9 +82,9 @@ public class NPCMenu implements Listener {
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
                     if (e.getCurrentItem().getItemMeta().getLore() != null && e.getCurrentItem().getItemMeta().getLore().contains(MainGUI.getString("ChooseNPC"))) {
                         EntityType type = EntityType.valueOf(e.getCurrentItem().getItemMeta().getDisplayName().substring(2).replaceAll(" ", "_").toUpperCase());

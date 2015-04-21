@@ -29,6 +29,7 @@ import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.AddSellingItem;
 import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.OpenSellingOptions;
 import me.moomaxie.BetterShops.Listeners.OwnerSellingOptions.SellingItemManager;
 import me.moomaxie.BetterShops.Listeners.SearchEngine.OpenEngine;
+import me.moomaxie.BetterShops.Listeners.SellerOptions.OpenSellShop;
 import me.moomaxie.BetterShops.Listeners.SellerOptions.SellItem;
 import me.moomaxie.BetterShops.Listeners.ShopDelete;
 import me.moomaxie.BetterShops.Metrics.Metrics;
@@ -95,12 +96,16 @@ public class Core extends JavaPlugin {
     private static boolean useSQL = false;
 
     //Beta versions
-    private static boolean beta = true;
+    private static boolean beta = false;
 
 
     @Override
     public void onDisable() {
-
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eSaving Shops..");
+        for (Shop shop : ShopManager.getAllShops()){
+            shop.saveConfig();
+        }
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eSaved!");
     }
 
     @Override
@@ -115,215 +120,215 @@ public class Core extends JavaPlugin {
         if (getVault() != null) {
 
             try {
+                if (setupEconomy()) {
+
+                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aEnabling BetterShops §e" + getDescription().getVersion());
+
+                    instance = this;
+
+                    //Register Listeners
+                    Bukkit.getPluginManager().registerEvents(new BuyItem(), this);
+                    Bukkit.getPluginManager().registerEvents(new AmountChooser(), this);
+                    Bukkit.getPluginManager().registerEvents(new CheckoutMenu(), this);
+                    Bukkit.getPluginManager().registerEvents(new ShopKeeperManager(), this);
+                    Bukkit.getPluginManager().registerEvents(new AddItemManager(), this);
+                    Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
+                    Bukkit.getPluginManager().registerEvents(new NPCMenu(), this);
+                    Bukkit.getPluginManager().registerEvents(new HistoryGUI(), this);
+                    Bukkit.getPluginManager().registerEvents(new NPCChooser(), this);
+                    Bukkit.getPluginManager().registerEvents(new ShopSettings(), this);
+                    Bukkit.getPluginManager().registerEvents(new GUIMessageListener(), this);
+                    Bukkit.getPluginManager().registerEvents(new LanguageInventory(), this);
+                    Bukkit.getPluginManager().registerEvents(new ConfigMenuListener(), this);
+                    Bukkit.getPluginManager().registerEvents(new OpenShopOptions(), this);
+                    Bukkit.getPluginManager().registerEvents(new LiveEco(), this);
+                    //Random break in the action
+                    Bukkit.getPluginManager().registerEvents(new ShopDelete(), this);
+                    Bukkit.getPluginManager().registerEvents(new OpenShop(), this);
+                    Bukkit.getPluginManager().registerEvents(new OwnerPages(), this);
+                    Bukkit.getPluginManager().registerEvents(new OpenSellingOptions(), this);
+                    Bukkit.getPluginManager().registerEvents(new AddSellingItem(), this);
+                    Bukkit.getPluginManager().registerEvents(new SellingItemManager(), this);
+                    Bukkit.getPluginManager().registerEvents(new SellItem(), this);
+                    Bukkit.getPluginManager().registerEvents(new OpenEngine(), this);
+                    Bukkit.getPluginManager().registerEvents(new OpeningChests(), this);
+                    Bukkit.getPluginManager().registerEvents(new OpenNPCShop(), this);
+                    Bukkit.getPluginManager().registerEvents(new HurtNPC(), this);
+                    Bukkit.getPluginManager().registerEvents(new ChatMessages(), this);
+                    Bukkit.getPluginManager().registerEvents(new ShopRearranger(), this);
+                    Bukkit.getPluginManager().registerEvents(new Blacklist(), this);
 
 
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aEnabling BetterShops §e" + getDescription().getVersion());
+                    //Switch Config/language files to current version
+                    Config.changeConfig();
+                    Messages.changeMessages();
+                    BuyingAndSelling.changeBuyingAndSellingConfig();
+                    Checkout.changeCheckoutConfig();
+                    ItemTexts.changeItemTextsConfig();
+                    MainGUI.changeMainGUIConfig();
+                    SearchEngine.changeSearchEngineConfig();
+                    me.moomaxie.BetterShops.Configurations.GUIMessages.ShopKeeperManager.changeShopKeeperManagerConfig();
+                    me.moomaxie.BetterShops.Configurations.GUIMessages.ShopSettings.changeShopSettingsConfig();
+                    History.changeHistoryConfig();
+                    NPCs.changeNPCsConfig();
+                    LiveEconomy.changeLiveEconomyConfig();
+                    Blacklist.changeBlacklist();
 
-                instance = this;
+                    String packageName = this.getServer().getClass().getPackage().getName();
 
-                //Register Listeners
-                Bukkit.getPluginManager().registerEvents(new BuyItem(), this);
-                Bukkit.getPluginManager().registerEvents(new AmountChooser(), this);
-                Bukkit.getPluginManager().registerEvents(new CheckoutMenu(), this);
-                Bukkit.getPluginManager().registerEvents(new ShopKeeperManager(), this);
-                Bukkit.getPluginManager().registerEvents(new AddItemManager(), this);
-                Bukkit.getPluginManager().registerEvents(new ItemManager(), this);
-                Bukkit.getPluginManager().registerEvents(new NPCMenu(), this);
-                Bukkit.getPluginManager().registerEvents(new HistoryGUI(), this);
-                Bukkit.getPluginManager().registerEvents(new NPCChooser(), this);
-                Bukkit.getPluginManager().registerEvents(new ShopSettings(), this);
-                Bukkit.getPluginManager().registerEvents(new GUIMessageListener(), this);
-                Bukkit.getPluginManager().registerEvents(new LanguageInventory(), this);
-                Bukkit.getPluginManager().registerEvents(new ConfigMenuListener(), this);
-                Bukkit.getPluginManager().registerEvents(new OpenShopOptions(), this);
-                Bukkit.getPluginManager().registerEvents(new LiveEco(), this);
-                //Random break in the action
-                Bukkit.getPluginManager().registerEvents(new ShopDelete(), this);
-                Bukkit.getPluginManager().registerEvents(new OpenShop(), this);
-                Bukkit.getPluginManager().registerEvents(new OwnerPages(), this);
-                Bukkit.getPluginManager().registerEvents(new OpenSellingOptions(), this);
-                Bukkit.getPluginManager().registerEvents(new AddSellingItem(), this);
-                Bukkit.getPluginManager().registerEvents(new SellingItemManager(), this);
-                Bukkit.getPluginManager().registerEvents(new SellItem(), this);
-                Bukkit.getPluginManager().registerEvents(new OpenEngine(), this);
-                Bukkit.getPluginManager().registerEvents(new OpeningChests(), this);
-                Bukkit.getPluginManager().registerEvents(new OpenNPCShop(), this);
-                Bukkit.getPluginManager().registerEvents(new HurtNPC(), this);
-                Bukkit.getPluginManager().registerEvents(new ChatMessages(), this);
-                Bukkit.getPluginManager().registerEvents(new ShopRearranger(), this);
-                Bukkit.getPluginManager().registerEvents(new Blacklist(), this);
+                    String v = this.getServer().getVersion();
 
-                //Find Vault's Economy Hook
-                setupEconomy();
+                    // Get full package string of CraftServer.
+                    // org.bukkit.craftbukkit.version
+                    String version = packageName.substring(packageName.lastIndexOf('.') + 1);
+                    // Get the last element of the package
+
+                    if (Integer.parseInt(version.substring(3, version.length() - 3)) >= 8) {
+                        aboveEight = true;
+                    }
 
 
-                //Switch Config/language files to current version
-                Config.changeConfig();
-                Messages.changeMessages();
-                BuyingAndSelling.changeBuyingAndSellingConfig();
-                Checkout.changeCheckoutConfig();
-                ItemTexts.changeItemTextsConfig();
-                MainGUI.changeMainGUIConfig();
-                SearchEngine.changeSearchEngineConfig();
-                me.moomaxie.BetterShops.Configurations.GUIMessages.ShopKeeperManager.changeShopKeeperManagerConfig();
-                me.moomaxie.BetterShops.Configurations.GUIMessages.ShopSettings.changeShopSettingsConfig();
-                History.changeHistoryConfig();
-                NPCs.changeNPCsConfig();
-                LiveEconomy.changeLiveEconomyConfig();
-                Blacklist.changeBlacklist();
-
-                String packageName = this.getServer().getClass().getPackage().getName();
-
-                String v = this.getServer().getVersion();
-
-                // Get full package string of CraftServer.
-                // org.bukkit.craftbukkit.version
-                String version = packageName.substring(packageName.lastIndexOf('.') + 1);
-                // Get the last element of the package
-
-                if (Integer.parseInt(version.substring(3, version.length() - 3)) >= 8) {
-                    aboveEight = true;
-                }
-
-
-                //Choose Anvil GUI for Version
-                try {
-                    final Class<?> clazz = Class.forName("BetterShops.Versions." + version + ".AnvilGUI");
-                    // Check if we have a NMSHandler class at that location.
-                    if (clazz != null) {
-                        if (AnvilGUI.class.isAssignableFrom(clazz)) { // Make sure it actually implements NMS
-                            gui = (AnvilGUI) clazz.getConstructor().newInstance(); // Set our handler
+                    //Choose Anvil GUI for Version
+                    try {
+                        final Class<?> clazz = Class.forName("BetterShops.Versions." + version + ".AnvilGUI");
+                        // Check if we have a NMSHandler class at that location.
+                        if (clazz != null) {
+                            if (AnvilGUI.class.isAssignableFrom(clazz)) { // Make sure it actually implements NMS
+                                gui = (AnvilGUI) clazz.getConstructor().newInstance(); // Set our handler
+                            }
+                        } else {
+                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cCould not find support for this CraftBukkit version. Currently Supports CB version 1.7.9 RO.3 - Spigot 1.8.R1, You are using §d" + version + "§c. Plugin Disabling!");
+                            this.setEnabled(false);
+                            return;
                         }
-                    } else {
+
+                        boolean c = false;
+
+                        if (v.contains("Spigot")) {
+                            if (version.equals("v1_7_R4") || version.equals("v1_8_R1") || version.equals("v1_8_R2")) {
+                                c = true;
+                            }
+                        }
+
+
+                        if (c) {
+                            final Class<?> clazz2 = Class.forName("BetterShops.Versions." + version + ".TitleManager");
+                            // Check if we have a NMSHandler class at that location.
+
+                            if (clazz2 != null) {
+                                if (TitleManager.class.isAssignableFrom(clazz2)) { // Make sure it actually implements NMS
+                                    manager = (TitleManager) clazz2.getConstructor().newInstance(); // Set our handler
+                                }
+                            } else {
+                                aboveEight = false;
+
+                                return;
+                            }
+                        }
+                    } catch (final Exception e) {
+//                e.printStackTrace();
                         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cCould not find support for this CraftBukkit version. Currently Supports CB version 1.7.9 RO.3 - Spigot 1.8.R1, You are using §d" + version + "§c. Plugin Disabling!");
                         this.setEnabled(false);
                         return;
                     }
 
-                    boolean c = false;
 
-                    if (v.contains("Spigot")) {
-                        if (version.equals("v1_7_R4") || version.equals("v1_8_R1") || version.equals("v1_8_R2")) {
-                            c = true;
-                        }
-                    }
+                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for CraftBukkit §e" + version.replaceAll("_", "."));
 
-                    if (c) {
-                        final Class<?> clazz2 = Class.forName("BetterShops.Versions." + version + ".TitleManager");
-                        // Check if we have a NMSHandler class at that location.
 
-                        if (clazz2 != null) {
-                            if (TitleManager.class.isAssignableFrom(clazz2)) { // Make sure it actually implements NMS
-                                manager = (TitleManager) clazz2.getConstructor().newInstance(); // Set our handler
-                            }
+                    //Register WorldGuard
+                    if (getWorldGuard() != null) {
+                        if (getWorldGuard().getDescription().getVersion().startsWith("\"6") || getWorldGuard().getDescription().getVersion().startsWith("6")) {
+                            wg = true;
+                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for §eWorldGuard");
                         } else {
-                            aboveEight = false;
-
-                            return;
+                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eWorldGuard §ais detected, but the version §cmust be 6.0 or Higher§a. Current version is not supported.");
+                            wg = false;
                         }
                     }
-                } catch (final Exception e) {
-//                e.printStackTrace();
-                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cCould not find support for this CraftBukkit version. Currently Supports CB version 1.7.9 RO.3 - Spigot 1.8.R1, You are using §d" + version + "§c. Plugin Disabling!");
-                    this.setEnabled(false);
-                    return;
-                }
 
-
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for CraftBukkit §e" + version.replaceAll("_", "."));
-
-
-                //Register WorldGuard
-                if (getWorldGuard() != null) {
-                    if (getWorldGuard().getDescription().getVersion().startsWith("\"6") || getWorldGuard().getDescription().getVersion().startsWith("6")) {
-                        wg = true;
-                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for §eWorldGuard");
-                    } else {
-                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eWorldGuard §ais detected, but the version §cmust be 6.0 or Higher§a. Current version is not supported.");
-                        wg = false;
+                    //Register Holographic Displays
+                    if (getHolographicDisplays() != null) {
+                        holo = true;
+                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for §eHolographic Displays");
                     }
-                }
 
-                //Register Holographic Displays
-                if (getHolographicDisplays() != null) {
-                    holo = true;
-                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for §eHolographic Displays");
-                }
-
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + ShopLimits.loadShops() + " §aShops");
-
-                //Load The Shops
-                for (Shop shop : ShopLimits.getAllShops()) {
-                    if (shop.isNPCShop() || shop.getNPCShop() != null) {
-                        for (LivingEntity e : shop.getLocation().getWorld().getLivingEntities()) {
-
+                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + ShopManager.loadShops() + " §aShops");
+                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eNPC Shops§a...");
+                    //Load The Shops
+                    for (World w : Bukkit.getWorlds()) {
+                        for (LivingEntity e : w.getLivingEntities()) {
 
                             if (e.getCustomName() != null) {
-                                if (e.getCustomName().equals("§a§l" + shop.getName())) {
-                                    if (shop.getNPCShop() == null) {
-                                        me.moomaxie.BetterShops.ShopTypes.NPC.NPCs.addNPC(new ShopsNPC(e, shop));
-//                                        e.remove();
-                                    } else {
-                                        e.remove();
+                                if (e.getCustomName().contains("§a§l")) {
+                                    Shop shop = ShopManager.fromString(e.getCustomName().substring(4));
+                                    if (shop != null) {
+                                        if (!shop.isNPCShop() || shop.getNPCShop() == null) {
+                                            ShopsNPC s = new ShopsNPC(e, shop);
+                                            me.moomaxie.BetterShops.ShopTypes.NPC.NPCs.addNPC(s);
+                                            s.removeChest();
+                                            shop.setNPCShop(true);
+                                        } else {
+                                            e.remove();
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + me.moomaxie.BetterShops.ShopTypes.NPC.NPCs.getNPCs().size() + " §aNPC Shops");
+                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + me.moomaxie.BetterShops.ShopTypes.NPC.NPCs.getNPCs().size() + " §aNPC Shops");
 
-                if (useHolograms()) {
+                    if (useHolograms()) {
+                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eHologram Shops§a...");
+                        for (NamedHologram holo : NamedHologramManager.getHolograms()) {
 
-                    for (NamedHologram holo : NamedHologramManager.getHolograms()) {
+                            if (holo.getName().startsWith("BS")) {
 
-                        if (holo.getName().startsWith("BS")){
+                                Shop shop =ShopManager.fromString(holo.getName().substring(2).replaceAll("_", " "));
 
-                        if (ShopLimits.fromString(holo.getName().substring(2).replaceAll("_", " ")) != null) {
+                                if (shop != null) {
 
-                            Shop shop = ShopLimits.fromString(holo.getName().substring(2).replaceAll("_", " "));
+                                    if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
 
-                            if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
-
-                                if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
-                                    if (shop.getHolographicShop() == null) {
-                                        holo.delete();
-                                        CreateHologram.createHolographicShop(shop);
-                                    } else {
-                                        holo.delete();
+                                        if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
+                                            if (shop.getHolographicShop() == null) {
+                                                holo.delete();
+                                                CreateHologram.createHolographicShop(shop);
+                                            } else {
+                                                holo.delete();
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                        }
+                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + HologramManager.getHolographicShops().size() + " §aHologram Shops");
                     }
-                }
 
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + HologramManager.getHolographicShops().size() + " §aHologram Shops");
 
-                //Start NPC Return Policy
-                ReturnNPC.startReturnNPC();
+                    //Start NPC Return Policy
+                    ReturnNPC.startReturnNPC();
 
-                //Register WG Listeners
-                if (useWorldGuard()) {
-                    Bukkit.getPluginManager().registerEvents(new me.moomaxie.BetterShops.Listeners.ShopCreateWG(), this);
-                } else {
-                    Bukkit.getPluginManager().registerEvents(new me.moomaxie.BetterShops.Listeners.ShopCreate(), this);
-                }
-                if (aboveEight) {
-                    Bukkit.getPluginManager().registerEvents(new TypeSpecifier(), this);
-                } else {
-                    Bukkit.getPluginManager().registerEvents(new TypeSpecifier7(), this);
-                }
+                    //Register WG Listeners
+                    if (useWorldGuard()) {
+                        Bukkit.getPluginManager().registerEvents(new me.moomaxie.BetterShops.Listeners.ShopCreateWG(), this);
+                    } else {
+                        Bukkit.getPluginManager().registerEvents(new me.moomaxie.BetterShops.Listeners.ShopCreate(), this);
+                    }
+                    if (aboveEight) {
+                        Bukkit.getPluginManager().registerEvents(new TypeSpecifier(), this);
+                    } else {
+                        Bukkit.getPluginManager().registerEvents(new TypeSpecifier7(), this);
+                    }
 
-                //Use Metrics
-                if (Config.useMetrics()) {
-                    metrics = new Metrics(this);
-                    setUpMetrics();
-                    metrics.start();
-                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aUsing §eMetrics §7- http://mcstats.org");
-                }
+                    //Use Metrics
+                    if (Config.useMetrics()) {
+                        metrics = new Metrics(this);
+                        setUpMetrics();
+                        metrics.start();
+                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aUsing §eMetrics §7- http://mcstats.org");
+                    }
 
 //                if (Config.config.getBoolean("sql.use")) {
 //
@@ -346,7 +351,11 @@ public class Core extends JavaPlugin {
 //                    }
 //                }
 
-                Updater.startCheckForUpdate();
+                    Updater.startCheckForUpdate();
+                } else {
+                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cNo Economy Plugin Detected. Plugin Disabling!");
+                    this.setEnabled(false);
+                }
 
             } catch (Exception e) {
                 Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cAn error occurred! §cPlease inform the developer @ §ehttp://dev.bukkit.org/bukkit-plugins/better-shops/ §c. Plugin Disabling!");
@@ -392,22 +401,26 @@ public class Core extends JavaPlugin {
 
     //Get Anvil GUI
     public static AnvilGUI getAnvilGUI() {
-
-        try {
-            return gui.getClass().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            return gui;
+        if (gui != null) {
+            try {
+                return gui.getClass().newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                return gui;
+            }
         }
-
+        return null;
     }
 
     //Get Title Manager
     public static TitleManager getTitleManager() {
-         try {
-            return manager.getClass().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            return manager;
+        if (manager != null) {
+            try {
+                return manager.getClass().newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                return manager;
+            }
         }
+        return null;
     }
 
     //Test if 1.8 is being used
@@ -430,7 +443,8 @@ public class Core extends JavaPlugin {
     }
 
     public File getFile() {
-        return new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
+        File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
+        return file;
     }
 
     public String getJarName() {
@@ -450,7 +464,7 @@ public class Core extends JavaPlugin {
 
                         p.sendMessage(Messages.getString("Prefix") + "You are running version: §e" + getDescription().getVersion());
 
-                        p.sendMessage(Messages.getString("Prefix") + "Total Shops: §e" + ShopLimits.getAllShops().size());
+                        p.sendMessage(Messages.getString("Prefix") + "Total Shops: §e" + ShopManager.getAllShops().size());
                         p.sendMessage(Messages.getString("Prefix") + "Total NPC Shops: §e" + me.moomaxie.BetterShops.ShopTypes.NPC.NPCs.getNPCs().size());
                         p.sendMessage(Messages.getString("Prefix") + "Total Holographic Shops: §e" + HologramManager.getHolographicShops().size());
                     } else if (args[0].equalsIgnoreCase("update")) {
@@ -480,6 +494,21 @@ public class Core extends JavaPlugin {
                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                         }
 
+                    } else if (args[0].equalsIgnoreCase("list")) {
+                        if (Permissions.hasListPerm(p)) {
+                            List<Shop> shops = ShopManager.getAllShops();
+                            p.sendMessage("§d<-Listing Shops (§c" + shops.size() + "§d)->");
+                            for (int i = 1; i < shops.size() + 1; i++) {
+                                if (shops.get(i - 1).isNPCShop() || shops.get(i - 1).getNPCShop() != null) {
+                                    p.sendMessage("§c" + i + ". §a" + shops.get(i - 1).getName() + " §e(NPC)");
+                                } else if (shops.get(i - 1).isHoloShop()) {
+                                    p.sendMessage("§c" + i + ". §a" + shops.get(i - 1).getName() + " §e(Holo)");
+                                } else {
+                                    p.sendMessage("§c" + i + ". §a" + shops.get(i - 1).getName());
+                                }
+                            }
+                            p.sendMessage("§d<-Listing Shops (§c" + shops.size() + "§d)->");
+                        }
                     } else {
                         p.sendMessage("§d<-Better Shops Help->");
                         p.sendMessage("    §a/bs info");
@@ -501,7 +530,7 @@ public class Core extends JavaPlugin {
                                 name = name + " " + args[i];
                             }
 
-                            Shop shop = ShopLimits.fromString(p, name);
+                            Shop shop = ShopManager.fromString(p, name);
 
                             if (shop != null) {
                                 if (shop.getOwner() != null) {
@@ -512,7 +541,21 @@ public class Core extends JavaPlugin {
                                             OpenShopOptions.openShopOwnerOptionsInventory(null, p, shop, 1);
                                         }
                                     } else {
-                                        OpenShop.openShopItems(null, p, shop, 1);
+                                        if (shop.isOpen()) {
+                                            if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
+                                                OpenShop.openShopItems(null, p, shop, 1);
+                                            } else {
+                                                if (Config.useSellingShop()) {
+                                                    OpenSellShop.openSellerShop(null, p, shop, 1);
+                                                } else {
+                                                    OpenShop.openShopItems(null, p, shop, 1);
+                                                }
+                                            }
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("OpenShop"));
+                                        } else {
+                                            p.closeInventory();
+                                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("ShopClosed"));
+                                        }
                                     }
                                 } else {
                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("FakeShop"));
@@ -524,7 +567,7 @@ public class Core extends JavaPlugin {
                             p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                         }
                     } else if (args[0].equalsIgnoreCase("list")) {
-                        if (Permissions.hasOpenCommandPerm(p)) {
+                        if (Permissions.hasListPerm(p)) {
                             String name = args[1];
 
                             for (int i = 2; i < args.length; i++) {
@@ -533,12 +576,18 @@ public class Core extends JavaPlugin {
 
                             OfflinePlayer pl = Bukkit.getOfflinePlayer(name);
 
-                            if (pl != null){
-                                List<Shop> shops = ShopLimits.getShopsForPlayer(pl);
+                            if (pl != null) {
+                                List<Shop> shops = ShopManager.getShopsForPlayer(pl);
                                 if (shops != null && shops.size() > 0) {
                                     p.sendMessage("§d<-Listing §e" + pl.getName() + "'s §dShops (§c" + shops.size() + "§d)->");
                                     for (int i = 1; i < shops.size() + 1; i++) {
-                                        p.sendMessage("§c" + i + ". §a" + shops.get(i - 1).getName());
+                                        if (shops.get(i - 1).isNPCShop() || shops.get(i - 1).getNPCShop() != null) {
+                                            p.sendMessage("§c" + i + ". §a" + shops.get(i - 1).getName() + " §e(NPC)");
+                                        } else if (shops.get(i - 1).isHoloShop()) {
+                                            p.sendMessage("§c" + i + ". §a" + shops.get(i - 1).getName() + " §e(Holo)");
+                                        } else {
+                                            p.sendMessage("§c" + i + ". §a" + shops.get(i - 1).getName());
+                                        }
                                     }
                                     p.sendMessage("§d<-Listing §e" + pl.getName() + "'s §dShops (§c" + shops.size() + "§d)->");
                                 } else {
@@ -600,7 +649,7 @@ public class Core extends JavaPlugin {
                         name = name + " " + args[i];
                     }
 
-                    Shop shop = ShopLimits.fromString(p, name);
+                    Shop shop = ShopManager.fromString(p, name);
 
                     if (shop != null) {
 
@@ -625,7 +674,7 @@ public class Core extends JavaPlugin {
                                                     Block face = sign.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
 
-                                                    if (face.getType() == Material.CHEST) {
+                                                    if (face.getType() == Material.CHEST || face.getType() == Material.TRAPPED_CHEST) {
                                                         if (face.getState() instanceof Chest) {
                                                             Chest ch = (Chest) face.getState();
 
@@ -645,21 +694,17 @@ public class Core extends JavaPlugin {
 
                                         Bukkit.getPluginManager().callEvent(e);
 
-
-                                        for (ShopItem item : shop.getShopItems(false)) {
-                                            Stocks.removeAllOfDeletedItem(item, shop, p, false);
-                                        }
-                                        for (ShopItem item : shop.getShopItems(true)) {
-                                            Stocks.removeAllOfDeletedItem(item, shop, p, true);
+                                        for (ShopItem item : shop.getShopItems()) {
+                                            Stocks.addItemsToInventory(item, p, item.getStock());
                                         }
 
                                         if (shop.getOwner() != null) {
-                                            int amt = ShopLimits.getLimits().get(shop.getOwner().getUniqueId());
-                                            ShopLimits.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
+                                            int amt = ShopManager.getLimits().get(shop.getOwner().getUniqueId());
+                                            ShopManager.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
 
-                                            List<Shop> l = ShopLimits.getShopsForPlayer(shop.getOwner());
+                                            List<Shop> l = ShopManager.getShopsForPlayer(shop.getOwner());
                                             l.remove(shop);
-                                            ShopLimits.playerShops.put(shop.getOwner().getUniqueId(),l);
+                                            ShopManager.playerShops.put(shop.getOwner().getUniqueId(), l);
                                         }
 
                                         YamlConfiguration config = shop.config;
@@ -671,12 +716,12 @@ public class Core extends JavaPlugin {
                                         } catch (IOException e1) {
                                             e1.printStackTrace();
                                         }
-                                        ShopLimits.locs.remove(shop.getLocation());
-                                        ShopLimits.names.remove(shop.getName());
-                                        ShopLimits.shops.remove(shop);
+                                        ShopManager.locs.remove(shop.getLocation());
+                                        ShopManager.names.remove(shop.getName());
+                                        ShopManager.shops.remove(shop);
 
 
-                                        if (Core.useSQL()){
+                                        if (Core.useSQL()) {
                                             try {
                                                 Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
                                             } catch (SQLException e1) {
@@ -710,29 +755,27 @@ public class Core extends JavaPlugin {
                                                 if (npc.getShop().getName().equals(shop.getName())) {
                                                     me.moomaxie.BetterShops.ShopTypes.NPC.NPCs.removeNPC(npc);
                                                     e.remove();
-                                                    for (ShopItem item : shop.getShopItems(false)) {
-                                                        Stocks.removeAllOfDeletedItem(item, shop, p, false);
-                                                    }
-                                                    for (ShopItem item : shop.getShopItems(true)) {
-                                                        Stocks.removeAllOfDeletedItem(item, shop, p, true);
+
+                                                    for (ShopItem item : shop.getShopItems()) {
+                                                        Stocks.addItemsToInventory(item, p, item.getStock());
                                                     }
 
                                                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("DeleteShop"));
 
-                                                    ShopLimits.locs.remove(shop.getLocation());
-                                                    ShopLimits.names.remove(shop.getName());
-                                                    ShopLimits.shops.remove(shop);
+                                                    ShopManager.locs.remove(shop.getLocation());
+                                                    ShopManager.names.remove(shop.getName());
+                                                    ShopManager.shops.remove(shop);
 
                                                     if (shop.getOwner() != null) {
-                                                        int amt = ShopLimits.getLimits().get(shop.getOwner().getUniqueId());
-                                                        ShopLimits.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
+                                                        int amt = ShopManager.getLimits().get(shop.getOwner().getUniqueId());
+                                                        ShopManager.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
 
-                                                        List<Shop> l = ShopLimits.getShopsForPlayer(shop.getOwner());
+                                                        List<Shop> l = ShopManager.getShopsForPlayer(shop.getOwner());
                                                         l.remove(shop);
-                                                        ShopLimits.playerShops.put(shop.getOwner().getUniqueId(),l);
+                                                        ShopManager.playerShops.put(shop.getOwner().getUniqueId(), l);
                                                     }
 
-                                                    if (Core.useSQL()){
+                                                    if (Core.useSQL()) {
                                                         try {
                                                             Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
                                                         } catch (SQLException e1) {
@@ -764,21 +807,19 @@ public class Core extends JavaPlugin {
                                     }
 
                                     if (!can) {
-                                        for (ShopItem item : shop.getShopItems(false)) {
-                                            Stocks.removeAllOfDeletedItem(item, shop, p, false);
-                                        }
-                                        for (ShopItem item : shop.getShopItems(true)) {
-                                            Stocks.removeAllOfDeletedItem(item, shop, p, true);
+
+                                        for (ShopItem item : shop.getShopItems()) {
+                                            Stocks.addItemsToInventory(item, p, item.getStock());
                                         }
                                         p.sendMessage(Messages.getString("Prefix") + Messages.getString("DeleteShop"));
 
                                         if (shop.getOwner() != null) {
-                                            int amt = ShopLimits.getLimits().get(shop.getOwner().getUniqueId());
-                                            ShopLimits.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
+                                            int amt = ShopManager.getLimits().get(shop.getOwner().getUniqueId());
+                                            ShopManager.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
 
-                                            List<Shop> l = ShopLimits.getShopsForPlayer(shop.getOwner());
+                                            List<Shop> l = ShopManager.getShopsForPlayer(shop.getOwner());
                                             l.remove(shop);
-                                            ShopLimits.playerShops.put(shop.getOwner().getUniqueId(),l);
+                                            ShopManager.playerShops.put(shop.getOwner().getUniqueId(), l);
                                         }
 
                                         config.set(name, null);
@@ -787,12 +828,12 @@ public class Core extends JavaPlugin {
                                         } catch (IOException e1) {
                                             e1.printStackTrace();
                                         }
-                                        ShopLimits.locs.remove(shop.getLocation());
-                                        ShopLimits.names.remove(shop.getName());
-                                        ShopLimits.shops.remove(shop);
+                                        ShopManager.locs.remove(shop.getLocation());
+                                        ShopManager.names.remove(shop.getName());
+                                        ShopManager.shops.remove(shop);
 
 
-                                        if (Core.useSQL()){
+                                        if (Core.useSQL()) {
                                             try {
                                                 Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
                                             } catch (SQLException e1) {
@@ -827,7 +868,7 @@ public class Core extends JavaPlugin {
                                                     Block face = sign.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
 
-                                                    if (face.getType() == Material.CHEST) {
+                                                    if (face.getType() == Material.CHEST || face.getType() == Material.TRAPPED_CHEST) {
                                                         if (face.getState() instanceof Chest) {
                                                             Chest ch = (Chest) face.getState();
 
@@ -847,21 +888,17 @@ public class Core extends JavaPlugin {
 
                                         Bukkit.getPluginManager().callEvent(e);
 
-
-                                        for (ShopItem item : shop.getShopItems(false)) {
-                                            Stocks.removeAllOfDeletedItem(item, shop, p, false);
-                                        }
-                                        for (ShopItem item : shop.getShopItems(true)) {
-                                            Stocks.removeAllOfDeletedItem(item, shop, p, true);
+                                        for (ShopItem item : shop.getShopItems()) {
+                                            Stocks.addItemsToInventory(item, p, item.getStock());
                                         }
 
                                         if (shop.getOwner() != null) {
-                                            int amt = ShopLimits.getLimits().get(shop.getOwner().getUniqueId());
-                                            ShopLimits.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
+                                            int amt = ShopManager.getLimits().get(shop.getOwner().getUniqueId());
+                                            ShopManager.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
 
-                                            List<Shop> l = ShopLimits.getShopsForPlayer(shop.getOwner());
+                                            List<Shop> l = ShopManager.getShopsForPlayer(shop.getOwner());
                                             l.remove(shop);
-                                            ShopLimits.playerShops.put(shop.getOwner().getUniqueId(),l);
+                                            ShopManager.playerShops.put(shop.getOwner().getUniqueId(), l);
                                         }
 
                                         YamlConfiguration config = shop.config;
@@ -873,11 +910,11 @@ public class Core extends JavaPlugin {
                                         } catch (IOException e1) {
                                             e1.printStackTrace();
                                         }
-                                        ShopLimits.locs.remove(shop.getLocation());
-                                        ShopLimits.names.remove(shop.getName());
-                                        ShopLimits.shops.remove(shop);
+                                        ShopManager.locs.remove(shop.getLocation());
+                                        ShopManager.names.remove(shop.getName());
+                                        ShopManager.shops.remove(shop);
 
-                                        if (Core.useSQL()){
+                                        if (Core.useSQL()) {
                                             try {
                                                 Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
                                             } catch (SQLException e1) {
@@ -1000,7 +1037,7 @@ public class Core extends JavaPlugin {
     public void setUpMetrics() {
         Metrics.Graph shops = metrics.createGraph("Number of Shops per Server");
 
-        shops.addPlotter(new Metrics.Plotter("" + ShopLimits.getAllShops().size()) {
+        shops.addPlotter(new Metrics.Plotter("" + ShopManager.getAllShops().size()) {
             @Override
             public int getValue() {
                 return 1;
@@ -1016,6 +1053,16 @@ public class Core extends JavaPlugin {
             }
         });
 
+        if (useHolograms()) {
+            Metrics.Graph holoshops = metrics.createGraph("Number of Holographic Shops per Server");
+
+            holoshops.addPlotter(new Metrics.Plotter("" + HologramManager.getHolographicShops().size()) {
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+        }
 
         if (beta) {
 

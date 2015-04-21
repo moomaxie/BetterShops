@@ -2,7 +2,7 @@ package me.moomaxie.BetterShops.Updater;
 
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.*;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.ShopCreate;
 import me.moomaxie.BetterShops.Listeners.ShopDelete;
@@ -53,7 +53,7 @@ public class Updater {
                 if (s.equals("CREATE")) {
                     for (String s1 : config.getConfigurationSection(s).getKeys(false)) {
 
-                        if (ShopLimits.fromString(s1) == null) {
+                        if (ShopManager.fromString(s1) == null) {
 
                             String owner = config.getConfigurationSection(s).getConfigurationSection(s1).getString("OWNER");
 
@@ -75,7 +75,7 @@ public class Updater {
 
                 if (s.equals("DELETE")) {
                     for (String s1 : config.getConfigurationSection(s).getKeys(false)) {
-                        Shop shop = ShopLimits.fromString(s1);
+                        Shop shop = ShopManager.fromString(s1);
                         if (shop != null) {
                             if (shop.isNPCShop() || shop.getNPCShop() != null) {
                                 DeleteNPC.deleteNPC(shop.getNPCShop());
@@ -141,7 +141,7 @@ public class Updater {
 
                 if (s.equals("SHOP")) {
                     for (String s1 : config.getConfigurationSection(s).getKeys(false)) {
-                        Shop shop = ShopLimits.fromString(s1);
+                        Shop shop = ShopManager.fromString(s1);
                         if (shop != null) {
                             for (String s2 : config.getConfigurationSection(s).getConfigurationSection(s1).getKeys(false)) {
                                 if (s2.equals("DESCRIPTION")) {
@@ -221,7 +221,7 @@ public class Updater {
 
                 if (s.equals("SHOP ITEM")) {
                     for (String s1 : config.getConfigurationSection(s).getKeys(false)) {
-                        Shop shop = ShopLimits.fromString(s1);
+                        Shop shop = ShopManager.fromString(s1);
                         if (shop != null) {
                             for (String s2 : config.getConfigurationSection(s).getConfigurationSection(s1).getKeys(false)) {
                                 if (s2.equals("BUYING")) {
@@ -288,7 +288,7 @@ public class Updater {
 
                 if (s.equals("MANAGERS")) {
                     for (String s1 : config.getConfigurationSection(s).getKeys(false)) {
-                        Shop shop = ShopLimits.fromString(s1);
+                        Shop shop = ShopManager.fromString(s1);
                         if (shop != null) {
                             for (String s2 : config.getConfigurationSection(s).getConfigurationSection(s1).getKeys(false)) {
                                 if (s2.equals("ADD")) {

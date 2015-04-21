@@ -5,7 +5,7 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
 import me.moomaxie.BetterShops.Shops.Shop;
@@ -32,7 +32,7 @@ import java.util.UUID;
  * ***********************************************************************
  * Copyright Max Hubbard (c) 2014. All Rights Reserved.
  * Any code contained within this document, and any associated documents with similar branding
- * are the sole property of me.moomaxie. Distribution, reproduction, taking snippets, or
+ * are the sole property of Max. Distribution, reproduction, taking snippets, or
  * claiming any contents as your own will break the terms of the license, and void any
  * agreements with you, the third party.
  * ************************************************************************
@@ -45,7 +45,7 @@ public class ShopDelete implements Listener {
         Player p = e.getPlayer();
 
 
-        if (b.getType() == Material.CHEST) {
+        if (b.getType() == Material.CHEST || b.getType() == Material.TRAPPED_CHEST) {
 
             File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Shops");
             if (file != null) {
@@ -70,7 +70,7 @@ public class ShopDelete implements Listener {
 
                                         if (b.getLocation().equals(new Location(w, x, y, z))) {
                                             Player owner = Bukkit.getPlayer(UUID.fromString(config.getConfigurationSection(s).getString("Owner")));
-                                            Shop shop = ShopLimits.fromLocation(e.getBlock().getLocation());
+                                            Shop shop = ShopManager.fromLocation(e.getBlock().getLocation());
 
                                             if (shop != null) {
                                                 if (owner == p || p.isOp() || Config.usePerms() && Permissions.hasBreakPerm(p)) {
@@ -92,12 +92,8 @@ public class ShopDelete implements Listener {
 
                                                         }
 
-
-                                                        for (ShopItem item : shop.getShopItems(false)) {
-                                                            Stocks.removeAllOfDeletedItem(item, shop, p, false);
-                                                        }
-                                                        for (ShopItem item : shop.getShopItems(true)) {
-                                                            Stocks.removeAllOfDeletedItem(item, shop, p, true);
+                                                        for (ShopItem item : shop.getShopItems()) {
+                                                            Stocks.addItemsToInventory(item, p, item.getStock());
                                                         }
 
                                                         config.set(s, null);
@@ -106,16 +102,16 @@ public class ShopDelete implements Listener {
                                                         } catch (IOException e1) {
                                                             e1.printStackTrace();
                                                         }
-                                                        ShopLimits.locs.remove(shop.getLocation());
-                                                        ShopLimits.names.remove(shop.getName());
-                                                        ShopLimits.shops.remove(shop);
+                                                        ShopManager.locs.remove(shop.getLocation());
+                                                        ShopManager.names.remove(shop.getName());
+                                                        ShopManager.shops.remove(shop);
 
-                                                        int amt = ShopLimits.getLimits().get(owner.getUniqueId());
-                                                        ShopLimits.getLimits().put(owner.getUniqueId(), amt - 1);
+                                                        int amt = ShopManager.getLimits().get(owner.getUniqueId());
+                                                        ShopManager.getLimits().put(owner.getUniqueId(), amt - 1);
 
-                                                        List<Shop> li = ShopLimits.getShopsForPlayer(owner);
+                                                        List<Shop> li = ShopManager.getShopsForPlayer(owner);
                                                         li.remove(shop);
-                                                        ShopLimits.playerShops.put(owner.getUniqueId(), li);
+                                                        ShopManager.playerShops.put(owner.getUniqueId(), li);
 
 
                                                         if (Core.useSQL()) {
@@ -173,7 +169,7 @@ public class ShopDelete implements Listener {
                             Block face = e.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
 
-                            if (face.getType() == Material.CHEST) {
+                            if (face.getType() == Material.CHEST || face.getType() == Material.TRAPPED_CHEST) {
                                 if (face.getState() instanceof Chest) {
                                     Chest chest = (Chest) face.getState();
 
@@ -200,12 +196,12 @@ public class ShopDelete implements Listener {
 
                                                             if (chest.getLocation().equals(new Location(w, x, y, z))) {
 
-                                                                Shop shop = ShopLimits.fromLocation(new Location(w, x, y, z));
+                                                                Shop shop = ShopManager.fromLocation(new Location(w, x, y, z));
                                                                 Player owner = Bukkit.getPlayer(UUID.fromString(config.getConfigurationSection(s).getString("Owner")));
 
                                                                 if (shop == null) {
-                                                                    ShopLimits.loadShops();
-                                                                    shop = ShopLimits.fromLocation(new Location(w, x, y, z));
+                                                                    ShopManager.loadShops();
+                                                                    shop = ShopManager.fromLocation(new Location(w, x, y, z));
                                                                 }
 
 
@@ -229,12 +225,10 @@ public class ShopDelete implements Listener {
 
                                                                             }
 
-                                                                            for (ShopItem item : shop.getShopItems(false)) {
-                                                                                Stocks.removeAllOfDeletedItem(item, shop, p, false);
+                                                                            for (ShopItem item : shop.getShopItems()) {
+                                                                                Stocks.addItemsToInventory(item,p,item.getStock());
                                                                             }
-                                                                            for (ShopItem item : shop.getShopItems(true)) {
-                                                                                Stocks.removeAllOfDeletedItem(item, shop, p, true);
-                                                                            }
+
 
                                                                             config.set(s, null);
                                                                             try {
@@ -242,16 +236,16 @@ public class ShopDelete implements Listener {
                                                                             } catch (IOException e1) {
                                                                                 e1.printStackTrace();
                                                                             }
-                                                                            ShopLimits.locs.remove(shop.getLocation());
-                                                                            ShopLimits.names.remove(shop.getName());
-                                                                            ShopLimits.shops.remove(shop);
+                                                                            ShopManager.locs.remove(shop.getLocation());
+                                                                            ShopManager.names.remove(shop.getName());
+                                                                            ShopManager.shops.remove(shop);
 
-                                                                            int amt = ShopLimits.getLimits().get(owner.getUniqueId());
-                                                                            ShopLimits.getLimits().put(owner.getUniqueId(), amt - 1);
+                                                                            int amt = ShopManager.getLimits().get(owner.getUniqueId());
+                                                                            ShopManager.getLimits().put(owner.getUniqueId(), amt - 1);
 
-                                                                            List<Shop> li = ShopLimits.getShopsForPlayer(owner);
+                                                                            List<Shop> li = ShopManager.getShopsForPlayer(owner);
                                                                             li.remove(shop);
-                                                                            ShopLimits.playerShops.put(owner.getUniqueId(), li);
+                                                                            ShopManager.playerShops.put(owner.getUniqueId(), li);
 
                                                                             if (Core.useSQL()) {
                                                                                 Core.getSQLDatabase().getConnection().createStatement().execute("DELETE from Shops where Name='" + shop.getName() + "';");
@@ -323,16 +317,16 @@ public class ShopDelete implements Listener {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        ShopLimits.locs.remove(shop.getLocation());
-        ShopLimits.names.remove(shop.getName());
-        ShopLimits.shops.remove(shop);
+        ShopManager.locs.remove(shop.getLocation());
+        ShopManager.names.remove(shop.getName());
+        ShopManager.shops.remove(shop);
         if (shop.getOwner() != null) {
-            int amt = ShopLimits.getLimits().get(shop.getOwner().getUniqueId());
-            ShopLimits.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
+            int amt = ShopManager.getLimits().get(shop.getOwner().getUniqueId());
+            ShopManager.getLimits().put(shop.getOwner().getUniqueId(), amt - 1);
 
-            List<Shop> li = ShopLimits.getShopsForPlayer(shop.getOwner());
+            List<Shop> li = ShopManager.getShopsForPlayer(shop.getOwner());
             li.remove(shop);
-            ShopLimits.playerShops.put(shop.getOwner().getUniqueId(), li);
+            ShopManager.playerShops.put(shop.getOwner().getUniqueId(), li);
         }
 
         if (Core.useSQL()) {

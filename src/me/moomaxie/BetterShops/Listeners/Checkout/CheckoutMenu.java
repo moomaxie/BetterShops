@@ -5,10 +5,11 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.Checkout;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Configurations.WordsCapitalizer;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
+import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
 import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
 import me.moomaxie.BetterShops.Shops.Shop;
 import me.moomaxie.BetterShops.Shops.ShopItem;
@@ -237,9 +238,9 @@ public class CheckoutMenu implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    Shop shop = ShopLimits.fromString(p, name);
+                    Shop shop = ShopManager.fromString(p, name);
 
                     if (e.getCurrentItem().getItemMeta() != null && e.getCurrentItem().hasItemMeta()) {
 
@@ -479,15 +480,17 @@ public class CheckoutMenu implements Listener {
                                         value = bd.doubleValue();
                                     }
 
-                                    for (int o = 0; o < amt; o++) {
-                                        p.getInventory().addItem(it.getItem());
-                                    }
+                                    Stocks.addItemsToInventory(it, p, amt);
+
+//                                    for (int o = 0; o < amt; o++) {
+//                                        p.getInventory().addItem(it.getItem());
+//                                    }
                                     if (!it.isInfinite())
                                         it.setStock(it.getStock() - amt);
 
                                     shop.getHistory().addTransaction(p, new Date(), it, value, amt, false, true);
 
-                                    ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop);
+                                    ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop,p);
 
                                     Bukkit.getPluginManager().callEvent(ev);
 
@@ -548,9 +551,11 @@ public class CheckoutMenu implements Listener {
                                             value = bd.doubleValue();
                                         }
 
-                                        for (int o = 0; o < amt; o++) {
-                                            p.getInventory().addItem(it.getItem());
-                                        }
+                                        Stocks.addItemsToInventory(it, p, amt);
+
+//                                        for (int o = 0; o < amt; o++) {
+//                                            p.getInventory().addItem(it.getItem());
+//                                        }
 
                                         if (!it.isInfinite()) {
                                             if (it.getDisplayName() != null) {
@@ -568,7 +573,7 @@ public class CheckoutMenu implements Listener {
                                         }
                                         shop.getHistory().addTransaction(p, new Date(), it, value, amt, false, true);
 
-                                        ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop);
+                                        ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop,p);
 
                                         Bukkit.getPluginManager().callEvent(ev);
 

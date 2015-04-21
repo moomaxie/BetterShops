@@ -3,7 +3,7 @@ package me.moomaxie.BetterShops.Listeners.Misc;
 import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.ShopKeeperManager;
@@ -296,12 +296,12 @@ public class ChatMessages implements Listener {
 
                             }
 
-                            ShopLimits.loadShops();
+                            ShopManager.loadShops();
 
                             if (Config.autoAddItems()) {
 
                                 if (finalChest != null && finalChest.getBlockInventory() != null) {
-                                    Shop shop = ShopLimits.fromLocation(finalChest.getLocation());
+                                    Shop shop = ShopManager.fromLocation(finalChest.getLocation());
                                     int i = 18;
                                     for (final ItemStack items : finalChest.getBlockInventory().getContents()) {
                                         if (items != null && items.getType() != Material.AIR) {
@@ -778,7 +778,7 @@ public class ChatMessages implements Listener {
                 }
 
                 if (can) {
-                    if (amt > 0) {
+                    if (amt >= 0) {
                         if (amt <= Config.getMaxPrice()) {
                             assert shop != null;
                             ite.setPrice(amt);
@@ -837,7 +837,7 @@ public class ChatMessages implements Listener {
                 }
 
                 if (can) {
-                    if (amt > 0) {
+                    if (amt >= 0) {
                         if (amt <= Config.getMaxPrice()) {
                             assert shop != null;
                             ite.setPrice(amt);

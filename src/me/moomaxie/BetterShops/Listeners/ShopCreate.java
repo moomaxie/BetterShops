@@ -7,7 +7,7 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.CreationCost.CreationCost;
 import me.moomaxie.BetterShops.Listeners.Misc.ChatMessages;
@@ -50,7 +50,7 @@ public class ShopCreate implements Listener {
                 can = false;
             }
 
-            if (Config.useLimit() && Config.usePerms() && !Permissions.hasLimitPerm(p) && ShopLimits.atLimit(p) || Config.useLimit() && !p.isOp() && !Config.usePerms() && ShopLimits.atLimit(p)) {
+            if (Config.useLimit() && Config.usePerms() && !Permissions.hasLimitPerm(p) && ShopManager.atLimit(p) || Config.useLimit() && !p.isOp() && !Config.usePerms() && ShopManager.atLimit(p)) {
                 can = false;
             }
 
@@ -65,7 +65,7 @@ public class ShopCreate implements Listener {
                     Block face = e.getBlock().getRelative(((org.bukkit.material.Sign) (sign.getData())).getAttachedFace());
 
 
-                    if (face.getType() == Material.CHEST) {
+                    if (face.getType() == Material.CHEST || face.getType() == Material.TRAPPED_CHEST) {
                         if (face.getState() instanceof Chest) {
                             chest = (Chest) face.getState();
                         }
@@ -87,7 +87,7 @@ public class ShopCreate implements Listener {
 
                 final Chest finalChest = chest;
 
-                if (finalChest != null && ShopLimits.fromLocation(finalChest.getLocation()) == null) {
+                if (finalChest != null && ShopManager.fromLocation(finalChest.getLocation()) == null) {
 
                     if (Config.useAnvil()) {
 
@@ -114,7 +114,7 @@ public class ShopCreate implements Listener {
                                                         Long = true;
                                                     }
 
-                                                    if (ShopLimits.fromString(name) != null){
+                                                    if (ShopManager.fromString(name) != null){
                                                         can = false;
                                                     }
 
@@ -150,17 +150,17 @@ public class ShopCreate implements Listener {
                                                             }
 
 
-                                                            ShopCreateEvent e = new ShopCreateEvent(ShopLimits.fromLocation(finalChest.getLocation()));
+                                                            ShopCreateEvent e = new ShopCreateEvent(ShopManager.fromLocation(finalChest.getLocation()));
 
                                                             Bukkit.getPluginManager().callEvent(e);
 
 
-//                                                    ShopLimits.loadShops();
+//                                                    ShopManager.loadShops();
 
                                                             if (Config.autoAddItems()) {
 
                                                                 if (finalChest.getBlockInventory() != null) {
-                                                                    Shop shop = ShopLimits.fromLocation(finalChest.getLocation());
+                                                                    Shop shop = ShopManager.fromLocation(finalChest.getLocation());
                                                                     int i = 18;
                                                                     for (final ItemStack items : finalChest.getBlockInventory().getContents()) {
                                                                         if (items != null && items.getType() != Material.AIR) {
@@ -362,7 +362,7 @@ public class ShopCreate implements Listener {
         return true;
     }
 
-    public static void createShopExternally(Location loc, String name, OfflinePlayer owner) {
+    public static Shop createShopExternally(Location loc, String name, OfflinePlayer owner) {
         if (isAlphaNumeric(name)) {
             boolean can = true;
             boolean Long = false;
@@ -371,7 +371,7 @@ public class ShopCreate implements Listener {
                 Long = true;
             }
 
-            if (ShopLimits.fromString(name) != null){
+            if (ShopManager.fromString(name) != null){
                 can = false;
             }
 
@@ -418,13 +418,16 @@ public class ShopCreate implements Listener {
                     }
                 }
 
-                ShopCreateEvent e = new ShopCreateEvent(ShopLimits.fromLocation(loc));
+                Shop s = ShopManager.fromLocation(loc);
+
+                ShopCreateEvent e = new ShopCreateEvent(s);
 
                 Bukkit.getPluginManager().callEvent(e);
 
-
+                return s;
             }
 
         }
+        return null;
     }
 }

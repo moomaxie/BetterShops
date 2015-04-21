@@ -1,5 +1,6 @@
 package me.moomaxie.BetterShops.Configurations.Permissions;
 
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
 
@@ -39,6 +40,12 @@ public class Permissions {
 
     // bettershops.npc.*
     // bettershops.npc.TYPE
+
+    // bettershops.buy.*
+    // bettershops.buy.<Material>
+
+    // bettershops.sell.*
+    // bettershops.sell.<Material>
 
     public static boolean hasCreatePerm(OfflinePlayer p){
         return p.isOp() || p.getPlayer().hasPermission("bettershops.shop.create") || p.getPlayer().hasPermission("bettershops.shop.*");
@@ -122,5 +129,13 @@ public class Permissions {
 
     public static boolean hasBlacklistCommandPerm(OfflinePlayer p){
         return p.isOp() || p.getPlayer().hasPermission("bettershops.command.blacklist") || p.getPlayer().hasPermission("bettershops.command.*");
+    }
+
+    public static boolean hasBuyItemPerm(OfflinePlayer p, Material m){
+        return p.isOp() || p.getPlayer().hasPermission("bettershops.buy." + m.name()) || p.getPlayer().hasPermission("bettershops.buy.*");
+    }
+
+    public static boolean hasSellItemPerm(OfflinePlayer p, Material m){
+        return p.isOp() || p.getPlayer().hasPermission("bettershops.sell." + m.name()) || p.getPlayer().hasPermission("bettershops.sell.*");
     }
 }

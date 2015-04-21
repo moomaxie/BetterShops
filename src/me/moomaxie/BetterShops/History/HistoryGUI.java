@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.History;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
 import me.moomaxie.BetterShops.Shops.Shop;
@@ -150,9 +150,9 @@ public class HistoryGUI implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    Shop shop = ShopLimits.fromString(p, name);
+                    Shop shop = ShopManager.fromString(p, name);
 
                     if (e.getInventory().getItem(4).getItemMeta().getDisplayName() != null &&
                             e.getInventory().getItem(4).getItemMeta().getDisplayName().equals(History.getString("History"))) {

@@ -5,7 +5,7 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.Misc.ChatMessages;
@@ -53,9 +53,9 @@ public class AddSellingItem implements Listener {
 //                        if (p.getOpenInventory() != null && p.getOpenInventory().getTopInventory().getName().contains(MainGUI.getString("ShopHeader"))) {
 //
 //                            String name = p.getOpenInventory().getTopInventory().getName();
-//                            name = name.substring(11);
+//                            name = name.substring(MainGUI.getString("ShopHeader").length());
 //
-//                            final Shop shop = ShopLimits.fromString(p, name);
+//                            final Shop shop = ShopManager.fromString(p, name);
 //
 //                            int slot = e.getSlot();
 //
@@ -110,9 +110,9 @@ public class AddSellingItem implements Listener {
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
 
                     if (e.getCurrentItem().getItemMeta().getDisplayName() != null && e.getCurrentItem().getItemMeta().getDisplayName().equals(MainGUI.getString("AddItem"))) {

@@ -17,9 +17,9 @@ import java.util.List;
 
 /**
  * ***********************************************************************
- * Copyright me.moomaxie (c) 2014. All Rights Reserved.
+ * Copyright Max Hubbard (c) 2014. All Rights Reserved.
  * Any code contained within this document, and any associated documents with similar branding
- * are the sole property of me.moomaxie. Distribution, reproduction, taking snippets, or
+ * are the sole property of Max. Distribution, reproduction, taking snippets, or
  * claiming any contents as your own will break the terms of the license, and void any
  * agreements with you, the third party.
  * ************************************************************************
@@ -135,12 +135,20 @@ public class DisplayNameCheck {
                     }
                     lore.add(MainGUI.getString("Amount") + " §7" + it.getAmount());
                     if (!it.getLiveEco()) {
-                        lore.add(MainGUI.getString("Price") + " §7" + it.getPriceAsString());
+                        if (it.getPrice() > 0) {
+                            lore.add(MainGUI.getString("Price") + " §7" + it.getPriceAsString());
+                        } else {
+                            lore.add(MainGUI.getString("Price") + " §7" + MainGUI.getString("Free"));
+                        }
                     } else {
                         if (it.getAdjustedPrice() != it.getOrigPrice()) {
                             lore.add(MainGUI.getString("Price") + " §c§m" + it.getOrigPrice() + " §a" + it.getAdjustedPrice());
                         } else {
-                            lore.add(MainGUI.getString("Price") + " §7" + it.getPriceAsString());
+                            if (it.getPrice() > 0) {
+                                lore.add(MainGUI.getString("Price") + " §7" + it.getPriceAsString());
+                            } else {
+                                lore.add(MainGUI.getString("Price") + " §7" + MainGUI.getString("Free"));
+                            }
                         }
                     }
                     lore.add(MainGUI.getString("LeftClickToBuy"));

@@ -8,7 +8,7 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.History.HistoryGUI;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
@@ -57,9 +57,9 @@ public class ItemManager implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    Shop shop = ShopLimits.fromString(p, name);
+                    Shop shop = ShopManager.fromString(p, name);
 
                     if (shop != null) {
                         if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
@@ -184,9 +184,9 @@ public class ItemManager implements Listener {
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
                     final ItemStack ite = e.getInventory().getItem(4);
 
@@ -243,7 +243,7 @@ public class ItemManager implements Listener {
                                                         amt = bd.doubleValue();
 
                                                         if (can) {
-                                                            if (amt > 0) {
+                                                            if (amt >= 0) {
                                                                 if (amt <= Config.getMaxPrice()) {
                                                                     shopItem.setPrice(amt);
                                                                     if (shop.isHoloShop()){

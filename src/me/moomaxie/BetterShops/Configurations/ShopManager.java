@@ -22,7 +22,7 @@ import java.util.UUID;
  * agreements with you, the third party.
  * ************************************************************************
  */
-public class ShopLimits {
+public class ShopManager {
 
     private static HashMap<UUID, Integer> limit = new HashMap<UUID, Integer>();
     public static List<Shop> shops = new ArrayList<>();

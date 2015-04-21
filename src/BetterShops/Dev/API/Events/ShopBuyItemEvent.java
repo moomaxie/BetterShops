@@ -21,8 +21,9 @@ public class ShopBuyItemEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private Shop shop;
     private ShopItem item;
+    private OfflinePlayer buyer;
 
-    public ShopBuyItemEvent(ShopItem item, Shop shop) {
+    public ShopBuyItemEvent(ShopItem item, Shop shop,OfflinePlayer buyer) {
         this.shop = shop;
         this.item = item;
     }
@@ -33,6 +34,10 @@ public class ShopBuyItemEvent extends Event {
 
     public ShopItem getItem(){
         return item;
+    }
+
+    public OfflinePlayer getCustomer(){
+        return buyer;
     }
 
     public OfflinePlayer getOwner(){

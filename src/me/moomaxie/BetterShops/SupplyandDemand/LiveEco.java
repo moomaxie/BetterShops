@@ -7,7 +7,7 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.LiveEconomy;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.SearchEngine;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.Listeners.Misc.ChatMessages;
 import me.moomaxie.BetterShops.Shops.Shop;
@@ -163,9 +163,9 @@ public class LiveEco implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
                     if (shop != null) {
                         if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {

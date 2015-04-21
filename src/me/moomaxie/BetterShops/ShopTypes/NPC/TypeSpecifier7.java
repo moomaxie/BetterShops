@@ -3,7 +3,7 @@ package me.moomaxie.BetterShops.ShopTypes.NPC;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.Checkout;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Listeners.ManagerOptions.ShopSettings;
 import me.moomaxie.BetterShops.Shops.Shop;
 import org.bukkit.Bukkit;
@@ -575,9 +575,9 @@ public class TypeSpecifier7 implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    Shop shop = ShopLimits.fromString(name);
+                    Shop shop = ShopManager.fromString(name);
 
                     if (e.getInventory().getItem(4) != null && e.getInventory().getItem(4).getType() == Material.MONSTER_EGG && e.getInventory().getItem(53) != null && e.getInventory().getItem(53).getItemMeta().getDisplayName() != null && e.getInventory().getItem(53).getItemMeta().getDisplayName().equals(Checkout.getString("Confirm")) && e.getInventory().getItem(53).getType() == Material.CHEST) {
 

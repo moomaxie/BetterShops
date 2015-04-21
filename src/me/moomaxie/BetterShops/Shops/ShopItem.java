@@ -65,8 +65,14 @@ public class ShopItem {
         this.data = item.getData().getData();
         this.durability = item.getDurability();
 
-//        setAmountTo(calculateAmountTo());
+
         origAdjustedPrice = getPrice();
+
+        if (!getLiveEco()){
+            setAdjustedPrice(getPrice());
+        } else {
+            calculateAmountTo();
+        }
 
     }
 
@@ -165,9 +171,6 @@ public class ShopItem {
 
     public void setData(byte data) {
         this.data = data;
-//        MaterialData d = item.getData();
-//        d.setData(data);
-//        item.setData(d);
 
         item = new ItemStack(item.getType(),1,data);
         ItemMeta meta = item.getItemMeta();
@@ -208,6 +211,7 @@ public class ShopItem {
         manager.setPrice(price);
 
         if (!getLiveEco()) {
+            setAdjustedPrice(price);
             setOrigPrice(price);
         }
     }
@@ -232,7 +236,7 @@ public class ShopItem {
     }
 
     public double calculateAmountTo() {
-        amountTo = priceChangePercent / amountToDouble;
+        amountTo = getPriceChangePercent() * getAmountToDouble();
         return amountTo;
     }
 
@@ -264,7 +268,7 @@ public class ShopItem {
     }
 
     public void calculatePriceChangePercent() {
-        priceChangePercent = getAdjustedPrice() / getOrigPrice();
+        priceChangePercent = getPrice() / getOrigPrice();
         manager.setPriceChangePercent(priceChangePercent);
     }
 
@@ -345,15 +349,15 @@ public class ShopItem {
     }
 
     public void calculatePrice() {
-        double p = getOrigPrice() * getPriceChangePercent();
+        double p = getOrigPrice() + (getOrigPrice() * (getPriceChangePercent() / 100));
 
-        if (getAdjustedPrice() + p < minPrice) {
+        if (p < minPrice) {
             setAdjustedPrice(minPrice);
-        } else if (getAdjustedPrice() + p > maxPrice) {
+        } else if (p > maxPrice) {
             setAdjustedPrice(maxPrice);
         } else {
 
-            setAdjustedPrice(getAdjustedPrice() + p);
+            setAdjustedPrice(p);
         }
     }
 

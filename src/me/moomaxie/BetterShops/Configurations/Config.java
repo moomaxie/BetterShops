@@ -452,7 +452,7 @@ public class Config {
             try {
                 jar = new java.util.jar.JarFile(fil);
             } catch (IOException e) {
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cImproper Jar Name, Rename the .Jar to 'BetterShops.jar'. Plugin Disabling!");
+                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cCan't find the jar file, Rename the .Jar to 'BetterShops.jar'. Plugin Disabling!");
                 Bukkit.getPluginManager().disablePlugin(Core.getCore());
             }
             java.util.Enumeration enumEntries = jar.entries();

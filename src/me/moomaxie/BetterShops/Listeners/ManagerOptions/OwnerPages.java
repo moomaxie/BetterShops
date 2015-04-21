@@ -1,7 +1,7 @@
 package me.moomaxie.BetterShops.Listeners.ManagerOptions;
 
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Listeners.BuyerOptions.OpenShop;
 import me.moomaxie.BetterShops.Listeners.LayoutArrangement.ShopRearranger;
 import me.moomaxie.BetterShops.Listeners.OpenShopOptions;
@@ -52,9 +52,9 @@ public class OwnerPages implements Listener {
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
 
                     if (e.getInventory().getItem(13) != null && e.getInventory().getItem(13).getItemMeta() != null && e.getInventory().getItem(13).getItemMeta().getDisplayName() != null && e.getInventory().getItem(13).getItemMeta().getDisplayName().contains(MainGUI.getString("Page"))) {

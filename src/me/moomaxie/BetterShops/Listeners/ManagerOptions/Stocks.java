@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -73,69 +74,13 @@ public class Stocks {
 
     public static void addStock(ShopItem ite, int orig, Player p, Shop shop) {
 
-        int o = orig;
-
         if (orig > 0) {
 
-            int amt = 0;
-
-            for (int i = 1; i < ite.getItem().getMaxStackSize() + 1; i++) {
-
-                ite.setAmount(i);
-
-                for (ItemStack it : p.getInventory().all(ite.getItem()).values()) {
-                    amt = amt + it.getAmount();
-                }
-            }
-
-            ite.setAmount(1);
+            int amt = getNumberInInventory(ite.getItem(), p, shop);
 
             if (amt >= orig) {
 
-                if (o > 0) {
-                    for (int i = 0; i < p.getInventory().getSize(); i++) {
-                        ItemStack it = p.getInventory().getItem(i);
-
-                        if (it != null) {
-
-                            if (o > 0) {
-
-                                int u = it.getAmount();
-
-                                it.setAmount(1);
-
-
-                                if (it.equals(ite.getItem()) || it.toString().equals(ite.getItem().toString()) && it.getData().getData() == ite.getData() && it.getDurability() == ite.getDurability()) {
-
-                                    it.setAmount(u);
-
-                                    if (it.getAmount() > o) {
-                                        if (o > 0) {
-                                            int y = o;
-                                            o = o - it.getAmount();
-                                            it.setAmount(it.getAmount() - y);
-                                        } else {
-                                            break;
-                                        }
-                                    } else if (it.getAmount() <= o) {
-                                        if (o > 0) {
-                                            o = o - it.getAmount();
-
-                                            p.getInventory().setItem(i, new ItemStack(Material.AIR));
-                                        } else {
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    it.setAmount(u);
-                                }
-
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                }
+                removeItemsFromInventory(ite, p, shop, orig);
 
             } else {
                 p.sendMessage(Messages.getString("Prefix") + Messages.getString("NotEnoughItems"));
@@ -153,32 +98,13 @@ public class Stocks {
 
     public static void removeStock(ShopItem ite, int orig, Player p, Shop shop) {
 
-        int o = orig;
-
         if (shop.getOwner().getUniqueId().equals(p.getUniqueId())) {
 
             if (orig > 0) {
 
                 if (ite.getStock() >= orig) {
 
-                    int stacks = orig / ite.getItem().getMaxStackSize();
-
-                    for (int i = 0; i < stacks; i++) {
-                        o = o - ite.getItem().getMaxStackSize();
-
-                        ItemStack it = ite.getItem().clone();
-
-                        it.setAmount(ite.getItem().getMaxStackSize());
-
-                        p.getInventory().addItem(it);
-                    }
-
-                    if (o > 0) {
-                        ItemStack it = ite.getItem().clone();
-
-                        it.setAmount(o);
-                        p.getInventory().addItem(it);
-                    }
+                    addItemsToInventory(ite,p,orig);
 
                 } else {
                     p.sendMessage(Messages.getString("Prefix") + Messages.getString("LowStock"));
@@ -257,7 +183,7 @@ public class Stocks {
         }
     }
 
-    public static void throwItemsOnGround(ShopItem ite){
+    public static void throwItemsOnGround(ShopItem ite) {
         int amt = ite.getStock();
 
         int stacks = amt / ite.getItem().getMaxStackSize();
@@ -271,7 +197,7 @@ public class Stocks {
                 it.setAmount(ite.getItem().getMaxStackSize());
 
 
-                ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(),it);
+                ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(), it);
             }
         }
 
@@ -280,7 +206,7 @@ public class Stocks {
 
             it.setAmount(amt);
 
-            ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(),it);
+            ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(), it);
 
         }
     }
@@ -347,6 +273,42 @@ public class Stocks {
         ite.setAmount(a);
 
         return amt;
+    }
+
+    public static void addItemsToInventory(ShopItem ite, Player p, int amt) {
+        int stacks = amt / ite.getItem().getMaxStackSize();
+
+        if (stacks > 0) {
+            for (int i = 0; i < stacks; i++) {
+                amt = amt - ite.getItem().getMaxStackSize();
+
+                ItemStack it = ite.getItem().clone();
+
+                it.setAmount(ite.getItem().getMaxStackSize());
+
+                if (p.getInventory().firstEmpty() != -1) {
+
+                    p.getInventory().addItem(it);
+                } else {
+                    p.getLocation().getWorld().dropItem(p.getLocation(), it);
+                }
+            }
+        }
+
+        if (amt > 0) {
+            ItemStack it = ite.getItem().clone();
+
+            it.setAmount(amt);
+
+            HashMap<Integer, ItemStack> carl = p.getInventory().addItem(it);
+
+            if (carl.size() > 0) {
+                for (ItemStack item : carl.values()) {
+                    p.getLocation().getWorld().dropItem(p.getLocation(), item);
+                }
+            }
+
+        }
     }
 
     public static void removeItemsFromInventory(ShopItem ite, Player p, Shop shop, int orig) {

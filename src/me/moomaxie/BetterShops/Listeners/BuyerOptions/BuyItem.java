@@ -7,8 +7,9 @@ import me.moomaxie.BetterShops.Configurations.GUIMessages.ItemTexts;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
 import me.moomaxie.BetterShops.Configurations.Messages;
 import me.moomaxie.BetterShops.Configurations.Permissions.Permissions;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
+import me.moomaxie.BetterShops.Listeners.ManagerOptions.Stocks;
 import me.moomaxie.BetterShops.Listeners.SellerOptions.SellItem;
 import me.moomaxie.BetterShops.ShopTypes.Holographic.ShopHologram;
 import me.moomaxie.BetterShops.Shops.Shop;
@@ -51,9 +52,9 @@ public class BuyItem implements Listener {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
 
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    Shop shop = ShopLimits.fromString(p, name);
+                    Shop shop = ShopManager.fromString(p, name);
 
                     if (shop.getOwner() != p || shop.isServerShop()) {
 
@@ -233,9 +234,9 @@ public class BuyItem implements Listener {
             if (e.getInventory().getType() == InventoryType.CHEST) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
                     String name = e.getInventory().getName();
-                    name = name.substring(11);
+                    name = name.substring(MainGUI.getString("ShopHeader").length());
 
-                    final Shop shop = ShopLimits.fromString(p, name);
+                    final Shop shop = ShopManager.fromString(p, name);
 
                     ShopItem shopItem = ShopItem.fromItemStack(shop, e.getInventory().getItem(4), false);
 
@@ -288,87 +289,101 @@ public class BuyItem implements Listener {
 
                             double price = shopItem.getPrice();
 
+                            boolean c = true;
 
-                            if (!shop.isServerShop()) {
-                                if (shopItem.getStock() > 0) {
-                                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
-                                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), price);
+                            if (Config.usePerms()) {
+                                if (!Permissions.hasBuyItemPerm(p,shopItem.getMaterial())){
+                                    c = false;
+                                }
+                            }
 
-                                    if (shop.isNotify()) {
-                                        if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                            shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
-                                            shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + price));
+                            if (c) {
 
-                                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+                                if (!shop.isServerShop()) {
+                                    if (shopItem.getStock() > 0) {
+                                        Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
+                                        Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), price);
 
-                                                Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                                Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
-                                                Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + price));
+                                        if (shop.isNotify()) {
+                                            if (shop.getOwner() != null && shop.getOwner().isOnline()) {
+                                                shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                shop.getOwner().getPlayer().sendMessage(Messages.getString("Prefix") + Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + price));
+
+                                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+
+                                                    Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
+                                                    Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Messages.getString("NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                    Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Messages.getString("ReceivedAmount").replaceAll("<Amount>", "" + price));
 
 
+                                                }
                                             }
                                         }
+                                    } else {
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("LowStock"));
+                                        OpenShop.openShopItems(e.getInventory(), p, shop, shopItem.getPage());
+                                        return;
                                     }
                                 } else {
-                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("LowStock"));
-                                    OpenShop.openShopItems(e.getInventory(), p, shop, shopItem.getPage());
-                                    return;
+                                    if (shopItem.getStock() > 0) {
+                                        Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
+                                    } else {
+                                        p.sendMessage(Messages.getString("Prefix") + Messages.getString("LowStock"));
+                                        OpenShop.openShopItems(e.getInventory(), p, shop, shopItem.getPage());
+                                        return;
+                                    }
+                                }
+
+                                int amt = shopItem.getAmount();
+
+                                ItemMeta meta = item.getItemMeta();
+
+                                meta.setLore(shopItem.getLore());
+                                item.setItemMeta(meta);
+
+                                item.setAmount(amt);
+
+//                            p.getInventory().addItem(item);
+                                Stocks.addItemsToInventory(shopItem, p, amt);
+
+                                if (!shopItem.isInfinite())
+                                    shopItem.setStock(shopItem.getStock() - amt);
+
+                                OpenShop.openShopItems(null, p, shop, shopItem.getPage());
+
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("BuyItem"));
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + price));
+
+
+                                if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
+
+
+                                    Core.getTitleManager().setTimes(p, 20, 60, 20);
+                                    Core.getTitleManager().sendTitle(p, Messages.getString("BuyItem"));
+                                    Core.getTitleManager().sendSubTitle(p, Messages.getString("TakenAmount").replaceAll("<Amount>", "" + price));
+
+                                    p.closeInventory();
+                                }
+
+                                if (shop.getHistory() == null) {
+                                    shop.loadTransactions();
+                                }
+
+                                shop.getHistory().addTransaction(p, new Date(), shopItem, price, amt, false, true);
+
+                                ShopBuyItemEvent ev = new ShopBuyItemEvent(shopItem, shop, p);
+
+                                Bukkit.getPluginManager().callEvent(ev);
+
+                                if (shopItem.getLiveEco()) {
+                                    shopItem.setAmountTo(shopItem.getAmountTo() + 1);
+                                }
+                                if (shop.isHoloShop()) {
+                                    ShopHologram holo = shop.getHolographicShop();
+                                    holo.updateItemLines(holo.getItemLine(), false);
                                 }
                             } else {
-                                if (shopItem.getStock() > 0) {
-                                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
-                                } else {
-                                    p.sendMessage(Messages.getString("Prefix") + Messages.getString("LowStock"));
-                                    OpenShop.openShopItems(e.getInventory(), p, shop, shopItem.getPage());
-                                    return;
-                                }
-                            }
-
-                            int amt = shopItem.getAmount();
-
-                            ItemMeta meta = item.getItemMeta();
-
-                            meta.setLore(shopItem.getLore());
-                            item.setItemMeta(meta);
-
-                            item.setAmount(amt);
-
-                            p.getInventory().addItem(item);
-
-                            shopItem.setStock(shopItem.getStock() - amt);
-
-                            OpenShop.openShopItems(null, p, shop, shopItem.getPage());
-
-                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("BuyItem"));
-                            p.sendMessage(Messages.getString("Prefix") + Messages.getString("TakenAmount").replaceAll("<Amount>", "" + price));
-
-
-                            if (Core.isAboveEight() && Config.useTitles() && Core.getTitleManager() != null) {
-
-
-                                Core.getTitleManager().setTimes(p, 20, 60, 20);
-                                Core.getTitleManager().sendTitle(p, Messages.getString("BuyItem"));
-                                Core.getTitleManager().sendSubTitle(p, Messages.getString("TakenAmount").replaceAll("<Amount>", "" + price));
-
-                                p.closeInventory();
-                            }
-
-                            if (shop.getHistory() == null) {
-                                shop.loadTransactions();
-                            }
-
-                            shop.getHistory().addTransaction(p, new Date(), shopItem, price, amt, false, true);
-
-                            ShopBuyItemEvent ev = new ShopBuyItemEvent(shopItem, shop);
-
-                            Bukkit.getPluginManager().callEvent(ev);
-
-                            if (shopItem.getLiveEco()) {
-                                shopItem.setAmountTo(shopItem.getAmountTo() + 1);
-                            }
-                            if (shop.isHoloShop()) {
-                                ShopHologram holo = shop.getHolographicShop();
-                                holo.updateItemLines(holo.getItemLine(), false);
+                                p.sendMessage(Messages.getString("Prefix") + Messages.getString("NoPermission"));
                             }
                         }
                     }

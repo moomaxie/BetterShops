@@ -4,7 +4,7 @@ import me.moomaxie.BetterShops.Configurations.Config;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.Checkout;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.ItemTexts;
 import me.moomaxie.BetterShops.Configurations.GUIMessages.MainGUI;
-import me.moomaxie.BetterShops.Configurations.ShopLimits;
+import me.moomaxie.BetterShops.Configurations.ShopManager;
 import me.moomaxie.BetterShops.Core;
 import me.moomaxie.BetterShops.History.History;
 import me.moomaxie.BetterShops.History.Transaction;
@@ -50,72 +50,6 @@ public class Shop {
 
     public boolean transLoaded = false;
 
-
-    /**
-     * @param owner    - the owner of the shop
-     * @param shopName - The name of the shop
-     */
-
-    @Deprecated
-    public Shop(Player owner, String shopName) {
-        name = shopName;
-
-        if (name != null) {
-            File file = new File(Core.getCore().getDataFolder(), "Shops");
-
-            if (file == null) {
-                file.mkdir();
-            }
-
-            if (file.listFiles() != null) {
-
-                for (File f : file.listFiles()) {
-                    if (f.getName().contains(".yml")) {
-                        YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
-
-                        if (config != null) {
-
-
-                            for (String s : config.getKeys(false)) {
-                                if (name.equals(s)) {
-                                    s = s + ".Location";
-                                    if (s.contains("Location")) {
-                                        String c = config.getString(s);
-
-                                        if (c != null) {
-
-                                            String[] locs = c.split(" ");
-
-                                            World w = Bukkit.getWorld(locs[0]);
-
-                                            double x = Double.parseDouble(locs[1]);
-                                            double y = Double.parseDouble(locs[2]);
-                                            double z = Double.parseDouble(locs[3]);
-
-                                            p = Bukkit.getOfflinePlayer(UUID.fromString(config.getConfigurationSection(name).getString("Owner")));
-
-                                            l = new Location(w, x, y, z);
-
-                                            this.config = config;
-
-                                            this.file = f;
-
-                                            loadShopItems();
-                                            history = new History(this);
-                                            loadTransactions();
-
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public Shop(String name, YamlConfiguration config, File file) {
         this.config = config;
         this.name = name;
@@ -140,126 +74,6 @@ public class Shop {
         loadTransactions();
     }
 
-    /**
-     * @param shopName - The name of the shop
-     */
-    public Shop(String shopName) {
-        name = shopName;
-
-        if (name != null) {
-            File file = new File(Core.getCore().getDataFolder(), "Shops");
-
-            if (file == null) {
-                file.mkdir();
-            }
-
-            if (file.listFiles() != null) {
-
-                for (File f : file.listFiles()) {
-                    if (f.getName().contains(".yml")) {
-                        YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
-
-                        if (config != null) {
-
-
-                            for (String s : config.getKeys(false)) {
-                                if (name.equals(s)) {
-                                    s = s + ".Location";
-                                    if (s.contains("Location")) {
-                                        String c = config.getString(s);
-
-                                        if (c != null) {
-
-                                            String[] locs = c.split(" ");
-
-                                            World w = Bukkit.getWorld(locs[0]);
-
-                                            double x = Double.parseDouble(locs[1]);
-                                            double y = Double.parseDouble(locs[2]);
-                                            double z = Double.parseDouble(locs[3]);
-
-                                            p = Bukkit.getOfflinePlayer(UUID.fromString(config.getConfigurationSection(name).getString("Owner")));
-
-                                            l = new Location(w, x, y, z);
-
-                                            this.config = config;
-
-                                            this.file = f;
-
-                                            loadShopItems();
-                                            history = new History(this);
-                                            loadTransactions();
-
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param loc - the location of the shop (where the chest is)
-     */
-    public Shop(Location loc) {
-
-        File file = new File(Core.getCore().getDataFolder(), "Shops");
-
-        if (file == null) {
-            file.mkdir();
-        }
-
-        if (file.listFiles() != null) {
-
-            for (File f : file.listFiles()) {
-                if (f.getName().contains(".yml")) {
-                    YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
-
-                    for (String s : config.getKeys(true)) {
-                        if (s.contains("Location")) {
-                            String c = config.getString(s);
-
-                            String[] locs = c.split(" ");
-
-                            World w = Bukkit.getWorld(locs[0]);
-
-                            double x = Double.parseDouble(locs[1]);
-                            double y = Double.parseDouble(locs[2]);
-                            double z = Double.parseDouble(locs[3]);
-
-                            if (w != null) {
-
-                                if (loc.getWorld().getName().equals(w.getName())) {
-                                    if (loc.getX() == x && loc.getY() == y && loc.getZ() == z) {
-                                        l = loc;
-
-                                        String n = s.substring(0, s.length() - 9);
-
-                                        this.file = f;
-
-                                        name = n;
-
-                                        this.config = config;
-
-                                        p = Bukkit.getOfflinePlayer(UUID.fromString(config.getString(name + ".Owner")));
-
-                                        loadShopItems();
-                                        history = new History(this);
-                                        loadTransactions();
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * @return name - the name of the shop
@@ -1395,7 +1209,7 @@ public class Shop {
      */
 
     public static boolean isShopOwner(Player pl, Location chestLocation) {
-        Shop shop = ShopLimits.fromLocation(chestLocation);
+        Shop shop = ShopManager.fromLocation(chestLocation);
 
         boolean owner = false;
 
@@ -1411,7 +1225,7 @@ public class Shop {
     }
 
     public static boolean isShopOwner(Player pl, String name) {
-        Shop shop = ShopLimits.fromString(name);
+        Shop shop = ShopManager.fromString(name);
 
         boolean owner = false;
 
