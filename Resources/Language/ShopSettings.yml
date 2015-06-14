@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 
-Version: 1.6.1
+Version: 2.0
 
 NotificationsOn: '&a&lNotifications &7- &aOn'
 NotificationsOff: '&a&lNotifications &7- &cOff'
@@ -15,6 +15,15 @@ NotificationsLore: '&e&lLeft Click &7to change shop &dNotifications'
 
 ChangeDescription: '&a&lChange Description'
 ChangeDescriptionLore: '&e&lLeft Click &7to change shop &dDescription'
+
+ChangeName: '&a&lChange Name'
+ChangeNameLore: '&e&lLeft Click &7to change shop &dName'
+
+ChangeOwner: '&a&lChange Owner'
+ChangeOwnerLore: '&e&lLeft Click &7to change shop &dOwner'
+
+Blacklist: '&a&lPlayer Blacklist'
+BlacklistLore: '&e&lLeft Click &7to manage &aPlayer Blacklist'
 
 ServerShopOn: '&a&lServer Shop &7- &aOn'
 ServerShopOff: '&a&lServer Shop &7- &cOff'
@@ -29,3 +38,5 @@ NPCLore: '&e&lLeft Click &7to change &dNPC Shop Mode'
 HolographicOn: '&a&lHolographic Shop &7- &aOn'
 HolographicOff: '&a&lHolographic Shop &7- &cOff'
 HolographicLore: '&e&lLeft Click &7to change &dHolographic Shop Mode'
+
+Theme: '&e&lClick &7to set the Shop &aTheme'

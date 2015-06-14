@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.6.1
+Version: 2.0
 
 BabyOn: '&eBaby &7- &aON'
 BabyOff: '&eBaby &7- &cOFF'
@@ -20,6 +20,7 @@ VillagerOff: '&eVillager &7- &cOFF'
 
 Toggle: '&eClick &7to toggle'
 Choose: '&eClick &7to choose'
+Change: '&eClick &7to change player'
 
 SkeletonType: '&eSkeleton Type:'
 OcelotType: '&eOcelot Type:'
@@ -30,3 +31,4 @@ Color: '&eColor:'
 DyeColor: '&eDye Color:'
 Profession: '&eProfession:'
 Size: '&eSize:'
+Player: '&ePlayer:'

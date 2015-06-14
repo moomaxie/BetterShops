@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.6.1
+Version: 2.0
 
 SearchBuyItems: '&a&lSearch Buying Items'
 SearchSellItems: '&a&lSearch Selling Items'
@@ -35,3 +35,5 @@ NewData: 'New Data'
 EnterName: 'Enter Name'
 ItemName: 'Type Item or id'
 NewDescription: 'Type Description'
+
+Name: 'Type Name/Amount'

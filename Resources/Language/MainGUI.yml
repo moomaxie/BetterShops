@@ -7,9 +7,11 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 1.6.1
+Version: 2.0
 
 ShopCreate: '[Shop]'
+SignShopBuy: '[Buy]'
+SignShopSell: '[Sell]'
 ShopHeader: '&7[Shop] &a'
 
 ShopInfoDisplayNameOpen: '&a&lOPEN'
@@ -78,5 +80,13 @@ SignLine3Open: '&aOpen'
 SignLine3Closed: '&cClosed'
 SignLine4: '&b&k**************'
 
+SignShopLine1Buy: '[Buy]'
+SignShopLine1Sell: '[Sell]'
+SignShopLine2: '<Item>'
+SignShopLine3: '&9<Price>'
+SignShopLine4: '&9<Amount>'
+
 NoDescription: 'No Description'
 Free: 'Free'
+
+EditLore: '&e&lShift Click &7to &aEdit &7this shop'

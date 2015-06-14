@@ -1,15 +1,12 @@
 name: BetterShops
-main: me.moomaxie.BetterShops.Core
-version: 1.6.1
+main: max.hubbard.bettershops.Core
+version: 2.0
 author: moomaxie
 softdepend: [WorldGuard, Vault, HolographicDisplays]
 description: >
              Better Shops Plugin
 commands:
-   sremove:
-      description: Automatically Removes a Shop
-      usage: /<command> [Shop Name]
-   bs:
+   BS:
       description: The Main BetterShops command
       usage: /<command>
 
@@ -18,8 +15,6 @@ permissions:
         description: Gives access to all BetterShops Features
         children:
             bettershops.shop.create: true
-            bettershops.shop.buy: true
-            bettershops.shop.sell: true
             bettershops.shop.limit: true
             bettershops.shop.infinite: true
             bettershops.shop.owneruse: true
@@ -30,10 +25,12 @@ permissions:
             bettershops.shop.holograms: true
             bettershops.shop.arrange: true
             bettershops.shop.blacklist: true
+            bettershops.shop.playerblacklist: true
             bettershops.npc.*: true
             bettershops.command.*: true
             bettershops.buy.*: true
             bettershops.sell.*: true
+            bettershops.edit.*: true
     bettershops.shop.create:
         description: Allows you to create shops
         default: true
@@ -73,12 +70,18 @@ permissions:
     bettershops.shop.blacklist:
         description: Allows ability to bypass the blacklist
         default: op
+    bettershops.shop.playerblacklist:
+        description: Allows ability to use the player blacklist
+        default: true
     bettershops.buy.*:
         description: Access to buy all items
-        default: op
+        default: true
     bettershops.sell.*:
         description: Access to sell all items
-        default: op
+        default: true
+    bettershops.edit.*:
+        description: Allows ability to edit all shops
+        default: false
     bettershops.command.*:
         description: Access to all BetterShops Commands
         default: op
@@ -104,7 +107,7 @@ permissions:
         default: op
     bettershops.command.list:
         description: Allows ability to use the /bs list <Player> command
-        default: op
+        default: true
     bettershops.command.remove:
         description: Allows ability to use the /bs remove <Shop> command
         default: true

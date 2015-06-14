@@ -1,0 +1,193 @@
+#
+#                 Better Shop's Messages File
+#
+#        You Are Free To Change The Messages To Your Liking
+#
+#                Use a "&" To Signify a Color
+#
+#     Lines starting with # are comments and will be ignored.
+#
+
+Version: 2.0
+
+Prefix: '&b&lBetterShops &7&l» &d'
+
+OpenShop: '&eOpening Shop..'
+
+CreateShop: '&aShop Created!'
+
+DeleteShop: '&aShop Removed!'
+
+DenyDeleteShop: '&cCannot Remove Shop!'
+
+AddItem: '&aAdding Item To Shop.'
+
+RemoveItem: '&aRemoving Item From Shop.'
+
+BuyItem: '&aSuccessfully Bought Item.'
+
+SellItem: '&aSuccessfully Sold Item.'
+
+# <Player> is the name of the player who used the shop
+NotifySell: '&e<Player> &dSold an Item to you!'
+
+NotifyBuy: '&e<Player> &dBought an item from your shop!'
+
+ShopFull: '&eThe Shop is &cFull.'
+
+AlreadyHave: '&cYou are already asking for this item!'
+
+InvalidItem: '&cCannot find an item that matches.'
+
+ImproperSearch: '&cYou are not searching for that item.'
+
+ChangeStock: '&aChanged Stock.'
+
+ChangeAmount: '&aChanged Amount.'
+
+ChangePrice: '&aChanged Price.'
+
+ChangeData: '&aChanged Data.'
+
+LowStock: '&cStock is not high enough.'
+
+# <Value> is the value of infinite stock (On/Off)
+InfiniteStock: '&dTurned &e<Value> &dInfinite Stock.'
+
+NotEnoughItems: '&cNot enough items for that stock.'
+
+NotEnough: '&cNot enough items.'
+
+DenyKeeper: '&cShop Keepers Cannot Withdraw Items!'
+
+InvalidNumber: '&cNot a number.'
+
+NoPermission: '&cNot Enough Permissions.'
+
+ReceivedAmount: '&dYou have gained &e<Amount> &dDollars.'
+
+TakenAmount: '&e<Amount> &dDollars has been taken from your account.'
+
+ServerShop: '&dTurned &e<Value> &dServer Shop Mode.'
+
+NPCShop: '&dTurned &e<Value> &dNPC Shop Mode.'
+
+ChatMessage: '&aType a Name/Amount in your chat. Type &cCancel &ato cancel.'
+
+CreationCostDeny: '&cNot enough money to create a shop. Required: &e$<Amount>&c.'
+
+CreationCostAllow: '&aRemoved &e$<Amount> &ato create the shop.'
+
+WorldGuardDenyShop: '&cCannot create a shop in this protected area.'
+
+WorldGuardDenyNPC: '&cCannot create an NPC shop in this protected area.'
+
+FakeShop: '&cThis shop does not exist!'
+
+AddMore: '&aYou can add more of an item by going into the item settings!'
+
+ShopClosed: '&eShop Is &cClosed'
+
+Sorry: '&cSorry'
+
+LocationTaken: '&cA shop at this location already exists'
+
+CreationCancelled: '&cShop creation cancelled'
+
+Error: '&4Error'
+
+ImproperName: '&cNot an acceptable name.'
+
+NameTaken: '&cName Already Exists'
+
+LongName: '&cName is Too Long &7(Max: 16 Characters)'
+
+SignRemoved: '&cThe sign has been removed. Please recreate the shop.'
+
+MustBeAttached: '&cMust be attached to a chest!'
+
+CannotPlace: '&cCannot place a chest next to a shop.'
+
+NoOwner: '&cThis Shop has no Owner!'
+
+NonExistingItem: '&cNon-Existing Item'
+
+HighAmount: '&cMust be between 0 and 2034'
+
+Zero: '&cMust be greater than 0'
+
+HighPrice: '&cThat price is too high'
+
+Cancelled: '&cCanceled'
+
+ChangeDescription: '&aChanged Shop Description!'
+
+LongDescription: '&cThat description is too long.'
+
+ShopOption: '&aYour Shop is now &e<Value>'
+
+AlreadyAKeeper: '&cAlready a shop keeper'
+
+OutOfStock: '&cRan out of stock for &d'
+
+ImproperDescription: '&cNot an acceptable description. &7(Max: 26 Characters)'
+
+AddedKeeper: '&aAdded shop keeper'
+
+AddedPlayer: '&aAdded player.'
+
+InvalidKeeper: '&cNot a valid player or this player has not logged on to this server before.'
+
+RemovedPlayer: '&aRemoved player.'
+
+CannotAfford: '&cCould Not Afford &d'
+
+CanOnlyBuy: '&cCan only buy &e'
+
+PriceChange: '&cThe price of &e<Item> has just been changed. You have exited the shop to avoid fraud.'
+
+Fraud: '&cThe price of this item has just been changed. You have exited the shop to avoid fraud.'
+
+ClearHistoryLimit: '&cPlease wait until more transactions occur in order to Clear History.'
+
+Blacklist: '&cYou are prohibited from adding this item'
+
+TooFew: '&cYour shop needs to contain at least 1 item'
+
+InvalidShop: '&cThis shop either does not exist or something went wrong...'
+
+Updated: '&aUpdated the plugin from an Outside Source'
+
+ChangeLimit: '&aChanged the Selling Limit'
+
+SellLimit: '&aOnly able to sell &e<Amount>'
+
+LimitReached: '&cThe sell limit for this item has been reached'
+
+NoPermissionItem: '&cYou do not have permission to buy/sell &e<Item>'
+
+ChangeName: '&aChanged name!'
+
+ChangeOwner: '&aChanged Owner!'
+
+AtLimit: '&cThis player is at their limit for shops!'
+
+InvalidPrice: '&cYou must supply a proper price'
+
+InvalidAmount: '&cYou must supply a proper amount'
+
+NoMoney: '&cNot enough money'
+
+NoRoom: '&cNot enough space in chest'
+
+AlreadyTraded: '&cTrade has already occurred.'
+
+OwnerMoney: '&cOwner does not have enough money.'
+
+Trade: '&aSuccessfully traded items.'
+
+NotAllowed: '&cYou are not allowed to use this shop.'
+
+HighStock: '&cCannot add any more stock to this item.'
+
+StopStock: '&cSome stock was not added because the limit was reached.'

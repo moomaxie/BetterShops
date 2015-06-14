@@ -1,0 +1,21 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Player Blacklist" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+#
+Version: 2.0
+
+Add: '&a&lAdd Player'
+AddLore: '&e&lLeft Click &7to &aAdd &7a &dPlayer'
+
+Remove: '&c&lRemove Player'
+RemoveLore: '&e&lLeft Click &7to &cRemove &7a &dPlayer'
+
+Blacklist: '&a&lPlayer Blacklist'
+BlacklistLore: '&dThese players will not be allowed to use the shop'
+
+ClickRemove: '&e&lLeft Click &7to &cRemove Player'

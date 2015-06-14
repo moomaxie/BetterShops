@@ -6,7 +6,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 1.6.1
+Version: 2.0
 
 ####  General  ####
 
@@ -48,6 +48,12 @@ UseOnClose: False
 # Enables Transactions to be visible to the shop owners (May cause startup lag if enabled)
 UseTransactions: True
 
+# All stock for a selling item goes to a buying item if it exists
+SellToBuy: True
+
+# Limits the amount of stock a player can have (0 = infinite)
+StockLimit: 0
+
 ####  Shop Creation  ####
 
 # Enable Shop Creation Limits (True/False)
@@ -70,16 +76,23 @@ EnableNPC: True
 
 # The Type of NPC that a shop can use
 NPC:
-  Villager: true
+  Bat: true
+  Blaze: true
   Cave Spider: true
   Chicken: true
   Cow: true
+  Creeper: true
+  Enderman: true
   Endermite: true
+  Ghast: true
+  Giant: true
+  Guardian: true
   Horse: true
   Iron Golem: true
   Magma Cube: true
   Mushroom Cow: true
   Ocelot: true
+  Player: true
   Pig: true
   Pig Zombie: true
   Rabbit: true
@@ -90,6 +103,9 @@ NPC:
   Snowman: true
   Spider: true
   Squid: true
+  Villager: true
+  Witch: true
+  Wither: true
   Wolf: true
   Zombie: true
 
@@ -111,3 +127,10 @@ HoloShops: True
 # Enables the ability to use Live Economy
 UseLiveEco: True
 
+####  Databases  ####
+SQL: False
+host: 'localhost'
+port: 3306
+username: 'root'
+password: ''
+database: 'bettershops'

@@ -1,0 +1,38 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Trading" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+
+Version: 2.0
+
+Trades: '&e&lTrading'
+TradesLore: '&e&lLeft Click &7a &aTrade &7to manage'
+ViewLore: '&e&lLeft Click &7a &aTrade &7to view'
+
+OpenTrades: '&e&lLeft Click &7to manage &aTrades'
+ViewTrades: '&e&lLeft Click &7to view &aTrades'
+
+AddTrade: '&aAdd Trade'
+AddLore: '&e&lClick &7to create a &aTrade'
+
+TradeId: '&dTrade id: &7'
+
+Delete: '&cDelete Trade'
+
+AddRecItem: '&eAdd Receiving Item'
+
+YourMoney: '&eTrade Money: &7<Amount>'
+TheirMoney: '&eReceiving Money: &7<Amount>'
+
+AddAmount: '&eTrade Offer: &7$<Amount>'
+RecAmount: '&eReceive Offer: &7$<Amount>'
+AddLore: '&e&lLeft Click &7to add'
+RemoveLore: '&e&lRight Click &7to remove'
+ClearLore: '&e&lShift Click &7to clear'
+
+Confirm: '&aConfirm Trade'
+Collect: '&e&lClick &7 to collect Items'
