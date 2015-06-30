@@ -54,22 +54,43 @@ public class FileShop implements Shop {
         this.file = file;
         this.owner = owner;
 
+        final FileShop s = this;
+
         String[] locs = config.getString("Location").split(" ");
+        String world = locs[0];
+        int start = 1;
+        for (int i = 1; i < locs.length; i++){
+            try {
+                Double.parseDouble(locs[i]);
+                start = i;
+                break;
+            } catch (Exception e){
+                world = world + " " + locs[i];
+            }
+        }
 
-        World w = Bukkit.getWorld(locs[0]);
+        World w = Bukkit.getWorld(world);
 
-        double x = Double.parseDouble(locs[1]);
-        double y = Double.parseDouble(locs[2]);
-        double z = Double.parseDouble(locs[3]);
+        double x = Double.parseDouble(locs[start]);
+        double y = Double.parseDouble(locs[start + 1]);
+        double z = Double.parseDouble(locs[start + 2]);
 
         l = new Location(w, x, y, z);
-        history = new History(this);
-        loadItems();
-        loadMenus();
-        loadTransactions();
-        loadKeepers();
-        loadBlacklist();
-        TradeManager.loadTrades(this);
+        history = new History(s);
+
+        Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+            @Override
+            public void run() {
+
+                loadItems();
+                loadMenus();
+                loadTransactions();
+                loadKeepers();
+                loadBlacklist();
+                TradeManager.loadTrades(s);
+            }
+        });
+
     }
 
     public OfflinePlayer getOwner() {
@@ -154,10 +175,10 @@ public class FileShop implements Shop {
         if (config.isConfigurationSection("Items")) {
             for (String s : config.getConfigurationSection("Items").getKeys(false)) {
                 int id = Integer.parseInt(s);
-                ShopItem item = FileShopItem.loadShopItem(this,id);
+                ShopItem item = FileShopItem.loadShopItem(this, id);
 
                 items.add(item);
-                if (item.isSelling()){
+                if (item.isSelling()) {
                     sell.add(item);
                 } else {
                     buy.add(item);
@@ -288,9 +309,9 @@ public class FileShop implements Shop {
 
         items.remove(item);
 
-        if (item.isSelling()){
+        if (item.isSelling()) {
             this.sell.remove(item);
-        } else{
+        } else {
             buy.remove(item);
         }
 
@@ -344,7 +365,7 @@ public class FileShop implements Shop {
 
     public List<ShopItem> getShopItems(boolean sell) {
 
-        if (sell){
+        if (sell) {
             return this.sell;
         } else {
             return buy;
@@ -426,31 +447,34 @@ public class FileShop implements Shop {
 
     public void setOpen(boolean b) {
         setObject("Open", b);
-        Chest chest = (Chest) l.getWorld().getBlockAt(l).getState();
 
-        Block block = chest.getBlock();
+        if (l.getWorld().getBlockAt(l).getState() instanceof Chest) {
+            Chest chest = (Chest) l.getWorld().getBlockAt(l).getState();
 
-        Sign sign = null;
-        if (block.getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(1, 0, 0).getState();
-        } else if (block.getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(-1, 0, 0).getState();
-        } else if (block.getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(0, 0, 1).getState();
-        } else if (block.getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(0, 0, -1).getState();
-        }
+            Block block = chest.getBlock();
 
-        if (sign != null) {
-            if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
-                if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
-                    if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
-                        if (b) {
-                            sign.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
-                        } else {
-                            sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+            Sign sign = null;
+            if (block.getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(1, 0, 0).getState();
+            } else if (block.getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(-1, 0, 0).getState();
+            } else if (block.getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, 1).getState();
+            } else if (block.getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, -1).getState();
+            }
+
+            if (sign != null) {
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                            if (b) {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
+                            } else {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+                            }
+                            sign.update();
                         }
-                        sign.update();
                     }
                 }
             }
@@ -474,19 +498,19 @@ public class FileShop implements Shop {
     }
 
     public boolean isNPCShop() {
-        return config.getBoolean("NPC") || config.getString("NPC").equalsIgnoreCase("true");
+        return getObject("NPC") != null && config.getBoolean("NPC") || config.getString("NPC").equalsIgnoreCase("true");
     }
 
     public boolean isHoloShop() {
-        return config.getBoolean("Holo") || config.getString("Holo").equalsIgnoreCase("true");
+        return getObject("Holo") != null && config.getBoolean("Holo") || config.getString("Holo").equalsIgnoreCase("true");
     }
 
     public boolean isServerShop() {
-        return config.getBoolean("Server") || config.getString("Server").equalsIgnoreCase("true");
+        return getObject("Server") != null && config.getBoolean("Server") || config.getString("Server").equalsIgnoreCase("true");
     }
 
     public boolean isNotify() {
-        return config.getBoolean("Notify") || config.getString("Notify").equalsIgnoreCase("true");
+        return getObject("Notify") != null && config.getBoolean("Notify") || config.getString("Notify").equalsIgnoreCase("true");
     }
 
     public ShopItem createShopItem(ItemStack it, int slot, int page, boolean sell) {
@@ -525,9 +549,9 @@ public class FileShop implements Shop {
                 e.printStackTrace();
             }
 
-            if (sell){
+            if (sell) {
                 this.sell.add(item);
-            } else{
+            } else {
                 buy.add(item);
             }
 

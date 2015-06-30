@@ -17,6 +17,7 @@ import java.util.Date;
 public class Transaction {
 
     private OfflinePlayer p;
+    private String n;
     private String item;
     private double price;
     private int amount;
@@ -44,8 +45,25 @@ public class Transaction {
         this.sell = sell;
     }
 
+    public Transaction(String p, Date date, String item, double price, int amount, boolean sell) {
+        this.n = p;
+        this.amount = amount;
+        this.item = item;
+        this.price = price;
+        this.date = date;
+        this.sell = sell;
+    }
+
     public OfflinePlayer getPlayer() {
         return p;
+    }
+
+    public String getPlayerName(){
+        if (p != null){
+            return p.getName();
+        } else {
+            return n;
+        }
     }
 
     public double getPrice() {

@@ -27,6 +27,7 @@ public class DeleteNPC {
 
     public static void deleteNPC(final ShopsNPC npc) {
 
+
         for (Entity e : npc.getShop().getLocation().getWorld().getLivingEntities()) {
             if (e.getType() == npc.getEntity().getType()) {
 
@@ -39,6 +40,15 @@ public class DeleteNPC {
                     NPCManager.removeNPCShop(npc);
                     npc.getEntity().remove();
                     final boolean open = shop.isOpen();
+
+                    BlockFace fa = null;
+
+                    if (shop.getOwner().isOnline()) {
+                        fa = yawToFace(shop.getOwner().getPlayer().getLocation().getYaw()).getOppositeFace();
+                    }
+
+                    final BlockFace f = fa;
+
                     new BukkitRunnable() {
 
                         @Override
@@ -48,11 +58,11 @@ public class DeleteNPC {
                             Chest chest = (Chest) shop.getLocation().getBlock().getState();
 
                             org.bukkit.material.Chest c = (org.bukkit.material.Chest) chest.getData();
-
-                            BlockFace fa = c.getFacing();
-
-                            if (shop.getOwner().isOnline()) {
-                                fa = yawToFace(shop.getOwner().getPlayer().getLocation().getYaw()).getOppositeFace();
+                            BlockFace fa;
+                            if (f == null) {
+                                fa = c.getFacing();
+                            } else {
+                                fa = f;
                             }
 
                             final BlockFace face = fa;

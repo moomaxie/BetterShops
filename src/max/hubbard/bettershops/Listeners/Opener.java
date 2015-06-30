@@ -126,7 +126,11 @@ public class Opener implements Listener {
                             if (sho != null) {
                                 ShopManager.signLocs.put(sign.getLocation(), sho);
                             } else {
-                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidShop"));
+                                if (ShopManager.loadingTotal == ShopManager.getShops().size()) {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidShop"));
+                                } else {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                                }
                                 return;
                             }
                         }

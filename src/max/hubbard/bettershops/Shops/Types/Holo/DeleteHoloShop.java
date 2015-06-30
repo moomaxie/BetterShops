@@ -39,6 +39,19 @@ public class DeleteHoloShop {
 
             final boolean open = shop.isOpen();
 
+            BlockFace fa = null;
+
+            if (shop.getOwner().isOnline()) {
+                fa = yawToFace(shop.getOwner().getPlayer().getLocation().getYaw()).getOppositeFace();
+            }
+
+            final BlockFace f = fa;
+
+            shop.setObject("Holo", false);
+            HologramManager.removeHolographicShop(holo);
+
+            shop.getMenu(MenuType.SHOP_SETTINGS).draw(shop.getOwner().getPlayer(), 1);
+
             new BukkitRunnable() {
 
                 @Override
@@ -48,12 +61,13 @@ public class DeleteHoloShop {
                     Chest chest = (Chest) shop.getLocation().getBlock().getState();
 
                     org.bukkit.material.Chest c = (org.bukkit.material.Chest) chest.getData();
-
-                    BlockFace fa = c.getFacing();
-
-                    if (shop.getOwner().isOnline()) {
-                        fa = yawToFace(shop.getOwner().getPlayer().getLocation().getYaw()).getOppositeFace();
+                    BlockFace fa;
+                    if (f == null) {
+                        fa = c.getFacing();
+                    } else {
+                        fa = f;
                     }
+
 
                     final BlockFace face = fa;
 
@@ -92,17 +106,14 @@ public class DeleteHoloShop {
                             s.update();
 
                             ShopManager.signLocs.values().remove(shop);
-                            ShopManager.signLocs.put(s.getLocation(),shop);
+                            ShopManager.signLocs.put(s.getLocation(), shop);
                         }
 
                     }
                 }
 
             }.runTask(Bukkit.getPluginManager().getPlugin("BetterShops"));
-            shop.setObject("Holo", false);
-            HologramManager.removeHolographicShop(holo);
 
-            shop.getMenu(MenuType.SHOP_SETTINGS).draw(shop.getOwner().getPlayer(), 1);
         }
 
     }

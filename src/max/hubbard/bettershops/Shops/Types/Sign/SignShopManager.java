@@ -84,9 +84,11 @@ public class SignShopManager {
         ids.put(sign, id);
         sell.put(sign, sel);
         admin.put(sign, ad);
-        chests.put(sign, chest);
         items.put(sign, m);
-        invs.put(chest.getInventory(), sign);
+        if (chest != null) {
+            chests.put(sign, chest);
+            invs.put(chest.getInventory(), sign);
+        }
     }
 
     public static void removeSign(Sign sign) {
@@ -96,8 +98,10 @@ public class SignShopManager {
         ids.remove(sign);
         sell.remove(sign);
         admin.remove(sign);
-        invs.remove(chests.get(sign).getInventory());
-        chests.remove(sign);
+        if (chests.containsKey(sign)) {
+            invs.remove(chests.get(sign).getInventory());
+            chests.remove(sign);
+        }
         items.remove(sign);
 
     }
@@ -132,7 +136,7 @@ public class SignShopManager {
                                         "(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})",
                                         "$1-$2-$3-$4-$5");
 
-                                if (!CreateShop.isAlphaNumeric(id)){
+                                if (!CreateShop.isAlphaNumeric(id)) {
                                     break;
                                 }
                                 OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(id));
@@ -140,6 +144,7 @@ public class SignShopManager {
                                 if (p.hasPlayedBefore()) {
 
                                     String mat = lines[2].substring(3, lines[2].length());
+
                                     String[] split = lines[3].split(":");
 
                                     if (split.length == 5) {
@@ -154,6 +159,12 @@ public class SignShopManager {
 
                                         mat = mat.toUpperCase();
 
+                                        String q = split[0];
+                                        try {
+                                            Integer.parseInt(q);
+                                        } catch (Exception e) {
+                                            mat = mat + q.toUpperCase();
+                                        }
                                         String sell = split[1];
                                         if (sell.equals("B")) {
                                             sell = "false";

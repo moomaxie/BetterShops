@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -95,28 +94,31 @@ public class AddShop {
 
             try {
                 Statement s = Core.getConnection().createStatement();
-                s.executeUpdate("INSERT INTO shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
+                s.executeUpdate("INSERT INTO Shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
                         " ('" + name + "', '" + p.getUniqueId().toString() + "', '" + Language.getString("MainGUI", "NoDescription") + "', '" + c.getLocation().getWorld().getName() + "', '" + c.getLocation().getX() + "', '" + c.getLocation().getY() + "', '" + c.getLocation().getZ() + "', '"
                         + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 7 + "');");
 
-                ResultSet set = s.executeQuery("SELECT * FROM Shops WHERE Name = '" + name + "';");
-                if (set.next()) {
-                    shop = new SQLShop(name, set);
-                    ShopManager.shops.add(shop);
-                    ShopManager.locs.put(c.getLocation(), shop);
-                    ShopManager.names.put(name, shop);
-                    List<Shop> l = ShopManager.getShopsForPlayer(p);
-                    if (l == null) {
-                        l = new ArrayList<>();
-                    }
-                    l.add(shop);
-                    ShopManager.playerShops.put(p.getUniqueId(), l);
-                    ShopManager.getLimits().put(p.getUniqueId(), l.size());
+
+                shop = new SQLShop(name);
+                ShopManager.shops.add(shop);
+                ShopManager.locs.put(c.getLocation(), shop);
+                ShopManager.names.put(name, shop);
+                List<Shop> l = ShopManager.getShopsForPlayer(p);
+                if (l == null) {
+                    l = new ArrayList<>();
                 }
+                l.add(shop);
+                ShopManager.playerShops.put(p.getUniqueId(), l);
+                ShopManager.getLimits().put(p.getUniqueId(), l.size());
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
 
+        }
+
+        if (Core.getMetrics() != null){
+            Core.getCore().setUpMetrics();
         }
 
     }
@@ -162,7 +164,7 @@ public class AddShop {
                     shop = new FileShop(config, file, p);
                 }
                 ShopManager.shops.add(shop);
-                ShopManager.locs.put(chest.getLocation(), shop);
+                ShopManager.locs.put(l, shop);
                 ShopManager.names.put(name, shop);
                 List<Shop> li = ShopManager.getShopsForPlayer(p);
                 if (li == null) {
@@ -177,13 +179,13 @@ public class AddShop {
         } else {
             try {
                 Statement s = Core.getConnection().createStatement();
-                s.executeUpdate("INSERT INTO shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
+                s.executeUpdate("INSERT INTO Shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
                         " ('" + name + "', '" + p.getUniqueId().toString() + "', '" + Language.getString("MainGUI", "NoDescription") + "', '" + chest.getLocation().getWorld().getName() + "', '" + chest.getLocation().getX() + "', '" + chest.getLocation().getY() + "', '" + chest.getLocation().getZ() + "', '"
                         + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 7 + "');");
 
-                shop = new SQLShop(name, s.getResultSet());
+                shop = new SQLShop(name);
                 ShopManager.shops.add(shop);
-                ShopManager.locs.put(chest.getLocation(), shop);
+                ShopManager.locs.put(l, shop);
                 ShopManager.names.put(name, shop);
                 List<Shop> li = ShopManager.getShopsForPlayer(p);
                 if (li == null) {
@@ -195,6 +197,9 @@ public class AddShop {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+        if (Core.getMetrics() != null){
+            Core.getCore().setUpMetrics();
         }
     }
 
@@ -213,20 +218,6 @@ public class AddShop {
             config.set("Open", "True");
         } else {
             config.set("Open", "False");
-        }
-
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setSignShop(boolean open) {
-        if (open) {
-            config.set("Sign", "True");
-        } else {
-            config.set("Sign", "False");
         }
 
         try {
@@ -348,19 +339,6 @@ public class AddShop {
         loc = new Location(w, x, y, z);
 
         return loc;
-    }
-
-    public List<Player> getManagers() {
-        List<Player> mans = new ArrayList<Player>();
-        if (!config.isConfigurationSection("Managers")) {
-            config.createSection("Managers");
-        }
-        for (String id : config.getConfigurationSection("Managers").getKeys(false)) {
-            UUID uid = UUID.fromString(id);
-
-            mans.add(Bukkit.getPlayer(uid));
-        }
-        return mans;
     }
 
     public void addManager(OfflinePlayer p) {

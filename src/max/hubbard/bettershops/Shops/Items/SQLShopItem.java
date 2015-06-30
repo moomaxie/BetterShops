@@ -6,6 +6,7 @@ import max.hubbard.bettershops.Shops.SQLShop;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Utils.ItemUtils;
 import max.hubbard.bettershops.Utils.SQLUtil;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -13,7 +14,10 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * ***********************************************************************
@@ -90,9 +94,24 @@ public class SQLShopItem implements ShopItem {
             durability = item.getDurability();
             try {
                 this.statement = Core.getConnection().createStatement();
-                statement.executeUpdate("INSERT INTO Items (Shop, Id, Item, Page, Slot, Selling, Stock, Amount, Price, OrigPrice, Infinite, " +
+                String l = null;
+                if (lore != null) {
+                    l = lore.get(0);
+                    for (int i = 1; i < lore.size(); i++) {
+                        l = l + "||BS||" + lore.get(i);
+                    }
+                }
+
+                String enchants = "";
+                if (item.getEnchantments().size() > 0) {
+                    for (Enchantment en : item.getEnchantments().keySet()) {
+                        enchants = enchants + "||BS||" + en.getName() + "-" + item.getEnchantments().get(en);
+                    }
+                }
+
+                statement.executeUpdate("INSERT INTO Items (Shop, Id, Item, DisplayName, Lore, Enchants, Page, Slot, Selling, Stock, Amount, Price, OrigPrice, Infinite, " +
                         "LiveEconomy, PriceChangePercent, DoubleAmount, MinimumPrice, MaximumPrice, AdjustedPrice, SellLimit) VALUES " +
-                        "('" + shop.getName() + "', '" + id + "', '" + ItemUtils.toString(item) + "', '" + page + "', '" + slot + "', '" + SQLUtil.getBoolValue(sell) + "', '" + 0 + "', " +
+                        "('" + shop.getName() + "', '" + id + "', '" + ItemUtils.toString(item) + "', '" + displayName + "', '" + l + "', '" + enchants + "', '" + page + "', '" + slot + "', '" + SQLUtil.getBoolValue(sell) + "', '" + 0 + "', " +
                         "'" + 1 + "', '" + Config.getObject("DefaultPrice") + "', '" + Config.getObject("DefaultPrice") + "', '" + 0 + "', '" + 0 + "', '" + priceChangePercent + "', " +
                         "'" + amountToDouble + "', '" + minPrice + "', '" + maxPrice + "', '" + Config.getObject("DefaultPrice") + "', '" + 0 + "');");
 
@@ -105,7 +124,7 @@ public class SQLShopItem implements ShopItem {
         }
     }
 
-    protected SQLShopItem(Shop shop, int id, ResultSet set) {
+    protected SQLShopItem(Shop shop, int id) {
         if (shop instanceof SQLShop) {
 
             this.shop = shop;
@@ -113,13 +132,48 @@ public class SQLShopItem implements ShopItem {
 
             try {
                 this.statement = Core.getConnection().createStatement();
-                this.item = ItemUtils.fromString(set.getString("Item"));
+                ResultSet set = statement.executeQuery("SELECT * FROM Items WHERE Shop='" + shop.getName() + "' AND Id='" + id + "';");
+                set.next();
+                String ite = set.getString("Item");
+                Map<String, Object> m = ItemUtils.deserialize(ite);
+                try {
+                    this.item = ItemStack.deserialize(m);
+                    System.out.println(item.serialize());
+                } catch (Exception e) {
+                    this.item = ItemUtils.fromString(set.getString("Item"));
+                    if (item.getItemMeta() != null) {
+                        if (set.getString("Lore") != null && !set.getString("Lore").equals("null"))
+                            lore = Arrays.asList(set.getString("Lore").split(Pattern.quote("||BS||")));
+                        if (set.getString("DisplayName") != null && !set.getString("DisplayName").equals("null"))
+                            displayName = set.getString("DisplayName");
+                    }
+
+                    ItemMeta meta = item.getItemMeta();
+                    if (displayName != null) {
+                        meta.setDisplayName(displayName);
+                    }
+                    if (lore != null) {
+                        meta.setLore(lore);
+                    }
+                    item.setItemMeta(meta);
+
+                    if (set.getString("Enchants") != null && !set.getString("Enchants").equals("null")) {
+                        String en = set.getString("Enchants");
+
+                        String[] split = en.split(Pattern.quote("||BS||"));
+
+                        for (String s : split) {
+                            if (s.contains("-")) {
+                                String[] sp = s.split(Pattern.quote("-"));
+                                item.addEnchantment(Enchantment.getByName(sp[0]), Integer.parseInt(sp[1]));
+                            }
+                        }
+                    }
+                }
+
+
                 this.sell = set.getBoolean("Selling");
 
-                if (item.getItemMeta() != null) {
-                    lore = item.getItemMeta().getLore();
-                    displayName = item.getItemMeta().getDisplayName();
-                }
                 data = item.getData().getData();
                 durability = item.getDurability();
 
@@ -145,7 +199,7 @@ public class SQLShopItem implements ShopItem {
     }
 
     public static ShopItem loadShopItem(Shop shop, int id, ResultSet set) {
-        return new SQLShopItem(shop, id, set);
+        return new SQLShopItem(shop, id);
     }
 
     public Object getObject(String s) {
@@ -375,7 +429,7 @@ public class SQLShopItem implements ShopItem {
     }
 
     public void calculatePrice() {
-        double p = getOrigPrice() * (getPriceChangePercent()/100);
+        double p = getOrigPrice() * (getPriceChangePercent() / 100);
 
         if (getAdjustedPrice() + p < minPrice) {
             setAdjustedPrice(minPrice);

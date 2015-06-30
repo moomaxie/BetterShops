@@ -46,12 +46,13 @@ public class CreateSign implements Listener {
             sell = true;
         }
 
-        if (((boolean) Config.getObject("Permissions")) && Permissions.hasCreateSignShopPerm(p)){
-            p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","NoPermission"));
-            return;
-        }
+
 
         if (can) {
+            if (((boolean) Config.getObject("Permissions")) && !Permissions.hasCreateSignShopPerm(p)){
+                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","NoPermission"));
+                return;
+            }
 
             Sign s = (Sign) e.getBlock().getState();
 
@@ -124,6 +125,8 @@ public class CreateSign implements Listener {
                     for (int i = 0; i < parts.size(); i++) {
                         e.setLine(i + 3, parts.get(i));
                     }
+                } else {
+                    e.setLine(3,"");
                 }
                 if (sell)
                     e.setLine(3, e.getLine(3) + ":S:" + d + ":" + pr + ":" + am);

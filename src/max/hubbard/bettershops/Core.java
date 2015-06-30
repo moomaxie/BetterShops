@@ -1,8 +1,5 @@
 package max.hubbard.bettershops;
 
-import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
-import com.gmail.filoghost.holographicdisplays.object.NamedHologram;
-import com.gmail.filoghost.holographicdisplays.object.NamedHologramManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import max.hubbard.bettershops.Commands.BSCommand;
 import max.hubbard.bettershops.Configurations.Blacklist;
@@ -16,13 +13,13 @@ import max.hubbard.bettershops.Listeners.*;
 import max.hubbard.bettershops.SQL.Database;
 import max.hubbard.bettershops.SQL.mysql.MySQL;
 import max.hubbard.bettershops.Shops.Shop;
-import max.hubbard.bettershops.Shops.Types.Holo.CreateHologram;
 import max.hubbard.bettershops.Shops.Types.Holo.HologramManager;
 import max.hubbard.bettershops.Shops.Types.NPC.NPCManager;
 import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
 import max.hubbard.bettershops.Shops.Types.Sign.CreateSign;
 import max.hubbard.bettershops.Shops.Types.Sign.Purchase;
 import max.hubbard.bettershops.Shops.Types.Sign.SignShopManager;
+import max.hubbard.bettershops.Utils.ChatManager;
 import max.hubbard.bettershops.Utils.Conversion;
 import max.hubbard.bettershops.Utils.Metrics;
 import max.hubbard.bettershops.Versions.AnvilGUI;
@@ -61,7 +58,7 @@ public class Core extends JavaPlugin {
     private static boolean aboveEight = false;
     private static boolean holo = false;
     private static boolean wg = false;
-    private static boolean beta = true;
+    private static boolean beta = false;
     private static Connection c;
     private static Database db;
 
@@ -69,6 +66,9 @@ public class Core extends JavaPlugin {
     public void onDisable() {
         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eSaving Shops..");
         for (Shop shop : ShopManager.getShops()) {
+            if (shop.isHoloShop()){
+                shop.getHolographicShop().getHologram().delete();
+            }
             shop.saveConfig();
         }
         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eSaved!");
@@ -88,6 +88,7 @@ public class Core extends JavaPlugin {
                 //REGISTER LISTENERS
                 Bukkit.getPluginManager().registerEvents(new ClickableActionListener(), this);
                 Bukkit.getPluginManager().registerEvents(new AddItemListener(), this);
+                Bukkit.getPluginManager().registerEvents(new ChatManager(), this);
                 Bukkit.getPluginManager().registerEvents(new Blacklist(), this);
                 Bukkit.getPluginManager().registerEvents(new CreateShop(), this);
                 Bukkit.getPluginManager().registerEvents(new CreateSign(), this);
@@ -204,67 +205,8 @@ public class Core extends JavaPlugin {
                 if (Conversion.checkConversion()) {
                     Conversion.startConversion();
                 }
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + ShopManager.loadShops() + " §aChest Shops");
-
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eSign Shops§a...");
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + SignShopManager.loadSignShops() + " §aSign Shops");
-
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eNPC Shops§a...");
-                //Load The Shops
-                for (World w : ShopManager.worlds) {
-                    for (LivingEntity e : w.getLivingEntities()) {
-
-                        if (!(e instanceof ArmorStand)) {
-
-                            if (e.getCustomName() != null) {
-                                if (e.getCustomName().contains("§a§l")) {
-                                    Shop shop = ShopManager.fromString(e.getCustomName().substring(4));
-                                    if (shop != null) {
-                                        if (!shop.isNPCShop() || shop.getNPCShop() == null) {
-                                            ShopsNPC s = new ShopsNPC(e, shop);
-
-                                            NPCManager.addNPCShop(s);
-                                            s.removeChest();
-                                            shop.setObject("NPC", true);
-                                        } else {
-                                            e.remove();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + NPCManager.getNPCShops().size() + " §aNPC Shops");
-
-
-                if (useHolograms() && (boolean) Config.getObject("HoloShops")) {
-                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eHologram Shops§a...");
-                    for (NamedHologram holo : NamedHologramManager.getHolograms()) {
-
-                        if (holo.getName().startsWith("BS")) {
-
-                            Shop shop = ShopManager.fromString(holo.getName().substring(2).replaceAll("_", " "));
-
-                            if (shop != null) {
-                                if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
-                                    if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
-                                        if (shop.getHolographicShop() == null) {
-                                            holo.delete();
-                                            CreateHologram.createHolographicShop(shop);
-                                        } else {
-                                            holo.delete();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + HologramManager.getHolographicShops().size() + " §aHologram Shops");
-                    Updater.startCheckForUpdate();
-                }
-
+                loadShops();
+                Updater.startCheckForUpdate();
 
             } catch (Exception e) {
                 Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cAn error occurred! §cPlease inform the developer @ §ehttp://dev.bukkit.org/bukkit-plugins/better-shops/ §c. Plugin Disabling!");
@@ -448,5 +390,110 @@ public class Core extends JavaPlugin {
 
     public static boolean useSQL() {
         return db != null;
+    }
+
+    public static void loadShops() throws Exception {
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + ShopManager.loadShops() + " §aChest Shops");
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eSome shops may still be initializing, this may last a few minutes");
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eSign Shops§a...");
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + SignShopManager.loadSignShops() + " §aSign Shops");
+
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eNPC Shops§a...");
+        //Load The Shops
+
+//        for (Location l : ShopManager.locs.keySet()){
+//            l.getBlock().get.
+//        }
+
+        for (World w : ShopManager.worlds) {
+            if (w != null)
+                for (final LivingEntity e : w.getLivingEntities()) {
+
+                    if (!(e instanceof ArmorStand)) {
+
+                        if (e.getCustomName() != null) {
+                            if (e.getCustomName().contains("§a§l")) {
+                                final Shop shop = ShopManager.fromString(e.getCustomName().substring(4));
+                                if (shop != null) {
+                                    if (!shop.isNPCShop() || shop.getNPCShop() == null) {
+//                                        EntityCheck.isNPC(e);
+//                                        if (EntityCheck.isNPC(e)) {
+                                        ShopsNPC s = new ShopsNPC(e, shop);
+                                        NPCManager.addNPCShop(s);
+                                        s.removeChest();
+                                        shop.setObject("NPC", true);
+//                                        } else {
+//                                            Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//
+//                                                    ShopsNPC s = new ShopsNPC(e.getType(), Arrays.asList(""), shop, false, false, false);
+//
+//                                                    NPCManager.addNPCShop(s);
+//                                                    s.removeChest();
+//                                                    shop.setObject("NPC", true);
+//                                                    e.remove();
+//                                                }
+//                                            });
+//                                        }
+                                    } else {
+                                        e.remove();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + NPCManager.getNPCShops().size() + " §aNPC Shops");
+
+        if (useHolograms() && (boolean) Config.getObject("HoloShops")) {
+            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aHolographic Shops will be loaded when needed.");
+        }
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone");
+//            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading §eHologram Shops§a...");
+//            Set<String> savedHologramsNames = HologramDatabase.getHolograms();
+//            for (final String s : savedHologramsNames) {
+//                System.out.println(s);
+//
+//                if (s.startsWith("BS")) {
+//
+//                    final Shop shop = ShopManager.fromString(s.substring(2).replaceAll("_", " "));
+//
+//                    if (shop != null) {
+//                        System.out.println("Not Null | " + shop.getName());
+//                        try {
+//                            final NamedHologram holo = HologramDatabase.loadHologram(s);
+////                            if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
+////                                if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
+//                            if (shop.getHolographicShop() == null) {
+//                                NamedHologramManager.removeHologram(holo);
+//                                holo.delete();
+//                                HologramDatabase.deleteHologram(s);
+//                                HologramDatabase.saveToDisk();
+//
+//                                CreateHologram.restoreHoloShop(shop);
+//                                System.out.println("Here1");
+//
+//                            } else {
+//                                holo.delete();
+//                                System.out.println("Here2");
+//                            }
+////                                }
+////                            }
+//                        } catch (Exception e) {
+//                            HologramDatabase.deleteHologram(s);
+//                            HologramDatabase.saveToDisk();
+//
+//                            CreateHologram.restoreHoloShop(shop);
+//                            System.out.println("Here3");
+//                        }
+//                    }
+//                }
+//            }
+//            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoaded §d" + HologramManager.getHolographicShops().size() + " §aHologram Shops");
+
+//        }
     }
 }

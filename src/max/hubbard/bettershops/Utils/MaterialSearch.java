@@ -42,8 +42,6 @@ public class MaterialSearch {
 
                 String name = mat.name().replaceAll("_", " ").toLowerCase();
 
-
-
                 if (name.equals(m)) {
                     mats.add(mat);
                 }
@@ -53,16 +51,15 @@ public class MaterialSearch {
 
                 if (r.length > 1) {
                     if (mat.name().contains("_")) {
-                        if (mat.name().startsWith(r[0])) {
+                        if (mat.name().toLowerCase().startsWith(r[0].toLowerCase())) {
                             String s = mat.name().split("_")[1].toLowerCase();
-                            if (s.contains(r[1]) || s.equalsIgnoreCase(r[1])) {
+                            if (s.equalsIgnoreCase(r[1]) || s.contains(r[1].toLowerCase())) {
                                 mats.add(mat);
                             }
                         }
                     }
                 }
             }
-
         }
 
 

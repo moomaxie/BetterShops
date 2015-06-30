@@ -1,8 +1,6 @@
 package max.hubbard.bettershops.Shops.Types.Holo;
 
-import com.gmail.filoghost.holographicdisplays.disk.HologramDatabase;
 import com.gmail.filoghost.holographicdisplays.object.NamedHologram;
-import com.gmail.filoghost.holographicdisplays.object.NamedHologramManager;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Shops.Shop;
 import org.bukkit.Bukkit;
@@ -23,18 +21,13 @@ public class CreateHologram {
 
     public static void createHolographicShop(final Shop shop) {
 
-        final NamedHologram hologram = new NamedHologram(shop.getLocation().clone().add(.5, 3.5, .5), "BS" + shop.getName().replaceAll(" ", "_"));
-
         new BukkitRunnable() {
 
             @Override
             public void run() {
+                NamedHologram hologram = new NamedHologram(shop.getLocation().clone().add(.5, 3.5, .5), "BS" + shop.getName().replaceAll(" ", "_"));
                 ShopHologram shopHologram = new ShopHologram(shop, hologram);
                 HologramManager.addHolographicShop(shopHologram);
-
-                NamedHologramManager.addHologram(hologram);
-                HologramDatabase.saveHologram((NamedHologram) shopHologram.getHologram());
-                HologramDatabase.trySaveToDisk();
 
                 shop.setObject("Holo", true);
                 removeShopChest(shop);

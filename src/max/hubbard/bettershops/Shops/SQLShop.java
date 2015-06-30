@@ -1,5 +1,8 @@
 package max.hubbard.bettershops.Shops;
 
+import com.gmail.filoghost.holographicdisplays.disk.HologramDatabase;
+import com.gmail.filoghost.holographicdisplays.object.NamedHologram;
+import com.gmail.filoghost.holographicdisplays.object.NamedHologramManager;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Menus.MenuType;
@@ -8,6 +11,7 @@ import max.hubbard.bettershops.Menus.ShopMenus.*;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Items.SQLShopItem;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
+import max.hubbard.bettershops.Shops.Types.Holo.CreateHologram;
 import max.hubbard.bettershops.Shops.Types.Holo.HologramManager;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Shops.Types.NPC.NPCManager;
@@ -53,24 +57,60 @@ public class SQLShop implements Shop {
     private History history = new History(this);
     private String name;
 
-    public SQLShop(String name, ResultSet rs) throws SQLException {
+    public SQLShop(String name) throws SQLException {
 
-        try {
-            this.statement = Core.getConnection().createStatement();
-        } catch (SQLException ignored) {
+        this.statement = Core.getConnection().createStatement();
 
+
+        final ResultSet rs = statement.executeQuery("SELECT * FROM Shops WHERE Name = '" + name + "'");
+
+        if (rs.next()) {
+            this.name = name;
+            this.owner = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("Owner")));
+            l = new Location(Bukkit.getWorld(rs.getString("World")), rs.getInt("X"), rs.getInt("Y"), rs.getInt("Z"));
+            history = new History(this);
+
+            final SQLShop t = this;
+
+            Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                @Override
+                public void run() {
+
+                    loadItems();
+                    loadMenus();
+                    loadKeepers();
+                    loadBlacklist();
+                    TradeManager.loadTrades(t);
+                    loadTransactions();
+
+                    if (isHoloShop()){
+                        String s = "BS" + getName();
+                        try {
+                            NamedHologram holo = HologramDatabase.loadHologram(s);
+//                            if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
+//                                if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
+                            if (getHolographicShop() == null) {
+                                NamedHologramManager.removeHologram(holo);
+                                holo.delete();
+                                HologramDatabase.deleteHologram(s);
+                                HologramDatabase.saveToDisk();
+
+                            } else {
+                                holo.delete();
+                            }
+//                                }
+//                            }
+                        } catch (Exception e) {
+                            HologramDatabase.deleteHologram(s);
+                            HologramDatabase.trySaveToDisk();
+
+                        } finally {
+                            CreateHologram.createHolographicShop(t);
+                        }
+                    }
+                }
+            });
         }
-
-        this.name = name;
-        this.owner = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("Owner")));
-        l = new Location(Bukkit.getWorld(rs.getString("World")), rs.getInt("X"), rs.getInt("Y"), rs.getInt("Z"));
-        history = new History(this);
-        loadItems();
-        loadMenus();
-        loadTransactions();
-        loadKeepers();
-        loadBlacklist();
-        TradeManager.loadTrades(this);
     }
 
     public OfflinePlayer getOwner() {
@@ -154,7 +194,7 @@ public class SQLShop implements Shop {
         try {
             ResultSet set = statement.executeQuery("SELECT * FROM Items WHERE Shop = '" + name + "';");
 
-            while (set.next()) {
+            while (!set.isClosed() && set.next()) {
 
                 ShopItem item = SQLShopItem.loadShopItem(this, set.getInt("Id"), set);
                 items.add(item);
@@ -165,8 +205,8 @@ public class SQLShop implements Shop {
                 }
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ignore) {
+
         }
 
 
@@ -214,11 +254,10 @@ public class SQLShop implements Shop {
             ResultSet set = statement.executeQuery("SELECT * FROM Transactions WHERE Shop = '" + getName() + "';");
 
             while (set.next()) {
-                OfflinePlayer buy;
-                if (set.getString("Player").contains("-")) {
-                    buy = Bukkit.getOfflinePlayer(UUID.fromString(set.getString("Player")));
-                } else {
-                    buy = Bukkit.getOfflinePlayer(set.getString("Player"));
+                String p = set.getString("Player");
+                OfflinePlayer buy = null;
+                if (p.contains("-")) {
+                    buy = Bukkit.getOfflinePlayer(UUID.fromString(p));
                 }
                 Date date = new Date(set.getString("Date"));
                 double price = set.getDouble("Price");
@@ -226,11 +265,15 @@ public class SQLShop implements Shop {
                 boolean sell = set.getBoolean("Selling");
                 String item = set.getString("Item");
 
-                history.addTransaction(buy, date, item, price, amt, sell, false);
+                if (buy != null) {
+                    history.addTransaction(buy, date, item, price, amt, sell, false);
+                } else {
+                    history.addTransaction(p, date, item, price, amt, sell, false);
+                }
             }
 
-        } catch (SQLException ignored) {
-
+        } catch (SQLException e) {
+//            e.printStackTrace();
         }
         transLoaded = true;
     }
@@ -271,11 +314,25 @@ public class SQLShop implements Shop {
      */
     public void saveTransaction(Transaction t, boolean save) {
 
+        String item = t.getItem();
+        String player;
+        if (t.getPlayer() != null) {
+            player = t.getPlayer().getUniqueId().toString();
+        } else {
+            player = t.getPlayerName();
+        }
+        String owner = getOwner().getUniqueId().toString();
+        String date = t.getDate().toLocaleString();
+        boolean sell = t.isSell();
+        double price = t.getPrice();
+        int amt = t.getAmount();
+
         try {
-            statement.executeUpdate("INSERT INTO Transactions (Shop, Id, Item, Player, Owner, Price, Amount, Selling, Date) VALUES" +
-                    " ('" + getName() + "', " + t.getItem() + "', " + t.getPlayer().getName() + "', " + owner.getName() + "', " + t.getPrice() + "', " + t.getAmount() + "', '"
-                    + t.isSell() + "', " + t.getDate().toLocaleString() + "');");
-        } catch (SQLException ignored) {
+            statement.executeUpdate("INSERT INTO Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
+                    " ('" + getName() + "', '" + item + "', '" + player + "', '" + owner + "', '" + price + "', '" + amt + "', "
+                    + sell + ", '" + date + "'" +
+                    ");");
+        } catch (Exception ignored){
 
         }
     }
@@ -374,32 +431,35 @@ public class SQLShop implements Shop {
 
     public void setOpen(boolean b) {
         setObject("Open", b);
-        Chest chest = (Chest) l.getWorld().getBlockAt(l).getState();
 
-        Block block = chest.getBlock();
+        if (l.getWorld().getBlockAt(l).getState() instanceof Chest) {
+            Chest chest = (Chest) l.getWorld().getBlockAt(l).getState();
 
-        Sign sign = null;
-        if (block.getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(1, 0, 0).getState();
-        } else if (block.getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(-1, 0, 0).getState();
-        } else if (block.getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(0, 0, 1).getState();
-        } else if (block.getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
-            sign = (Sign) block.getRelative(0, 0, -1).getState();
-        }
+            Block block = chest.getBlock();
 
-        if (sign != null) {
-            ShopManager.signLocs.put(sign.getLocation(), this);
-            if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
-                if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
-                    if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
-                        if (b) {
-                            sign.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
-                        } else {
-                            sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+            Sign sign = null;
+            if (block.getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(1, 0, 0).getState();
+            } else if (block.getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(-1, 0, 0).getState();
+            } else if (block.getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, 1).getState();
+            } else if (block.getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, -1).getState();
+            }
+
+            if (sign != null) {
+                ShopManager.signLocs.put(sign.getLocation(), this);
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                            if (b) {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
+                            } else {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+                            }
+                            sign.update();
                         }
-                        sign.update();
                     }
                 }
             }
@@ -504,6 +564,5 @@ public class SQLShop implements Shop {
     }
 
     public void saveConfig() {
-
     }
 }

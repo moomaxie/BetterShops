@@ -184,7 +184,7 @@ public class SellItem implements ShopMenu {
                 inv.setItem(18, buy);
                 inv.setItem(19, buy);
 
-                if (Core.getEconomy().getBalance(shop.getOwner()) >= ((shopItem.getPrice() / shopItem.getAmount()) * Stocks.getNumberInInventory(shopItem, p, shop)))
+                if (shop.isServerShop() || Core.getEconomy().getBalance(shop.getOwner()) >= ((shopItem.getPrice() / shopItem.getAmount()) * Stocks.getNumberInInventory(shopItem, p, shop)))
                     inv.setItem(22, all);
             } else {
                 if (i.getAmount() < shopItem.getAmount() || Stocks.getNumberInInventory(shopItem, p, shop) < shopItem.getAmount()) {

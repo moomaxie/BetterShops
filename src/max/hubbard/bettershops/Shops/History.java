@@ -1,6 +1,5 @@
 package max.hubbard.bettershops.Shops;
 
-import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Utils.Transaction;
@@ -9,6 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -61,14 +61,42 @@ public class History {
         transactions.add(trans);
 
         if (save) {
-            if ((Boolean) Config.getObject("UseTransactions")) {
+            if (shop instanceof FileShop) {
                 shop.saveTransaction(trans, true);
+                saveTransactionToFile(trans);
+            } else {
+                try {
+                    saveToSQL(trans);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            saveTransactionToFile(trans);
+        }
+    }
+
+    public void addTransaction(String p, Date date, String item, double price, int amount, boolean sell, boolean save) {
+
+        Transaction trans = new Transaction(p, date, item, price, amount, sell);
+
+        if (sell) {
+            Selltransactions.add(trans);
+        } else {
+            Buytransactions.add(trans);
         }
 
-        if (transactions.size() > 36) {
-            shop.deleteFirstTransaction();
+        transactions.add(trans);
+
+        if (save) {
+            if (shop instanceof FileShop) {
+                shop.saveTransaction(trans, true);
+                saveTransactionToFile(trans);
+            } else {
+                try {
+                    saveToSQL(trans);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -85,8 +113,16 @@ public class History {
         transactions.add(trans);
 
         if (save) {
-            shop.saveTransaction(trans, true);
-            saveTransactionToFile(trans);
+            if (shop instanceof FileShop) {
+                shop.saveTransaction(trans, true);
+                saveTransactionToFile(trans);
+            } else {
+                try {
+                    saveToSQL(trans);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -159,6 +195,60 @@ public class History {
             config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void saveToSQL(Transaction t) throws Exception {
+        Statement statement;
+        statement = Core.getConnection().createStatement();
+
+        String item = t.getItem();
+        String player;
+        if (t.getPlayer() != null) {
+            player = t.getPlayer().getUniqueId().toString();
+        } else {
+            player = t.getPlayerName();
+        }
+        String owner = shop.getOwner().getUniqueId().toString();
+        String date = t.getDate().toLocaleString();
+        boolean sell = t.isSell();
+        double price = t.getPrice();
+        int amt = t.getAmount();
+
+        statement.executeUpdate("INSERT INTO Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
+                " ('" + shop.getName() + "', '" + item + "', '" + player + "', '" + owner + "', '" + price + "', '" + amt + "', "
+                + sell + ", '" + date + "'" +
+                ");");
+    }
+
+    public static void saveAllTransactionsToSQL() throws Exception {
+        File fi = new File(Core.getCore().getDataFolder(), "Transactions");
+
+        if (!fi.exists()) {
+            fi.mkdirs();
+        }
+        Statement statement;
+        statement = Core.getConnection().createStatement();
+        for (File f : fi.listFiles()) {
+            if (f.getName().contains(".yml")) {
+                YamlConfiguration c = YamlConfiguration.loadConfiguration(f);
+
+                for (String s : c.getKeys(false)) {
+                    String item = c.getConfigurationSection(s).getString("Item").replaceAll("'", "");
+                    String player = c.getConfigurationSection(s).getString("Buyer Name");
+                    String owner = c.getConfigurationSection(s).getString("Owner Name");
+                    String date = c.getConfigurationSection(s).getString("Date");
+                    boolean sell = c.getConfigurationSection(s).getBoolean("Selling Shop");
+                    double price = c.getConfigurationSection(s).getDouble("Price");
+                    int amt = c.getConfigurationSection(s).getInt("Amount");
+
+
+                    statement.executeUpdate("INSERT IGNORE INTO Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
+                            " ('" + f.getName().substring(0, f.getName().length() - 4) + "', '" + item + "', '" + player + "', '" + owner + "', '" + price + "', '" + amt + "', "
+                            + sell + ", '" + date + "'" +
+                            ");");
+                }
+            }
         }
     }
 }

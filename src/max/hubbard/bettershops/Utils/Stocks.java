@@ -166,6 +166,36 @@ public class Stocks {
         addItemsToInventory(ite, p, amt);
     }
 
+    public static void throwItemsOnGroundInThread(final ShopItem ite) {
+
+        int amt = ite.getStock();
+
+        int stacks = amt / ite.getItem().getMaxStackSize();
+
+        if (stacks > 0) {
+            for (int i = 0; i < stacks; i++) {
+                amt = amt - ite.getItem().getMaxStackSize();
+
+                ItemStack it = ite.getItem().clone();
+
+                it.setAmount(ite.getItem().getMaxStackSize());
+
+
+                ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(), it);
+            }
+        }
+
+        if (amt > 0) {
+            ItemStack it = ite.getItem().clone();
+
+            it.setAmount(amt);
+
+            ite.getShop().getLocation().getWorld().dropItemNaturally(ite.getShop().getLocation(), it);
+
+        }
+
+    }
+
     public static void throwItemsOnGround(final ShopItem ite) {
         new BukkitRunnable() {
 
@@ -420,7 +450,7 @@ public class Stocks {
 
                     if (carl.size() > 0) {
                         for (ItemStack item : carl.values()) {
-                            p.getLocation().getWorld().dropItem(p.getLocation().add(0,1,0), item);
+                            p.getLocation().getWorld().dropItem(p.getLocation().add(0, 1, 0), item);
                         }
                     }
 
@@ -450,7 +480,7 @@ public class Stocks {
 
                             p.getInventory().addItem(it);
                         } else {
-                            p.getLocation().getWorld().dropItem(p.getLocation().add(0,1,0), it);
+                            p.getLocation().getWorld().dropItem(p.getLocation().add(0, 1, 0), it);
                         }
                     }
                 }
@@ -464,7 +494,7 @@ public class Stocks {
 
                     if (carl.size() > 0) {
                         for (ItemStack item : carl.values()) {
-                            p.getLocation().getWorld().dropItem(p.getLocation().add(0,1,0), item);
+                            p.getLocation().getWorld().dropItem(p.getLocation().add(0, 1, 0), item);
                         }
                     }
 

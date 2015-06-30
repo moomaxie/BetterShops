@@ -1,6 +1,5 @@
 package max.hubbard.bettershops.Configurations;
 
-import max.hubbard.bettershops.Core;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -162,6 +161,16 @@ public class Blacklist implements Listener {
         if (page > 1) {
             inv.setItem(0, barrow);
         }
+
+        if (!config.isConfigurationSection("Items")){
+            config.createSection("Items");
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         int maxPage = (int) Math.ceil((double) (config.getConfigurationSection("Items").getKeys(false).size()) / 45);
 
         if (page != maxPage && maxPage != 0) {
@@ -260,73 +269,5 @@ public class Blacklist implements Listener {
         }
 
 
-    }
-
-    public static void changeBlacklist() {
-        boolean found3 = false;
-
-        if (Core.getCore().getDataFolder() != null) {
-
-            if (Core.getCore().getDataFolder().listFiles() == null) {
-                Core.getCore().getDataFolder().mkdir();
-            }
-            for (File f : Core.getCore().getDataFolder().listFiles()) {
-                if (f.getName().equals("blacklist.yml")) {
-                    found3 = true;
-                }
-            }
-        }
-
-        if (!found3) {
-
-            File fil = Core.getCore().getFile();
-
-            java.util.jar.JarFile jar = null;
-            try {
-                jar = new java.util.jar.JarFile(fil);
-            } catch (IOException e) {
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §cImproper Jar Name, Rename the .Jar to 'BetterShops.jar'. Plugin Disabling!");
-                Bukkit.getPluginManager().disablePlugin(Core.getCore());
-            }
-            java.util.Enumeration enumEntries = jar.entries();
-            while (enumEntries.hasMoreElements()) {
-                java.util.jar.JarEntry file = (java.util.jar.JarEntry) enumEntries.nextElement();
-                if (file.getName().equals("blacklist.yml")) {
-                    java.io.File f = new java.io.File(Core.getCore().getDataFolder() + java.io.File.separator + file.getName());
-                    if (file.isDirectory()) { // if its a directory, create it
-                        f.mkdir();
-                        continue;
-                    }
-                    try {
-                        java.io.InputStream is = jar.getInputStream(file); // get the input stream
-                        java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-                        while (is.available() > 0) {  // write contents of 'is' to 'fos'
-                            fos.write(is.read());
-                        }
-                        fos.close();
-                        is.close();
-                        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eCreated the blacklist file.");
-
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-
-            file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "blacklist.yml");
-
-            config = YamlConfiguration.loadConfiguration(file);
-
-            config.createSection("Items");
-
-            try {
-                config.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "blacklist.yml");
-
-        config = YamlConfiguration.loadConfiguration(file);
     }
 }

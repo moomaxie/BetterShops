@@ -47,17 +47,17 @@ public class ShopHologram {
             holo.appendTextLine(" ");
 
             if (item.isSelling()) {
-                shopLine = holo.appendTextLine(Language.getString("MainGUI" , "Selling"));
+                shopLine = holo.appendTextLine(Language.getString("MainGUI", "Selling"));
             } else {
-                shopLine = holo.appendTextLine(Language.getString("MainGUI" , "Buying"));
+                shopLine = holo.appendTextLine(Language.getString("MainGUI", "Buying"));
             }
             holo.appendTextLine(" ");
             TextLine upLine = holo.appendTextLine("§e§l▲");
             this.itemLine = holo.appendItemLine(item.getItem());
             TextLine downLine = holo.appendTextLine("§e§l▼");
-            final TextLine stockLine = holo.appendTextLine(Language.getString("MainGUI" , "Stock") + "§7" + item.getStock());
-            final TextLine amountLine = holo.appendTextLine(Language.getString("MainGUI" , "Amount") + "§7" + item.getAmount());
-            final TextLine priceLine = holo.appendTextLine(Language.getString("MainGUI" , "Price") + "§7" + item.getPriceAsString());
+            final TextLine stockLine = holo.appendTextLine(Language.getString("MainGUI", "Stock") + "§7" + item.getStock());
+            final TextLine amountLine = holo.appendTextLine(Language.getString("MainGUI", "Amount") + "§7" + item.getAmount());
+            final TextLine priceLine = holo.appendTextLine(Language.getString("MainGUI", "Price") + "§7" + item.getPriceAsString());
 
             updateItemLines(itemLine, item.isSelling());
 
@@ -66,7 +66,7 @@ public class ShopHologram {
                 @Override
                 public void onTouch(Player player) {
                     TextLine l = (TextLine) holo.getLine(2);
-                    if (l.getText().equals(Language.getString("MainGUI" , "Buying"))) {
+                    if (l.getText().equals(Language.getString("MainGUI", "Buying"))) {
                         if (shop.getOwner().getUniqueId().equals(player.getUniqueId()) && !shop.isServerShop() || shop.getOwner().getUniqueId().toString().equals(player.getUniqueId().toString()) && !shop.isServerShop()) {
 
                             if (shop instanceof FileShop) {
@@ -121,12 +121,13 @@ public class ShopHologram {
             shopLine.setTouchHandler(new TouchHandler() {
                 @Override
                 public void onTouch(Player player) {
-                    if (shop.getOwner().getUniqueId().equals(player.getUniqueId()) || shop.getOwner().getUniqueId().toString().equals(player.getUniqueId().toString())) {boolean sell;
+                    if (shop.getOwner().getUniqueId().equals(player.getUniqueId()) || shop.getOwner().getUniqueId().toString().equals(player.getUniqueId().toString())) {
+                        boolean sell;
                         TextLine l = (TextLine) holo.getLine(2);
-                        sell = !l.getText().equals(Language.getString("MainGUI" , "Buying"));
+                        sell = !l.getText().equals(Language.getString("MainGUI", "Buying"));
                         if (sell) {
                             if (shop.getShopItems(false).size() > 0) {
-                                shopLine.setText(Language.getString("MainGUI" , "Buying"));
+                                shopLine.setText(Language.getString("MainGUI", "Buying"));
 
                                 ShopItem it = shop.getShopItems(false).get(0);
                                 itemLine.setItemStack(it.getItem());
@@ -137,7 +138,7 @@ public class ShopHologram {
                         } else {
                             if ((boolean) Config.getObject("SellingShops")) {
                                 if (shop.getShopItems(true).size() > 0) {
-                                    shopLine.setText(Language.getString("MainGUI" , "Selling"));
+                                    shopLine.setText(Language.getString("MainGUI", "Selling"));
 
                                     ShopItem it = shop.getShopItems(true).get(0);
                                     itemLine.setItemStack(it.getItem());
@@ -157,7 +158,7 @@ public class ShopHologram {
                     if (shop.getOwner().getUniqueId().equals(player.getUniqueId()) || shop.getOwner().getUniqueId().toString().equals(player.getUniqueId().toString())) {
                         boolean sell;
                         TextLine l = (TextLine) holo.getLine(2);
-                        sell = !l.getText().equals(Language.getString("MainGUI" , "Buying"));
+                        sell = !l.getText().equals(Language.getString("MainGUI", "Buying"));
                         if (shop instanceof FileShop) {
                             changePrice(player, FileShopItem.fromItemStack(shop, itemLine.getItemStack(), sell));
                         } else {
@@ -174,7 +175,7 @@ public class ShopHologram {
                     if (shop.getOwner().getUniqueId().equals(player.getUniqueId()) || shop.getOwner().getUniqueId().toString().equals(player.getUniqueId().toString())) {
                         boolean sell;
                         TextLine l = (TextLine) holo.getLine(2);
-                        sell = !l.getText().equals(Language.getString("MainGUI" , "Buying"));
+                        sell = !l.getText().equals(Language.getString("MainGUI", "Buying"));
                         if (shop instanceof FileShop) {
                             changeAmount(player, FileShopItem.fromItemStack(shop, itemLine.getItemStack(), sell));
                         } else {
@@ -193,14 +194,14 @@ public class ShopHologram {
                 public void onTouch(Player player) {
                     boolean sell;
                     TextLine l = (TextLine) holo.getLine(2);
-                    sell = !l.getText().equals(Language.getString("MainGUI" , "Buying"));
+                    sell = !l.getText().equals(Language.getString("MainGUI", "Buying"));
 
                     ShopItem item;
 
-                    if (shop instanceof FileShop){
-                        item  = FileShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
+                    if (shop instanceof FileShop) {
+                        item = FileShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
                     } else {
-                        item  = SQLShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
+                        item = SQLShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
                     }
                     if (item != null) {
                         if (shop.getShopItems(sell).contains(item)) {
@@ -227,9 +228,9 @@ public class ShopHologram {
                             } else {
                                 itemLine.setItemStack(new ItemStack(Material.IRON_FENCE));
 
-                                stockLine.setText(Language.getString("MainGUI" , "Stock") + "-");
-                                amountLine.setText(Language.getString("MainGUI" , "Amount") + "-");
-                                priceLine.setText(Language.getString("MainGUI" , "Price") + "-");
+                                stockLine.setText(Language.getString("MainGUI", "Stock") + "-");
+                                amountLine.setText(Language.getString("MainGUI", "Amount") + "-");
+                                priceLine.setText(Language.getString("MainGUI", "Price") + "-");
                             }
                         }
                     } else {
@@ -241,9 +242,9 @@ public class ShopHologram {
                         } else {
                             itemLine.setItemStack(new ItemStack(Material.IRON_FENCE));
 
-                            stockLine.setText(Language.getString("MainGUI" , "Stock") + "-");
-                            amountLine.setText(Language.getString("MainGUI" , "Amount") + "-");
-                            priceLine.setText(Language.getString("MainGUI" , "Price") + "-");
+                            stockLine.setText(Language.getString("MainGUI", "Stock") + "-");
+                            amountLine.setText(Language.getString("MainGUI", "Amount") + "-");
+                            priceLine.setText(Language.getString("MainGUI", "Price") + "-");
                         }
                     }
                 }
@@ -254,14 +255,14 @@ public class ShopHologram {
                 public void onTouch(Player player) {
                     boolean sell;
                     TextLine l = (TextLine) holo.getLine(2);
-                    sell = !l.getText().equals(Language.getString("MainGUI" , "Buying"));
+                    sell = !l.getText().equals(Language.getString("MainGUI", "Buying"));
 
                     ShopItem item;
 
-                    if (shop instanceof FileShop){
-                        item  = FileShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
+                    if (shop instanceof FileShop) {
+                        item = FileShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
                     } else {
-                        item  = SQLShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
+                        item = SQLShopItem.fromItemStack(shop, itemLine.getItemStack(), sell);
                     }
 
                     if (item != null) {
@@ -289,9 +290,9 @@ public class ShopHologram {
                             } else {
                                 itemLine.setItemStack(new ItemStack(Material.IRON_FENCE));
 
-                                stockLine.setText(Language.getString("MainGUI" , "Stock") + "-");
-                                amountLine.setText(Language.getString("MainGUI" , "Amount") + "-");
-                                priceLine.setText(Language.getString("MainGUI" , "Price") + "-");
+                                stockLine.setText(Language.getString("MainGUI", "Stock") + "-");
+                                amountLine.setText(Language.getString("MainGUI", "Amount") + "-");
+                                priceLine.setText(Language.getString("MainGUI", "Price") + "-");
                             }
                         }
                     } else {
@@ -303,15 +304,15 @@ public class ShopHologram {
                         } else {
                             itemLine.setItemStack(new ItemStack(Material.IRON_FENCE));
 
-                            stockLine.setText(Language.getString("MainGUI" , "Stock") + "-");
-                            amountLine.setText(Language.getString("MainGUI" , "Amount") + "-");
-                            priceLine.setText(Language.getString("MainGUI" , "Price") + "-");
+                            stockLine.setText(Language.getString("MainGUI", "Stock") + "-");
+                            amountLine.setText(Language.getString("MainGUI", "Amount") + "-");
+                            priceLine.setText(Language.getString("MainGUI", "Price") + "-");
                         }
                     }
                 }
             });
         } else {
-            shop.setObject("Holo" , false);
+            shop.setObject("Holo", false);
             HologramManager.removeHolographicShop(this);
         }
     }
@@ -350,7 +351,7 @@ public class ShopHologram {
 
                     can = true;
                 } catch (Exception ex) {
-                    p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "InvalidNumber"));
+                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidNumber"));
                     can = false;
                 }
 
@@ -363,16 +364,16 @@ public class ShopHologram {
                         if (amt <= Config.getMaxPrice()) {
                             shopItem.setPrice(amt);
                             updateItemLines(itemLine, shopItem.isSelling());
-                            p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "ChangePrice"));
+                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ChangePrice"));
                         } else {
                             if (String.valueOf(Config.getMaxPrice()).contains("E")) {
-                                p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "HighPrice") + " §7(Max: " + Config.getMaxPriceAsString() + ")");
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "HighPrice") + " §7(Max: " + Config.getMaxPriceAsString() + ")");
                             } else {
-                                p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "HighPrice") + " §7(Max: " + Config.getMaxPrice() + ")");
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "HighPrice") + " §7(Max: " + Config.getMaxPrice() + ")");
                             }
                         }
                     } else {
-                        p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "Zero"));
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Zero"));
                     }
                 }
             }
@@ -393,18 +394,18 @@ public class ShopHologram {
                     amt = Integer.parseInt(name);
                     can = true;
                 } catch (Exception ex) {
-                    p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "InvalidNumber"));
+                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidNumber"));
                     can = false;
                 }
 
                 if (can) {
 
                     if (amt > 0 && amt <= 2304) {
-                        shopItem.setObject("Amount" , amt);
+                        shopItem.setObject("Amount", amt);
                         updateItemLines(itemLine, shopItem.isSelling());
-                        p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "ChangeAmount"));
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ChangeAmount"));
                     } else {
-                        p.sendMessage(Language.getString("Messages" , "Prefix") + Language.getString("Messages" , "HighAmount"));
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "HighAmount"));
                     }
                 }
             }
@@ -420,31 +421,31 @@ public class ShopHologram {
         }
 
         if (!it.isInfinite()) {
-            ((TextLine) holo.getLine(7)).setText(Language.getString("MainGUI" , "Stock") + "§7" + it.getStock());
+            ((TextLine) holo.getLine(7)).setText(Language.getString("MainGUI", "Stock") + "§7" + it.getStock());
         } else {
-            ((TextLine) holo.getLine(7)).setText(Language.getString("MainGUI" , "Stock") + "§7-");
+            ((TextLine) holo.getLine(7)).setText(Language.getString("MainGUI", "Stock") + "§7-");
         }
 
         if (sell) {
-            ((TextLine) holo.getLine(8)).setText(Language.getString("MainGUI" , "AskingAmount") + "§7" + it.getAmount());
+            ((TextLine) holo.getLine(8)).setText(Language.getString("MainGUI", "AskingAmount") + "§7" + it.getAmount());
             if (!it.getLiveEco()) {
-                ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI" , "AskingPrice") + "§7" + it.getPriceAsString());
+                ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI", "AskingPrice") + "§7" + it.getPriceAsString());
             } else {
                 if (it.getAdjustedPrice() != it.getOrigPrice()) {
-                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI" , "AskingPrice") + "§c§m" + it.getOrigPrice() + "§a" + it.getAdjustedPriceAsString());
+                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI", "AskingPrice") + "§c§m" + it.getOrigPrice() + "§a" + it.getAdjustedPriceAsString());
                 } else {
-                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI" , "AskingPrice") + "§7" + it.getPriceAsString());
+                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI", "AskingPrice") + "§7" + it.getPriceAsString());
                 }
             }
         } else {
-            ((TextLine) holo.getLine(8)).setText(Language.getString("MainGUI" , "Amount") + "§7" + it.getAmount());
+            ((TextLine) holo.getLine(8)).setText(Language.getString("MainGUI", "Amount") + "§7" + it.getAmount());
             if (!it.getLiveEco()) {
-                ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI" , "Price") + "§7" + it.getPriceAsString());
+                ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI", "Price") + "§7" + it.getPriceAsString());
             } else {
                 if (it.getAdjustedPrice() != it.getOrigPrice()) {
-                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI" , "Price") + "§c§m" + it.getOrigPrice() + "§a" + it.getAdjustedPriceAsString());
+                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI", "Price") + "§c§m" + it.getOrigPrice() + "§a" + it.getAdjustedPriceAsString());
                 } else {
-                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI" , "Price") + "§7" + it.getPriceAsString());
+                    ((TextLine) holo.getLine(9)).setText(Language.getString("MainGUI", "Price") + "§7" + it.getPriceAsString());
                 }
             }
         }

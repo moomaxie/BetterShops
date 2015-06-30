@@ -13,11 +13,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.IOException;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * ***********************************************************************
@@ -32,8 +35,9 @@ import java.util.*;
 public class ShopManager {
 
     public static List<Shop> shops = new ArrayList<Shop>();
+    public static int loadingTotal;
 
-    public static int loadShops() throws SQLException, IOException {
+    public static int loadShops() throws Exception {
 
         limit.clear();
         shops.clear();
@@ -43,84 +47,10 @@ public class ShopManager {
         playerShops.clear();
         worlds.clear();
 
-        int ss = 0;
+        int ss;
 
         if (!Core.useSQL() || Core.useSQL() && !SQLUtil.isConverted()) {
-
-            File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Shops");
-
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-
-            int total = 0;
-            if (file.listFiles() != null)
-            for (File f : file.listFiles()) {
-                File[] fi = f.listFiles();
-                if (fi != null)
-                    total = total + fi.length;
-            }
-            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aStarting Loading of Chest Shops (§d" + total + "§a) §eVia File");
-            int i = 0;
-            if (file.listFiles() != null)
-                for (File f : file.listFiles()) {
-
-                    if (f.listFiles() != null)
-                        for (File file1 : f.listFiles()) {
-                            List<Shop> shops1 = new ArrayList<>();
-                            if (file1.getName().contains(".yml")) {
-                                UUID id = UUID.fromString(f.getName());
-
-                                YamlConfiguration config = YamlConfiguration.loadConfiguration(file1);
-
-                                limit.put(id, f.listFiles().length);
-
-                                Shop shop = new FileShop(config, file1, Bukkit.getOfflinePlayer(id));
-
-                                shops1.add(shop);
-
-                                shops.add(shop);
-                                locs.put(shop.getLocation(), shop);
-                                names.put(shop.getName(), shop);
-                                if (!worlds.contains(shop.getLocation().getWorld()))
-                                    worlds.add(shop.getLocation().getWorld());
-
-
-                                ss++;
-
-                                i++;
-                                if (i == (total * .10)) {
-                                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a10%");
-                                }
-                                if (i == (total * .33)) {
-                                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a33%");
-                                }
-                                if (i == (total * .66)) {
-                                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a66%");
-                                }
-                                if (i == (total * .5)) {
-                                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a50%");
-                                }
-                                if (i == (total * .25)) {
-                                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a25%");
-                                }
-                                if (i == (total * .75)) {
-                                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a75%");
-                                }
-                                if (i == (total * .9)) {
-                                    Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a90%");
-                                }
-                            }
-                            playerShops.put(UUID.fromString(f.getName()), shops1);
-                        }
-                }
-            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
-            if (Core.useSQL()) {
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aConverting Shops to MySQL (Will take awhile)");
-                SQLUtil.convertShopToSQL();
-                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
-                loadSQL();
-            }
+            ss = loadFile();
         } else {
             ss = loadSQL();
         }
@@ -188,26 +118,138 @@ public class ShopManager {
         }
     }
 
-    public static int loadSQL() throws SQLException {
+    public static int loadFile() throws Exception {
+        limit.clear();
+        shops.clear();
+        names.clear();
+        locs.clear();
+        signLocs.clear();
+        playerShops.clear();
+        worlds.clear();
+        int ss = 0;
+        File file = new File(Bukkit.getPluginManager().getPlugin("BetterShops").getDataFolder(), "Shops");
 
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        int total = 0;
+        if (file.listFiles() != null)
+            for (File f : file.listFiles()) {
+                File[] fi = f.listFiles();
+                if (fi != null) {
+                    total = total + fi.length;
+                    loadingTotal = total;
+                }
+            }
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aStarting Loading of Chest Shops (§d" + total + "§a) §eVia File");
+        int i = 0;
+        if (file.listFiles() != null)
+            for (File f : file.listFiles()) {
+
+                if (f.listFiles() != null)
+                    for (File file1 : f.listFiles()) {
+                        List<Shop> shops1 = new ArrayList<>();
+                        if (file1.getName().contains(".yml")) {
+                            UUID id = UUID.fromString(f.getName());
+
+                            YamlConfiguration config = YamlConfiguration.loadConfiguration(file1);
+
+                            limit.put(id, f.listFiles().length);
+
+                            Shop shop = new FileShop(config, file1, Bukkit.getOfflinePlayer(id));
+
+                            shops1.add(shop);
+
+                            shops.add(shop);
+                            locs.put(shop.getLocation(), shop);
+                            names.put(shop.getName(), shop);
+                            if (!worlds.contains(shop.getLocation().getWorld()))
+                                worlds.add(shop.getLocation().getWorld());
+
+
+                            ss++;
+
+                            i++;
+                            if (i == (total * .10)) {
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a10%");
+                            }
+                            if (i == (total * .33)) {
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a33%");
+                            }
+                            if (i == (total * .66)) {
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a66%");
+                            }
+                            if (i == (total * .5)) {
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a50%");
+                            }
+                            if (i == (total * .25)) {
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a25%");
+                            }
+                            if (i == (total * .75)) {
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a75%");
+                            }
+                            if (i == (total * .9)) {
+                                Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a90%");
+                            }
+                        }
+                        playerShops.put(UUID.fromString(f.getName()), shops1);
+                    }
+            }
+        Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
+        if (Core.useSQL()) {
+            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aConverting Shops to MySQL (Will take awhile)");
+            SQLUtil.convertShopToSQL();
+            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
+            loadSQL();
+        }
+        return ss;
+    }
+
+    public static int loadSQL() throws SQLException {
+        limit.clear();
+        shops.clear();
+        names.clear();
+        locs.clear();
+        signLocs.clear();
+        playerShops.clear();
+        worlds.clear();
         Statement statement = Core.getConnection().createStatement();
+
+        DatabaseMetaData md = Core.getConnection().getMetaData();
+        ResultSet rs3 = md.getColumns(null, null, "Items", "DisplayName");
+        if (!rs3.next()) {
+            statement.executeUpdate("ALTER TABLE `Items`" +
+                    "ADD COLUMN `DisplayName` TEXT NULL DEFAULT NULL AFTER `Item`," +
+                    "ADD COLUMN `Lore` TEXT NULL DEFAULT NULL AFTER `DisplayName`," +
+                    "ADD COLUMN `Enchants` TEXT NULL DEFAULT NULL AFTER `Lore`;");
+        }
 
         ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM Shops");
         int total = 0;
         if (rs.next()) {
             total = rs.getInt(1);
+            loadingTotal = total;
         }
 
         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aStarting Loading of Chest Shops (§d" + total + "§a) §evia MySQL");
 
         int i = 0;
 
-        ResultSet r = statement.executeQuery("SELECT * FROM Shops");
+        final ResultSet r = statement.executeQuery("SELECT * FROM Shops");
         while (r.next()) {
-            String name = r.getString("Name");
-            Shop shop = new SQLShop(name, r);
+
+            final String name = r.getString("Name");
+
+            Shop shop = null;
+            try {
+                shop = new SQLShop(name);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
             shops.add(shop);
+            assert shop != null;
             locs.put(shop.getLocation(), shop);
             names.put(shop.getName(), shop);
             if (!worlds.contains(shop.getLocation().getWorld()))
@@ -226,6 +268,8 @@ public class ShopManager {
                 playerShops.put(shop.getOwner().getUniqueId(), shops1);
                 limit.put(shop.getOwner().getUniqueId(), shops1.size());
             }
+
+
             i++;
         }
         return i;

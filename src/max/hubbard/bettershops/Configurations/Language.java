@@ -84,7 +84,7 @@ public class Language {
 
         File fil = Core.getCore().getFile();
 
-        java.util.jar.JarFile jar = null;
+        java.util.jar.JarFile jar;
         try {
             jar = new java.util.jar.JarFile(fil);
         } catch (IOException e) {

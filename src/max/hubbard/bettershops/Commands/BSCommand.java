@@ -16,6 +16,7 @@ import max.hubbard.bettershops.Shops.Types.NPC.NPCManager;
 import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
 import max.hubbard.bettershops.Shops.Types.Sign.SignShopManager;
 import max.hubbard.bettershops.Updater;
+import max.hubbard.bettershops.Utils.Conversion;
 import max.hubbard.bettershops.Utils.ShopDeleter;
 import max.hubbard.bettershops.Versions.SignChange;
 import org.bukkit.*;
@@ -49,7 +50,21 @@ public class BSCommand implements CommandExecutor {
                 Player p = (Player) sender;
                 if (args.length == 1) {
 
-                    if (args[0].equalsIgnoreCase("info")) {
+                    if (args[0].equalsIgnoreCase("migrate") && p.isOp()) {
+                        p.sendMessage(Language.getString("Messages","Prefix") + "§eStarting Shop Migration...");
+                        Conversion.startConversion();
+
+                        try {
+                            ShopManager.loadFile();
+
+                            Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
+                            p.sendMessage(Language.getString("Messages","Prefix") + "§aDone");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            p.sendMessage(Language.getString("Messages", "Prefix") + "§cAn error occurred, please inform a server administrator.");
+                        }
+
+                    } else if (args[0].equalsIgnoreCase("info")) {
 
                         p.sendMessage(Language.getString("Messages", "Prefix") + "You are running version: §e" + Bukkit.getPluginManager().getPlugin("BetterShops").getDescription().getVersion());
 
@@ -112,6 +127,7 @@ public class BSCommand implements CommandExecutor {
                         p.sendMessage("    §a/bs open <Shop>");
                         p.sendMessage("    §a/bs remove <Shop>");
                         p.sendMessage("    §a/bs list <Player>");
+                        p.sendMessage("    §a/bs migrate");
                         p.sendMessage("§d<-Better Shops Help->");
                     }
                 } else if (args.length >= 2) {
@@ -251,7 +267,6 @@ public class BSCommand implements CommandExecutor {
                                             Block b = loc.getBlock();
 
                                             if (b.getState() instanceof Chest) {
-                                                Chest chest = (Chest) b.getState();
 
                                                 for (Chunk c : loc.getWorld().getLoadedChunks()) {
                                                     for (BlockState bs : c.getTileEntities()) {
@@ -347,7 +362,6 @@ public class BSCommand implements CommandExecutor {
                                             Block b = loc.getBlock();
 
                                             if (b.getState() instanceof Chest) {
-                                                Chest chest = (Chest) b.getState();
 
                                                 for (Chunk c : loc.getWorld().getLoadedChunks()) {
                                                     for (BlockState bs : c.getTileEntities()) {
@@ -411,6 +425,7 @@ public class BSCommand implements CommandExecutor {
                         p.sendMessage("    §a/bs open <Shop>");
                         p.sendMessage("    §a/bs remove <Shop>");
                         p.sendMessage("    §a/bs list <Player>");
+                        p.sendMessage("    §a/bs migrate");
                         p.sendMessage("§d<-Better Shops Help->");
                     }
 
@@ -424,6 +439,7 @@ public class BSCommand implements CommandExecutor {
                     p.sendMessage("    §a/bs open <Shop>");
                     p.sendMessage("    §a/bs remove <Shop>");
                     p.sendMessage("    §a/bs list <Player>");
+                    p.sendMessage("    §a/bs migrate");
                     p.sendMessage("§d<-Better Shops Help->");
                 }
             }

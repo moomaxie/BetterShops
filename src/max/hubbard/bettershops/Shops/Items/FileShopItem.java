@@ -3,6 +3,7 @@ package max.hubbard.bettershops.Shops.Items;
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Shops.FileShop;
 import max.hubbard.bettershops.Shops.Shop;
+import max.hubbard.bettershops.Utils.ItemUtils;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -72,6 +73,8 @@ public class FileShopItem implements ShopItem {
             ((FileShop) shop).config.set("Items." + id + ".Page", page);
             ((FileShop) shop).config.set("Items." + id + ".Slot", slot);
 
+            shop.saveConfig();
+
             if (getObject("LiveEconomy") == null) {
                 setObject("Price", Config.getObject("DefaultPrice"));
                 setObject("LiveEconomy", false);
@@ -87,20 +90,24 @@ public class FileShopItem implements ShopItem {
             } else {
                 calculateAmountTo();
             }
-
-            shop.saveConfig();
         }
     }
 
     public static ShopItem loadShopItem(Shop shop, int id) {
         if (shop instanceof FileShop) {
-            ItemStack item = ((FileShop) shop).config.getItemStack("Items." + id + ".ItemStack");
+            ItemStack item;
+            if (((FileShop) shop).config.isItemStack("Items." + id + ".ItemStack")) {
+                item = ((FileShop) shop).config.getItemStack("Items." + id + ".ItemStack");
+            } else {
+                item = ItemUtils.fromString(((FileShop) shop).config.getString("Items." + id + ".ItemStack"));
+            }
             int page = (Integer) shop.getObject("Items." + id + ".Page");
             int slot = (Integer) shop.getObject("Items." + id + ".Slot");
             boolean sell = (Boolean) shop.getObject("Items." + id + ".Selling");
 
-
-            return new FileShopItem(shop, item, id, page, slot, sell);
+            if (item != null)
+                return new FileShopItem(shop, item, id, page, slot, sell);
+            else return null;
         } else {
             return null;
         }
@@ -109,11 +116,21 @@ public class FileShopItem implements ShopItem {
     public static ShopItem loadShopItem(Shop shop, int id, boolean sell) {
         if (shop instanceof FileShop) {
             if (((FileShop) shop).config.isBoolean("Items." + id + ".Selling")) {
-                ItemStack item = ((FileShop) shop).config.getItemStack("Items." + id + ".ItemStack");
+                ItemStack item;
+                if (((FileShop) shop).config.isItemStack("Items." + id + ".ItemStack")) {
+                    item = ((FileShop) shop).config.getItemStack("Items." + id + ".ItemStack");
+                } else {
+                    item = ItemUtils.fromString(((FileShop) shop).config.getString("Items." + id + ".ItemStack"));
+                }
                 int page = (Integer) shop.getObject("Items." + id + ".Page");
-                int slot = (Integer) shop.getObject("Items." + id + ".Slot");
 
+                int slot;
+                if (shop.getObject("Items." + id + ".Slot") != null) {
+                    slot = (Integer) shop.getObject("Items." + id + ".Slot");
+                } else {
+                    slot = 18;
 
+                }
                 return new FileShopItem(shop, item, id, page, slot, sell);
             } else {
                 return loadShopItem(shop, id);

@@ -44,9 +44,9 @@ public class CreateShop implements Listener {
             boolean can = true;
             boolean wgCan;
 
-
             if ((boolean) Config.getObject("Permissions") && !Permissions.hasCreatePerm(p)) {
-                can = false;
+                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","NoPermission"));
+                return;
             }
 
             if ((boolean) Config.getObject("Creation Limit") && (boolean) Config.getObject("Permissions") && !Permissions.hasLimitPerm(p) && ShopManager.atLimit(p) || (boolean) Config.getObject("Creation Limit") && !p.isOp() && !(boolean) Config.getObject("Permissions") && ShopManager.atLimit(p)) {
@@ -54,11 +54,9 @@ public class CreateShop implements Listener {
             }
 
             wgCan = !Core.useWorldGuard() || WorldGuardStuff.checkCreateShop(e.getBlock().getLocation());
-
             if (can) {
 
                 if (wgCan) {
-
                     if (e.getBlock().getType() == Material.WALL_SIGN) {
 
                         org.bukkit.block.Sign sign = (org.bukkit.block.Sign) e.getBlock().getState();
@@ -88,8 +86,6 @@ public class CreateShop implements Listener {
                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "WorldGuardDenyShop"));
                     return;
                 }
-
-
                 final Chest finalChest = chest;
 
                 if (finalChest != null && ShopManager.fromLocation(finalChest.getLocation()) == null) {
@@ -257,6 +253,8 @@ public class CreateShop implements Listener {
                     });
 
                 }
+            } else {
+                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","AtLimit"));
             }
         }
     }

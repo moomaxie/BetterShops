@@ -1,5 +1,6 @@
 package max.hubbard.bettershops.Utils;
 
+import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Events.ShopDeleteEvent;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.FileShop;
@@ -7,7 +8,6 @@ import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.SQLShop;
 import max.hubbard.bettershops.Shops.Shop;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -23,16 +23,13 @@ import java.util.List;
  */
 public class ShopDeleter {
 
-    public static void deleteShopExternally(Shop shop) {
+    public static void deleteShopExternally(final Shop shop) {
         ShopDeleteEvent ev = new ShopDeleteEvent(shop);
         Bukkit.getPluginManager().callEvent(ev);
 
-        shop.getLocation().getBlock().setType(Material.AIR);
-
         for (ShopItem item : shop.getShopItems()) {
-            Stocks.throwItemsOnGround(item);
+            Stocks.throwItemsOnGroundInThread(item);
         }
-
         if (shop instanceof FileShop) {
             ((FileShop) shop).file.delete();
         } else {
@@ -46,6 +43,7 @@ public class ShopDeleter {
                 e.printStackTrace();
             }
         }
+
 
         ShopManager.locs.remove(shop.getLocation());
         ShopManager.names.remove(shop.getName());
@@ -62,6 +60,10 @@ public class ShopDeleter {
             ShopManager.playerShops.put(shop.getOwner().getUniqueId(), li);
         }
 
+        ShopManager.loadingTotal = ShopManager.getShops().size();
 
+        if (Core.getMetrics() != null) {
+            Core.getCore().setUpMetrics();
+        }
     }
 }
