@@ -1,7 +1,7 @@
 # BetterShops
 ![](http://dev.bukkit.org/media/images/80/60/BetterShopsLogo.png)
 
-## THE REVOLUTIONARY SHOP PLUGIN
+## THE REVOLUTIONARY SHOP PLUGIN ![](https://travis-ci.org/moomaxie/BetterShops.svg?branch=master)
 
 After months of hard work and designing, a new generation of shops has appeared.
 
