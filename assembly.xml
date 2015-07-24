@@ -16,8 +16,8 @@
                 <includeModuleDirectory>false</includeModuleDirectory>
                 <fileSets>
                     <fileSet>
+                        <directory>.</directory>
                         <outputDirectory>/</outputDirectory>
-                        <directory>target</directory>
                         <includes>
                             <include>*.jar</include>
                         </includes>
