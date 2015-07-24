@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 2.0.4
+Version: 2.1.0
 
 AddKeeperDisplayName: '&a&lAdd Keeper'
 AddKeeperLore: '&e&lLeft Click &7to &aAdd &7a &dShop Keeper'

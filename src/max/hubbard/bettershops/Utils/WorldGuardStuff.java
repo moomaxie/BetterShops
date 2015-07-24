@@ -18,7 +18,6 @@ public class WorldGuardStuff {
 
     public static void allowMobs(Location l) {
 
-
         for (com.sk89q.worldguard.protection.regions.ProtectedRegion r : Core.getWorldGuard().getRegionManager(l.getWorld()).getApplicableRegions(l)) {
             r.setFlag(com.sk89q.worldguard.protection.flags.DefaultFlag.MOB_SPAWNING, com.sk89q.worldguard.protection.flags.StateFlag.State.ALLOW);
         }
@@ -52,11 +51,6 @@ public class WorldGuardStuff {
             }
         } else if (Core.useWorldGuard() && !(boolean) Config.getObject("EnableAllowShopsFlag")) {
             return true;
-//                ApplicableRegionSet set = Core.getRegionSet(e.getBlock().getLocation());
-
-//                if (!set.allows(com.sk89q.worldguard.protection.flags.DefaultFlag.ENABLE_SHOP)){
-//                    wgCan = false;
-//                }
         } else {
             return true;
         }

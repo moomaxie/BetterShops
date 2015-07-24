@@ -3,6 +3,7 @@ package max.hubbard.bettershops.Events;
 
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
+import max.hubbard.bettershops.Utils.Transaction;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Event;
@@ -23,11 +24,13 @@ public class ShopSellItemEvent extends Event {
     private Shop shop;
     private ShopItem item;
     private OfflinePlayer seller;
+    private Transaction t;
 
-    public ShopSellItemEvent(ShopItem item, Shop shop, OfflinePlayer seller) {
+    public ShopSellItemEvent(ShopItem item, Shop shop, OfflinePlayer seller, Transaction t) {
         this.shop = shop;
         this.item = item;
         this.seller = seller;
+        this.t = t;
     }
 
     public Shop getShop(){
@@ -42,6 +45,10 @@ public class ShopSellItemEvent extends Event {
 
     public OfflinePlayer getOwner(){
         return shop.getOwner();
+    }
+
+    public Transaction getTransaction(){
+        return t;
     }
 
     public Location getLocation(){

@@ -54,7 +54,7 @@ public class ConfigMenuListener implements Listener {
                         if (s.equalsIgnoreCase("CostForShops")) {
                             setCost(p);
                         }
-                        if (s.equalsIgnoreCase("Creation Limit")) {
+                        if (s.equalsIgnoreCase("Limit")) {
                             setLimit(p);
                         }
                         if (s.equalsIgnoreCase("DefaultPrice")) {
@@ -65,6 +65,9 @@ public class ConfigMenuListener implements Listener {
                         }
                         if (s.equalsIgnoreCase("StockLimit")) {
                             setStockLimit(p);
+                        }
+                        if (s.equalsIgnoreCase("RemoveAfter")) {
+                            setRemoveAfter(p);
                         }
                     }
 
@@ -109,7 +112,45 @@ public class ConfigMenuListener implements Listener {
                 }
 
                 if (!can) {
-                    Config.setObject("Creation Limit", amt);
+                    Config.setObject("Limit", amt);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        public void run() {
+                            ConfigMenu.openConfigMenu(null, p, 1);
+                        }
+                    }, 1L);
+                } else {
+                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidNumber"));
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        public void run() {
+                            ConfigMenu.openConfigMenu(null, p, 1);
+                        }
+                    }, 1L);
+                }
+            }
+        });
+
+
+    }
+
+    public void setRemoveAfter(final Player p) {
+        final AnvilManager man = new AnvilManager(p);
+        Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+            @Override
+            public void run() {
+                final String name = man.call();
+
+                int amt = 0;
+                boolean can = true;
+                try {
+                    amt = Integer.parseInt(name);
+                    can = false;
+
+
+                } catch (Exception ex) {
+                }
+
+                if (!can) {
+                    Config.setObject("RemoveAfter", amt);
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         public void run() {
                             ConfigMenu.openConfigMenu(null, p, 1);

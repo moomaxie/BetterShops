@@ -24,6 +24,6 @@ public class ShopItemStack {
     }
 
     public boolean compare(ItemStack it) {
-        return item.isSimilar(it) || item.toString().equals(it.toString()) && item.getData().getData() == it.getData().getData() && item.getDurability() == it.getDurability();
+        return it != null && item != null && (item.isSimilar(it) || item.toString().equals(it.toString()) && item.getData().getData() == it.getData().getData() && item.getDurability() == it.getDurability());
     }
 }

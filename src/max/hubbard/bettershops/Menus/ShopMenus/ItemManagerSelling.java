@@ -2,6 +2,9 @@ package max.hubbard.bettershops.Menus.ShopMenus;
 
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
+import max.hubbard.bettershops.Events.AmountChangeEvent;
+import max.hubbard.bettershops.Events.PriceChangeEvent;
+import max.hubbard.bettershops.Events.StockChangeEvent;
 import max.hubbard.bettershops.Menus.MenuType;
 import max.hubbard.bettershops.Menus.ShopMenu;
 import max.hubbard.bettershops.Shops.Items.Actions.ClickableItem;
@@ -24,6 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * ***********************************************************************
@@ -101,6 +105,8 @@ public class ItemManagerSelling implements ShopMenu {
                         if (can) {
                             if (amt >= 0) {
                                 if (amt <= Config.getMaxPrice()) {
+                                    PriceChangeEvent e = new PriceChangeEvent(shopItem,shopItem.getPrice(),amt);
+                                    Bukkit.getPluginManager().callEvent(e);
                                     shopItem.setPrice(amt);
                                     if (shop.isHoloShop()) {
                                         ShopHologram h = shop.getHolographicShop();
@@ -168,6 +174,11 @@ public class ItemManagerSelling implements ShopMenu {
                     } else {
                         shop.getMenu(MenuType.OWNER_SELLING).draw(p, page);
                     }
+
+                    if (shop.getShopItems().size() == 0 && max.hubbard.bettershops.TradeManager.getTrades(shop).size() == 0){
+                        shop.setObject("Removal",new Date().getTime());
+                    }
+
                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "RemoveItem"));
 
                 } else {
@@ -197,6 +208,8 @@ public class ItemManagerSelling implements ShopMenu {
                             amt = Integer.parseInt(name);
                         } catch (Exception ex) {
                             if (name.equalsIgnoreCase("all")) {
+                                StockChangeEvent e = new StockChangeEvent(shopItem,shopItem.getStock(),0);
+                                Bukkit.getPluginManager().callEvent(e);
                                 Stocks.collectAll(shopItem, shop, p);
                                 if (shop.isHoloShop()) {
                                     ShopHologram h = shop.getHolographicShop();
@@ -247,6 +260,8 @@ public class ItemManagerSelling implements ShopMenu {
                         if (can) {
 
                             if (amt > 0 && amt <= 2304) {
+                                AmountChangeEvent e = new AmountChangeEvent(shopItem,shopItem.getAmount(),amt);
+                                Bukkit.getPluginManager().callEvent(e);
                                 shopItem.setObject("Amount", amt);
 
                                 if (shopItem.getLiveEco()) {
@@ -341,10 +356,42 @@ public class ItemManagerSelling implements ShopMenu {
             }
         });
 
+        ItemStack autoStock = new ItemStack(Material.DIAMOND);
+        ItemMeta autoStockMeta = autoStock.getItemMeta();
+        autoStockMeta.setDisplayName(Language.getString("Timings", "AutoStock"));
+        autoStockMeta.setLore(Arrays.asList(Language.getString("Timings", "AutoStockLore")));
+        autoStock.setItemMeta(autoStockMeta);
+        ClickableItem autoStockClick = new ClickableItem(new ShopItemStack(autoStock), inv, p);
+        autoStockClick.addLeftClickAction(new LeftClickAction() {
+                                              @Override
+                                              public void onAction(InventoryClickEvent e) {
+                                                  shop.getMenu(MenuType.AUTO_STOCK).draw(p, page, shopItem);
+                                              }
+                                          }
+
+        );
+
+        ItemStack transCool = new ItemStack(Material.WATCH);
+        ItemMeta transCoolMeta = transCool.getItemMeta();
+        transCoolMeta.setDisplayName(Language.getString("Timings", "Transactions"));
+        transCoolMeta.setLore(Arrays.asList(Language.getString("Timings", "TransactionsLore")));
+        transCool.setItemMeta(transCoolMeta);
+        ClickableItem transCoolClick = new ClickableItem(new ShopItemStack(transCool), inv, p);
+        transCoolClick.addLeftClickAction(new LeftClickAction() {
+                                              @Override
+                                              public void onAction(InventoryClickEvent e) {
+                                                  shop.getMenu(MenuType.COOLDOWNS).draw(p, page, shopItem);
+                                              }
+                                          }
+
+        );
+
         inv.setItem(0, back);
 
         inv.setItem(4, shopItem.getItem());
         inv.setItem(8, limit);
+
+        inv.setItem(48, transCool);
 
         inv.setItem(inv.firstEmpty(), nam);
         inv.setItem(inv.firstEmpty(), desc);

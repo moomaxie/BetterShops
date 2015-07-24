@@ -1,5 +1,6 @@
 package max.hubbard.bettershops.Utils;
 
+import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.FileShop;
@@ -34,8 +35,12 @@ public class SQLUtil {
         Statement statement;
         statement = Core.getConnection().createStatement();
 
-        ResultSet set = statement.getConnection().getMetaData().getTables(null, null, "Transactions", null);
+        ResultSet set = statement.getConnection().getMetaData().getTables(null, null, Config.getObject("prefix") + "Transactions", null);
 
+        if (set.next()) {
+            return true;
+        }
+        set = statement.getConnection().getMetaData().getTables(null, null, "Transactions", null);
         return set.next();
     }
 
@@ -43,21 +48,21 @@ public class SQLUtil {
         Statement statement;
         statement = Core.getConnection().createStatement();
 
-        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Shops (Name VARCHAR(30) NOT NULL, Owner TEXT, Description TEXT, World TEXT, X INTEGER, " +
-                "Y INTEGER, Z INTEGER, NextShopId INTEGER, Open BOOLEAN, Notify BOOLEAN, Server BOOLEAN, NPC BOOLEAN, Holo BOOLEAN, Frame INTEGER, PRIMARY KEY (`Name`));");
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.getObject("prefix") + "Shops (Name VARCHAR(30) NOT NULL, Owner TEXT, Description TEXT, World TEXT, X INTEGER, " +
+                "Y INTEGER, Z INTEGER, NextShopId INTEGER, Open BOOLEAN, Notify BOOLEAN, Server BOOLEAN, NPC BOOLEAN, Holo BOOLEAN, Frame INTEGER, NPCInfo TEXT, Removal TEXT, PRIMARY KEY (`Name`));");
 
-        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Keepers (Shop VARCHAR(30) NOT NULL, Players TEXT);");
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.getObject("prefix") + "Keepers (Shop VARCHAR(30) NOT NULL, Players TEXT);");
 
-        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Blacklist (Shop VARCHAR(30) NOT NULL, Players TEXT);");
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.getObject("prefix") + "Blacklist (Shop VARCHAR(30) NOT NULL, Players TEXT);");
 
-        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Items (Shop VARCHAR(30) NOT NULL, Id TEXT, Item TEXT, DisplayName TEXT, Lore TEXT, Enchants TEXT, Page INTEGER, Slot INTEGER, Selling BOOLEAN, Stock INTEGER, Amount INTEGER," +
-                "Price DECIMAL, OrigPrice DECIMAL, Infinite BOOLEAN, LiveEconomy BOOLEAN, PriceChangePercent DECIMAL, DoubleAmount INTEGER," +
-                "MinimumPrice DECIMAL, MaximumPrice DECIMAL, AdjustedPrice DECIMAL, SellLimit INTEGER);");
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.getObject("prefix") + "Items (Shop VARCHAR(30) NOT NULL, Id TEXT, Item TEXT, DisplayName TEXT, Lore TEXT, Enchants TEXT, Page INTEGER, Slot INTEGER, Selling BOOLEAN, Stock INTEGER, Amount INTEGER," +
+                "Price DOUBLE, OrigPrice DOUBLE, Infinite BOOLEAN, LiveEconomy BOOLEAN, PriceChangePercent DECIMAL, DoubleAmount INTEGER," +
+                "MinimumPrice DOUBLE, MaximumPrice DOUBLE, AdjustedPrice DOUBLE, SellLimit INTEGER, AutoStock TEXT, TransCool TEXT, Auto BOOLEAN, Trans BOOLEAN, Cooldowns TEXT, SellEco BOOLEAN);");
 
-        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Trades (Shop VARCHAR(30) NOT NULL, Id TEXT, TradeItems TEXT, ReceiveItems TEXT, Gold INTEGER, " +
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.getObject("prefix") + "Trades (Shop VARCHAR(30) NOT NULL, Id TEXT, TradeItems TEXT, ReceiveItems TEXT, Gold INTEGER, " +
                 "RecGold INTEGER,Traded BOOLEAN);");
 
-        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Transactions (Shop VARCHAR(30) NOT NULL, Item TEXT, Player TEXT, Owner TEXT, Price DECIMAL, " +
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.getObject("prefix") + "Transactions (Shop VARCHAR(30) NOT NULL, Item TEXT, Player TEXT, Owner TEXT, Price DECIMAL, " +
                 "Amount INTEGER, Selling BOOLEAN, Date TEXT);");
 
         for (Shop shop : ShopManager.getShops()) {
@@ -77,22 +82,30 @@ public class SQLUtil {
                 List<ShopItem> items = shop.getShopItems();
                 History history = shop.getHistory();
 
-                statement.executeUpdate("INSERT IGNORE INTO Shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
+                Object removal = shop.getObject("Removal");
+
+                String npcIn = null;
+
+                if (shop.getObject("NPCInfo") != null) {
+                    npcIn = (String) shop.getObject("NPCInfo");
+                }
+
+                statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`, `NPCInfo`, `Removal`) VALUES" +
                         " ('" + name + "', '" + id + "', '" + description + "', '" + loc.getWorld().getName() + "', '" + loc.getX() + "', '" + loc.getY() + "', '" + loc.getZ() + "', '"
-                        + nextId + "', " + open + ", '" + getBoolValue(notify) + "', '" + getBoolValue(server) + "', '" + getBoolValue(npc) + "', '" + getBoolValue(holo) + "', '" + shop.getFrameColor()+
-                        "');");
+                        + nextId + "', " + open + ", '" + getBoolValue(notify) + "', '" + getBoolValue(server) + "', '" + getBoolValue(npc) + "', '" + getBoolValue(holo) + "', '" + shop.getFrameColor() +
+                        "', '" + npcIn + "', '" + removal + "');");
 
                 for (OfflinePlayer pl : keepers) {
-                    statement.executeUpdate("INSERT IGNORE INTO Keepers (`Shop`, `Players`) VALUES ('" + name + "', '" + pl.getUniqueId().toString() + "')"+
+                    statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Keepers (`Shop`, `Players`) VALUES ('" + name + "', '" + pl.getUniqueId().toString() + "')" +
 
                             ";");
                 }
                 for (OfflinePlayer pl : blacklist) {
-                    statement.executeUpdate("INSERT IGNORE INTO Blacklist (`Shop`, `Players`) VALUES ('" + name + "', '" + pl.getUniqueId().toString() + "')" +
+                    statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Blacklist (`Shop`, `Players`) VALUES ('" + name + "', '" + pl.getUniqueId().toString() + "')" +
                             ";");
                 }
                 for (String s : history.config.getKeys(false)) {
-                    String item = history.config.getConfigurationSection(s).getString("Item").replaceAll("'","");
+                    String item = history.config.getConfigurationSection(s).getString("Item").replaceAll("'", "");
                     String player = history.config.getConfigurationSection(s).getString("Buyer Name");
                     String owner = history.config.getConfigurationSection(s).getString("Owner Name");
                     String date = history.config.getConfigurationSection(s).getString("Date");
@@ -101,9 +114,9 @@ public class SQLUtil {
                     int amt = history.config.getConfigurationSection(s).getInt("Amount");
 
 
-                    statement.executeUpdate("INSERT IGNORE INTO Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
+                    statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
                             " ('" + name + "', '" + item + "', '" + player + "', '" + owner + "', '" + price + "', '" + amt + "', "
-                            + sell + ", '" + date + "'"+
+                            + sell + ", '" + date + "'" +
                             ");");
                 }
 
@@ -138,12 +151,18 @@ public class SQLUtil {
                     double min = item.getMinPrice();
                     double max = (Double) item.getObject("MaximumPrice");
                     double adjust = item.getAdjustedPrice();
+                    String autoStock = item.getAutoStockTiming().toString();
+                    String transCool = item.getTransCooldownTiming().toString();
+                    boolean auto = item.isAutoStock();
+                    boolean trans = item.isTransCooldown();
+                    String cool = (String) item.getObject("Cooldowns");
+                    boolean selleco = item.isSellEco();
 
-                    statement.executeUpdate("INSERT IGNORE INTO Items VALUES " +
+                    statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Items VALUES " +
                             "('" + name + "', '" + idd + "', '" + ItemUtils.toString(ite) + "', '" + display + "', '" + l + "', '" + enchants + "', '" + page + "', '" + slot + "', '" + getBoolValue(sell) + "', '" + stock + "', " +
                             "'" + amt + "', '" + price + "', '" + origPrice + "', '" + getBoolValue(infinite) + "', '" + getBoolValue(liveEco) + "', '" + percent + "', " +
-                            "'" + doubleAmt + "', '" + min + "', '" + max + "', '" + adjust + "', '" + item.getLimit() + "'"+
-                            ");");
+                            "'" + doubleAmt + "', '" + min + "', '" + max + "', '" + adjust + "', '" + item.getLimit() + "'" +
+                            ", '" + autoStock + "', '" + transCool + "', '" + auto + "', '" + trans + "', '" + cool + "', '" + selleco + "');");
                 }
 
                 if (TradeManager.getTrades(shop) != null)
@@ -171,9 +190,9 @@ public class SQLUtil {
                             s2 = s2 + s1 + "###";
                         }
 
-                        statement.executeUpdate("INSERT IGNORE INTO Trades (`Shop`, `Id`, `TradeItems`, `ReceiveItems`, `Gold`, `RecGold`, `Traded`) VALUES" +
+                        statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Trades (`Shop`, `Id`, `TradeItems`, `ReceiveItems`, `Gold`, `RecGold`, `Traded`) VALUES" +
                                 " ('" + name + "', '" + t.getId() + "', '" + s + "', '" + s2 + "', '" + t.getTradeGold() + "', '" + t.getReceivingGold() + "', '"
-                                + getBoolValue(t.isTraded()) + "'"+
+                                + getBoolValue(t.isTraded()) + "'" +
                                 ");");
 
 

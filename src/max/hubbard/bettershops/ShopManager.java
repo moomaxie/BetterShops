@@ -13,10 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +78,7 @@ public class ShopManager {
     }
 
     public static boolean atLimit(OfflinePlayer p) {
-        return (boolean) Config.getObject("Creation Limit") && getShopAmt(p) >= (Integer) Config.getObject("Limit");
+        return (boolean) Config.getObject("Creation Limit") && getShopAmt(p) >= (Double) Config.getObject("Limit");
     }
 
     public static int getShopAmt(OfflinePlayer p) {
@@ -217,15 +214,54 @@ public class ShopManager {
         Statement statement = Core.getConnection().createStatement();
 
         DatabaseMetaData md = Core.getConnection().getMetaData();
-        ResultSet rs3 = md.getColumns(null, null, "Items", "DisplayName");
+
+        ResultSet rs2 = md.getColumns(null, null, "Shops", null);
+        if (rs2.next()) {
+            statement.executeUpdate("RENAME TABLE Shops TO " + Config.getObject("prefix") + "Shops;");
+            statement.executeUpdate("RENAME TABLE Items TO " + Config.getObject("prefix") + "Items;");
+            statement.executeUpdate("RENAME TABLE Trades TO " + Config.getObject("prefix") + "Trades;");
+            statement.executeUpdate("RENAME TABLE Keepers TO " + Config.getObject("prefix") + "Keepers;");
+            statement.executeUpdate("RENAME TABLE Blacklist TO " + Config.getObject("prefix") + "Blacklist;");
+            statement.executeUpdate("RENAME TABLE Transactions TO " + Config.getObject("prefix") + "Transactions;");
+        }
+
+        ResultSet rs3 = md.getColumns(null, null, Config.getObject("prefix") + "Items", "DisplayName");
         if (!rs3.next()) {
-            statement.executeUpdate("ALTER TABLE `Items`" +
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items" +
                     "ADD COLUMN `DisplayName` TEXT NULL DEFAULT NULL AFTER `Item`," +
                     "ADD COLUMN `Lore` TEXT NULL DEFAULT NULL AFTER `DisplayName`," +
                     "ADD COLUMN `Enchants` TEXT NULL DEFAULT NULL AFTER `Lore`;");
         }
 
-        ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM Shops");
+        ResultSet rs4 = md.getColumns(null, null, Config.getObject("prefix") + "Shops", "NPCInfo");
+        if (!rs4.next()) {
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Shops" +
+                    "ADD COLUMN `NPCInfo` TEXT NULL DEFAULT NULL;");
+        }
+
+        ResultSet rs6 = md.getColumns(null, null, Config.getObject("prefix") + "Shops", "Removal");
+        if (!rs6.next()) {
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Shops" +
+                    "ADD COLUMN `Removal` TEXT NULL DEFAULT NULL;");
+        }
+
+        ResultSet rs5 = md.getColumns(null, null, Config.getObject("prefix") + "Items", "AutoStock");
+        if (!rs5.next()) {
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items" +
+                    "ADD COLUMN `AutoStock` TEXT NULL DEFAULT NULL," +
+                    "ADD COLUMN `TransCool` TEXT NULL DEFAULT NULL," +
+                    "ADD COLUMN `Auto` BOOLEAN NULL DEFAULT NULL," +
+                    "ADD COLUMN `Trans` BOOLEAN NULL DEFAULT NULL," +
+                    "ADD COLUMN `Cooldowns` TEXT NULL DEFAULT NULL," +
+                    "ADD COLUMN `SellEco` BOOLEAN NULL DEFAULT NULL;");
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items MODIFY Price DOUBLE," +
+                    "MODIFY OrigPrice DOUBLE," +
+                    "MODIFY MinimumPrice DOUBLE," +
+                    "MODIFY MaximumPrice DOUBLE," +
+                    "MODIFY AdjustedPrice DOUBLE;");
+        }
+
+        ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM " + Config.getObject("prefix") + "Shops");
         int total = 0;
         if (rs.next()) {
             total = rs.getInt(1);
@@ -236,7 +272,7 @@ public class ShopManager {
 
         int i = 0;
 
-        final ResultSet r = statement.executeQuery("SELECT * FROM Shops");
+        final ResultSet r = statement.executeQuery("SELECT * FROM " + Config.getObject("prefix") + "Shops");
         while (r.next()) {
 
             final String name = r.getString("Name");
@@ -274,4 +310,6 @@ public class ShopManager {
         }
         return i;
     }
+
+
 }

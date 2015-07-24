@@ -6,7 +6,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 2.0.4
+Version: 2.1.0
 
 ####  General  ####
 
@@ -27,6 +27,9 @@ Metrics: True
 
 # Allow use of chests by Shop Owners/using double chests for shops
 UseChests: True
+
+# Remove Empty shops after x Days (0 turns it off)
+RemoveAfter: 0
 
 #### Shop Options ####
 
@@ -53,6 +56,9 @@ SellToBuy: True
 
 # Limits the amount of stock a player can have (0 = infinite)
 StockLimit: 0
+
+# Enable Trades
+Trades: True
 
 ####  Shop Creation  ####
 
@@ -134,3 +140,4 @@ port: 3306
 username: 'root'
 password: ''
 database: 'bettershops'
+prefix: 'bs_'

@@ -1,14 +1,14 @@
 package max.hubbard.bettershops.Menus.ShopMenus;
 
 import max.hubbard.bettershops.Configurations.Language;
+import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Menus.MenuType;
 import max.hubbard.bettershops.Menus.ShopMenu;
 import max.hubbard.bettershops.Shops.Items.Actions.ClickableItem;
 import max.hubbard.bettershops.Shops.Items.Actions.LeftClickAction;
 import max.hubbard.bettershops.Shops.Items.Actions.ShopItemStack;
 import max.hubbard.bettershops.Shops.Shop;
-import max.hubbard.bettershops.Shops.Types.NPC.NPCManager;
-import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
+import max.hubbard.bettershops.Shops.Types.NPC.*;
 import max.hubbard.bettershops.Utils.AnvilManager;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -93,14 +93,23 @@ public class NPCConfigure implements ShopMenu {
             confirmClick.addLeftClickAction(new LeftClickAction() {
                 @Override
                 public void onAction(InventoryClickEvent e) {
-                    ShopsNPC npc = new ShopsNPC(EntityType.valueOf(ty.getItemMeta().getDisplayName().substring(2)), lore, shop, bb, shear, vill);
-                    NPCManager.addNPCShop(npc);
-                    shop.setObject("NPC", true);
-                    p.closeInventory();
+                    if (Core.useCitizens()) {
+                        ShopsNPC npc = new CitizensShop(new EntityInfo(EntityType.valueOf(ty.getItemMeta().getDisplayName().substring(2)), lore, bb, shear, vill), shop);
+                        npc.removeChest();
+                        npc.spawn();
+                        NPCManager.addNPCShop(npc);
+                        shop.setObject("NPC", true);
+                        p.closeInventory();
+                    } else {
+                        ShopsNPC npc = new NPCShop(EntityType.valueOf(ty.getItemMeta().getDisplayName().substring(2)), lore, shop, bb, shear, vill);
+                        NPCManager.addNPCShop(npc);
+                        shop.setObject("NPC", true);
+                        p.closeInventory();
+                    }
                 }
             });
 
-            if (Ageable.class.isAssignableFrom(type.getEntityClass())) {
+            if (Ageable.class.isAssignableFrom(type.getEntityClass()) || type == EntityType.ZOMBIE) {
 
                 ItemStack baby = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
                 ItemMeta babyMeta = baby.getItemMeta();
@@ -355,7 +364,7 @@ public class NPCConfigure implements ShopMenu {
 
         inv.setItem(0, back);
 
-       new BukkitRunnable() {
+        new BukkitRunnable() {
 
             @Override
             public void run() {

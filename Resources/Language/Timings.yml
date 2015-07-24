@@ -1,0 +1,74 @@
+#
+#                 Better Shop's Language File
+#
+#        You Are Free To Change The Values To Your Liking
+#
+#These messages are what appear in the "Timings" section of shops
+#
+#     Lines starting with # are comments and will be ignored.
+
+Version: 2.1.0
+
+Days: '&a&lDays: &7'
+Hours: '&a&lHours: &7'
+Minutes: '&a&lMinutes: &7'
+Seconds: '&a&lSeconds: &7'
+
+AddDays: '&e&lAdd Days'
+RemoveDays: '&e&lRemove Days'
+
+AddHours: '&e&lAdd Hours'
+RemoveHours: '&e&lRemove Hours'
+
+AddMinutes: '&e&lAdd Minutes'
+RemoveMinutes: '&e&lRemove Minutes'
+
+AddSeconds: '&e&lAdd Seconds'
+RemoveSeconds: '&e&lRemove Seconds'
+
+AddThirty: '&e&lRight Click &7to add &a30'
+RemoveThirty: '&e&lRight Click &7to remove &a30'
+
+AddTwelve: '&e&lShift Click &7to add &a12'
+RemoveTwelve: '&e&lShift Click &7to remove &a12'
+
+AddSix: '&e&lRight Click &7to add &a6'
+RemoveSix: '&e&lRight Click &7to remove &a6'
+
+AddOne: '&e&lLeft Click &7to add &a1'
+RemoveOne: '&e&lLeft Click &7to remove &a1'
+
+AddSixty: '&e&lShift Click &7to add &a60'
+RemoveSixty: '&e&lShift Click &7to Remove &a60'
+
+TransactionAmount: '&aTransaction Limit: &7'
+RestockAmount: '&aRestock Amount: &7'
+
+TransCoolOn: '&eTransactions Cooldowns: &aOn'
+TransCoolOff: '&eTransactions Cooldowns: &cOff'
+TransCoolToggle: '&eLeft Click &7to toggle'
+
+AutoStockOn: '&eAuto Stock: &aOn'
+AutoStockOff: '&eAuto Stock: &cOff'
+AutoStockToggle: '&eLeft Click &7to toggle'
+
+Transactions: '&eTransaction Cooldowns'
+TransactionsLore: '&e&lLeft Click &7to open &aTransaction Cooldowns'
+
+AutoStock: '&eAuto Stock'
+AutoStockLore: '&e&lLeft Click &7to manage &aAuto Stock'
+
+Restock: '&dRestocking in: '
+Available: '&dAvailable in: '
+Removal: '&d&lInactivity Removal in: '
+
+Day: '&eDays'
+Hour: '&eHours'
+Minute: '&eMins'
+Second: '&eSecs'
+
+CannotBuy: '&cYou have exceeded your buying limit for this item'
+CannotSell: '&cYou have exceeded your selling limit for this item'
+
+OnlyBuy: '&eCan only buy &a<Amount> &efor &a<Price>'
+OnlySell: '&eCan only sell &a<Amount> &efor &a<Price>'

@@ -8,6 +8,7 @@ import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
 import max.hubbard.bettershops.Utils.Transaction;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Sign;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -122,6 +123,10 @@ public interface Shop {
     public int getNextAvailablePage(boolean sell);
 
     public int getNextSlotForPage(int page, boolean sell);
+
+    public Sign getSign();
+
+    public void convert();
 
     public void saveConfig();
 }

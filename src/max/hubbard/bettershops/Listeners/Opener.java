@@ -2,6 +2,7 @@ package max.hubbard.bettershops.Listeners;
 
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
+import max.hubbard.bettershops.Configurations.Permissions;
 import max.hubbard.bettershops.Menus.MenuType;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Items.Actions.ClickableItem;
@@ -95,11 +96,7 @@ public class Opener implements Listener {
                                     } else {
                                         e.setCancelled(true);
                                         ClickableItem.clearPlayer(p);
-                                        if (shop.isOpen()) {
-                                            shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
-                                        } else {
-                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
-                                        }
+                                        open(p, shop);
                                     }
                                 } else {
                                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotAllowed"));
@@ -163,28 +160,68 @@ public class Opener implements Listener {
         if (shop.isServerShop() || !shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
 
             if (!shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) && !shop.isOpen()) {
-                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
-                return;
+                if (!Permissions.hasEditPerm(p, shop)) {
+                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
+                    return;
+                } else {
+                    if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
+
+                        if (shop.getMenu(MenuType.OWNER_BUYING) != null)
+                            shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
+                        else
+                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                    } else {
+                        if ((boolean) Config.getObject("SellingShops")) {
+                            if (shop.getMenu(MenuType.OWNER_SELLING) != null)
+                                shop.getMenu(MenuType.OWNER_SELLING).draw(p, 1);
+                            else
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                        } else {
+                            if (shop.getMenu(MenuType.OWNER_BUYING) != null)
+                                shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
+                            else
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                        }
+                    }
+                }
             }
 
             if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
+                if (shop.getMenu(MenuType.MAIN_BUYING) != null)
                 shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
+                else
+                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
             } else {
                 if ((boolean) Config.getObject("SellingShops")) {
-                    shop.getMenu(MenuType.MAIN_SELLING).draw(p, 1);
+                    if (shop.getMenu(MenuType.MAIN_SELLING) != null)
+                        shop.getMenu(MenuType.MAIN_SELLING).draw(p, 1);
+                    else
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
                 } else {
-                    shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
+                    if (shop.getMenu(MenuType.MAIN_BUYING) != null)
+                        shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
+                    else
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
                 }
             }
         } else if (shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
             if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
 
-                shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
+                if (shop.getMenu(MenuType.OWNER_BUYING) != null)
+                    shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
+                else
+                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
             } else {
                 if ((boolean) Config.getObject("SellingShops")) {
-                    shop.getMenu(MenuType.OWNER_SELLING).draw(p, 1);
+                    if (shop.getMenu(MenuType.OWNER_SELLING) != null)
+                        shop.getMenu(MenuType.OWNER_SELLING).draw(p, 1);
+                    else
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
                 } else {
-                    shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
+                    if (shop.getMenu(MenuType.OWNER_BUYING) != null)
+                        shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
+                    else
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
                 }
             }
         }

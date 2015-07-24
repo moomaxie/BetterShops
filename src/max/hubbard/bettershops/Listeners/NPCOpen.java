@@ -1,10 +1,10 @@
 package max.hubbard.bettershops.Listeners;
 
 import max.hubbard.bettershops.Configurations.Language;
+import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Shop;
-import max.hubbard.bettershops.Shops.Types.NPC.NPCManager;
-import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
+import max.hubbard.bettershops.Shops.Types.NPC.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -43,26 +43,32 @@ public class NPCOpen implements Listener {
 
                             if (!shop.isNPCShop() || shop.getNPCShop() == null) {
                                 shop.setObject("NPC", true);
-                                ShopsNPC n = new ShopsNPC(ent, shop);
 
-                                n.removeChest();
-                                n.returnNPC();
-                                NPCManager.addNPCShop(n);
+                                try {
+                                    EntityInfo info = EntityInfo.getInfo(ent);
+                                    if (Core.useCitizens()) {
+                                        ShopsNPC n = new CitizensShop(info, shop);
+                                        n.spawn();
+                                        n.removeChest();
+                                        n.returnNPC();
+                                        NPCManager.addNPCShop(n);
+                                    } else {
+                                        ShopsNPC n = new NPCShop(info.getType(), info.getLore(), shop, info.isBaby(), info.isSheared(), info.isVillagerZombie());
+                                        n.removeChest();
+                                        n.returnNPC();
+                                        NPCManager.addNPCShop(n);
+                                    }
+
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                }
                             }
                             e.setCancelled(true);
 
                             Player p = e.getPlayer();
 
                             if (!shop.getBlacklist().contains(p)) {
-                                if (shop.isOpen()) {
-                                    Opener.open(p, shop);
-                                } else {
-                                    if (!shop.getOwner().getUniqueId().equals(p.getUniqueId()) || !shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
-                                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
-                                    } else {
-                                        Opener.open(p, shop);
-                                    }
-                                }
+                                Opener.open(p,shop);
                             } else {
                                 p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotAllowed"));
                             }

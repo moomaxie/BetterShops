@@ -1,5 +1,6 @@
 package max.hubbard.bettershops.Menus.ShopMenus;
 
+import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.Permissions;
 import max.hubbard.bettershops.Menus.MenuType;
@@ -19,9 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * ***********************************************************************
@@ -71,17 +70,63 @@ public class OwnerSelling implements ShopMenu {
         } else {
             optionsMeta.setDisplayName(Language.getString("MainGUI", "ShopInfoDisplayNameClosed"));
         }
-        if (Permissions.hasArrangePerm(p)) {
-            optionsMeta.setLore(Arrays.asList("§a" + shop.getObject("Name"), "§7" + shop.getObject("Description"), " ", Language.getString("MainGUI", "SellingShop"), " ", Language.getString("MainGUI", "Owner") + " §a" + shop.getOwner().getName(),
-                    Language.getString("MainGUI", "Keepers") + " §7" + shop.getKeepers().size(), " ", Language.getString("MainGUI", "OpenShopSettings"), Language.getString("MainGUI", "ToggleOpenAndClosed"), Language.getString("MainGUI", "ManageItems"),
-                    Language.getString("MainGUI", "AddItemToShop"), " ", Language.getString("MainGUI", "ArrangementMode")));
-            options.setItemMeta(optionsMeta);
-        } else {
-            optionsMeta.setLore(Arrays.asList("§a" + shop.getObject("Name"), "§7" + shop.getObject("Description"), " ", Language.getString("MainGUI", "SellingShop"), " ", Language.getString("MainGUI", "Owner") + " §a" + shop.getOwner().getName(),
-                    Language.getString("MainGUI", "Keepers") + " §7" + shop.getKeepers().size(), " ", Language.getString("MainGUI", "OpenShopSettings"), Language.getString("MainGUI", "ToggleOpenAndClosed"), Language.getString("MainGUI", "ManageItems"),
-                    Language.getString("MainGUI", "AddItemToShop")));
-            options.setItemMeta(optionsMeta);
+
+        List<String> lor = new ArrayList<>();
+
+        if (Config.getObject("RemoveAfter") != null && (int) Config.getObject("RemoveAfter") != 0) {
+            if (shop.getObject("Removal") != null) {
+
+                if (!shop.getObject("Removal").equals("")) {
+                    String s1 = "";
+                    Date dt1 = new Date();
+                    Date dt2 = new Date(Long.valueOf((String) shop.getObject("Removal")));
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(dt2);
+                    c.add(Calendar.DATE,(int) Config.getObject("RemoveAfter"));
+                    dt2 = c.getTime();
+
+                    long diff = dt2.getTime() - dt1.getTime();
+                    long diffSeconds = diff / 1000 % 60;
+                    long diffMinutes = diff / (60 * 1000) % 60;
+                    long diffHours = diff / (60 * 60 * 1000);
+                    int diffInDays = (int) ((dt2.getTime() - dt1.getTime()) / (1000 * 60 * 60 * 24));
+
+                    if (diffInDays != 0){
+                        s1 = s1 + "§7" + Math.abs(diffInDays) + " " + Language.getString("Timings","Day") + " ";
+                    }
+
+                    if (diffHours != 0){
+                        s1 = s1 + "§7" + Math.abs(diffHours) + " " + Language.getString("Timings","Hour") + " ";
+                    }
+
+                    if (diffMinutes != 0){
+                        s1 = s1 + "§7" + Math.abs(diffMinutes) + " " + Language.getString("Timings","Minute") + " ";
+                    }
+
+                    if (diffSeconds != 0){
+                        s1 = s1 + "§7" + Math.abs(diffSeconds) + " " + Language.getString("Timings","Second");
+                    }
+
+                    lor.add(Language.getString("Timings","Removal") + s1);
+
+                    lor.add(" ");
+                }
+
+            }
         }
+
+        lor.addAll(Arrays.asList("§a" + shop.getObject("Name"), "§7" + shop.getObject("Description"), " ", Language.getString("MainGUI", "SellingShop"), " ", Language.getString("MainGUI", "Owner") + " §a" + shop.getOwner().getName(),
+                Language.getString("MainGUI", "Keepers") + " §7" + shop.getKeepers().size(), " ", Language.getString("MainGUI", "OpenShopSettings"), Language.getString("MainGUI", "ToggleOpenAndClosed"), Language.getString("MainGUI", "ManageItems"),
+                Language.getString("MainGUI", "AddItemToShop")));
+
+        if (Permissions.hasArrangePerm(p)) {
+            lor.add(" ");
+            lor.add(Language.getString("MainGUI", "ArrangementMode"));
+        }
+
+        optionsMeta.setLore(lor);
+        options.setItemMeta(optionsMeta);
+
         ClickableItem optionsClick = new ClickableItem(new ShopItemStack(options), inv, p);
         optionsClick.addLeftClickAction(new LeftClickAction() {
             @Override
@@ -174,8 +219,8 @@ public class OwnerSelling implements ShopMenu {
                         String desc = man.call();
 
                         List<Material> m = MaterialSearch.closestMaterial(desc);
-                        if (m.size() > 0){
-                            shop.createShopItem(new ItemStack(m.get(0)),shop.getNextSlotForPage(shop.getNextAvailablePage(true),true),shop.getNextAvailablePage(true),true);
+                        if (m.size() > 0) {
+                            shop.createShopItem(new ItemStack(m.get(0)), shop.getNextSlotForPage(shop.getNextAvailablePage(true), true), shop.getNextAvailablePage(true), true);
                             p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "AddItem"));
                             p.playSound(p.getLocation(), Sound.NOTE_PLING, 400, 400);
                         } else {
@@ -198,7 +243,9 @@ public class OwnerSelling implements ShopMenu {
                 shop.getMenu(MenuType.TRADING).draw(p, page, obj);
             }
         });
-        inv.setItem(1, trade);
+
+        if (Config.getObject("Trades") instanceof Boolean && (boolean) Config.getObject("Trades") || Config.getObject("Trades") instanceof String && ((String) Config.getObject("Trades")).equalsIgnoreCase("True"))
+            inv.setItem(1, trade);
         inv.setItem(3, info);
         inv.setItem(4, options);
         inv.setItem(5, keepers);
@@ -220,6 +267,14 @@ public class OwnerSelling implements ShopMenu {
                             lore.add(s);
                         }
                     }
+
+                    if (it.isTransCooldown()){
+                        if (!Cooldowns.canTransaction(p,it,1)) {
+                            lore.add(Language.getString("Timings", "Available") + it.getTransCooldownTiming().getDifferenceString());
+                            lore.add(" ");
+                        }
+                    }
+
                     if (it.isInfinite()) {
                         lore.add(Language.getString("MainGUI", "Stock") + " §7-");
                     } else {
@@ -247,6 +302,7 @@ public class OwnerSelling implements ShopMenu {
 
                     meta.setLore(lore);
                     itemStack.setItemMeta(meta);
+                    itemStack.setAmount(it.getAmount());
                     inv.setItem(it.getSlot(), itemStack);
 
                     ClickableItem itemClick = new ClickableItem(new ShopItemStack(itemStack), inv, p);

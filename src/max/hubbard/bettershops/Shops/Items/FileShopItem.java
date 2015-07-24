@@ -4,6 +4,8 @@ import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Shops.FileShop;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Utils.ItemUtils;
+import max.hubbard.bettershops.Utils.Timing;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -29,11 +31,13 @@ public class FileShopItem implements ShopItem {
     private List<String> lore;
     private String displayName;
     private double priceChangePercent = 1;
-    private int amountToDouble = 750;
+    private int amountToDouble = 420;
     private double minPrice = 0;
     private double adjustedPrice;
     private double maxPrice = 10000000;
     private double amountTo;
+    private Timing autoStock;
+    private Timing transCool;
 
     public static ShopItem createShopItem(Shop shop, ItemStack item, int id, int page, int slot, boolean sell) {
         return new FileShopItem(shop, item, id, page, slot, sell);
@@ -57,6 +61,40 @@ public class FileShopItem implements ShopItem {
         return null;
     }
 
+    public static ShopItem createShopItem(Shop shop, ItemStack item, int id, boolean sell) {
+        return new FileShopItem(shop, item, id, sell);
+    }
+
+    protected FileShopItem(Shop shop, ItemStack item, int id, boolean sell) {
+        if (shop instanceof FileShop) {
+            this.shop = shop;
+            this.item = item;
+            this.sell = sell;
+            this.id = id;
+            if (item.getItemMeta() != null) {
+                lore = item.getItemMeta().getLore();
+                displayName = item.getItemMeta().getDisplayName();
+            }
+            data = item.getData().getData();
+            durability = item.getDurability();
+
+            if (getObject("AutoStock") != null) {
+                autoStock = new Timing(this, (String) getObject("AutoStock"),true);
+            } else {
+                autoStock = new Timing(this, 0, 0, 0, 0, 0,true);
+                setObject("AutoStock", autoStock.toString());
+            }
+
+            if (getObject("TransCool") != null) {
+                transCool = new Timing(this, (String) getObject("TransCool"),false);
+            } else {
+                transCool = new Timing(this, 0, 0, 0, 0, 0,false);
+                setObject("TransCool", transCool.toString());
+            }
+
+        }
+    }
+
     protected FileShopItem(Shop shop, ItemStack item, int id, int page, int slot, boolean sell) {
         if (shop instanceof FileShop) {
             this.shop = shop;
@@ -74,6 +112,20 @@ public class FileShopItem implements ShopItem {
             ((FileShop) shop).config.set("Items." + id + ".Slot", slot);
 
             shop.saveConfig();
+
+            if (getObject("AutoStock") != null) {
+                autoStock = new Timing(this, (String) getObject("AutoStock"),true);
+            } else {
+                autoStock = new Timing(this, 0, 0, 0, 0, 0,true);
+                setObject("AutoStock", autoStock.toString());
+            }
+
+            if (getObject("TransCool") != null) {
+                transCool = new Timing(this, (String) getObject("TransCool"),false);
+            } else {
+                transCool = new Timing(this, 0, 0, 0, 0, 0,false);
+                setObject("TransCool", transCool.toString());
+            }
 
             if (getObject("LiveEconomy") == null) {
                 setObject("Price", Config.getObject("DefaultPrice"));
@@ -95,10 +147,10 @@ public class FileShopItem implements ShopItem {
 
     public static ShopItem loadShopItem(Shop shop, int id) {
         if (shop instanceof FileShop) {
-            ItemStack item;
+            ItemStack item = new ItemStack(Material.AIR);
             if (((FileShop) shop).config.isItemStack("Items." + id + ".ItemStack")) {
                 item = ((FileShop) shop).config.getItemStack("Items." + id + ".ItemStack");
-            } else {
+            } else if (((FileShop) shop).config.isString("Items." + id + ".ItemStack")) {
                 item = ItemUtils.fromString(((FileShop) shop).config.getString("Items." + id + ".ItemStack"));
             }
             int page = (Integer) shop.getObject("Items." + id + ".Page");
@@ -185,6 +237,46 @@ public class FileShopItem implements ShopItem {
             setObject("LiveEconomy", false);
             return false;
         }
+    }
+
+    @Override
+    public boolean isAutoStock() {
+        if (getObject("Auto") != null)
+            return (Boolean) getObject("Auto");
+        else {
+            setObject("Auto", false);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isTransCooldown() {
+        if (getObject("Trans") != null)
+            return (Boolean) getObject("Trans");
+        else {
+            setObject("Trans", false);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isSellEco() {
+        if (getObject("SellEco") != null)
+            return (Boolean) getObject("SellEco");
+        else {
+            setObject("SellEco", false);
+            return false;
+        }
+    }
+
+    @Override
+    public Timing getAutoStockTiming() {
+        return autoStock;
+    }
+
+    @Override
+    public Timing getTransCooldownTiming() {
+        return transCool;
     }
 
     public int getPage() {
@@ -318,7 +410,6 @@ public class FileShopItem implements ShopItem {
         if (getLiveEco()) {
             setObject("Price", adjustedPrice);
         }
-        calculatePriceChangePercent();
 
         if (!sell) {
             if (getSister() != null) {
@@ -328,7 +419,7 @@ public class FileShopItem implements ShopItem {
     }
 
     public void setAmountTo(double amt) {
-        if (!sell) {
+        if (!sell || isSellEco()) {
             amountTo = amt;
             calculatePricePercent();
             calculatePrice();
@@ -384,20 +475,22 @@ public class FileShopItem implements ShopItem {
     }
 
     public void calculatePrice() {
-        double p = getOrigPrice() * (getPriceChangePercent() / 100);
+        double p = getOrigPrice() + (getOrigPrice() * (priceChangePercent/100));
 
-        if (getAdjustedPrice() + p < minPrice) {
+        if (p < minPrice) {
             setAdjustedPrice(minPrice);
-        } else if (getAdjustedPrice() + p > maxPrice) {
+        } else if (p > maxPrice) {
             setAdjustedPrice(maxPrice);
         } else {
 
-            setAdjustedPrice(getAdjustedPrice() + p);
+            setAdjustedPrice(p);
         }
 
         if (!sell) {
             getSister().setObject("LiveEconomy", true);
-            getSister().setAdjustedPrice(getAdjustedPrice() / 2);
+            if (!isSellEco()) {
+                getSister().setAdjustedPrice(p / 2);
+            }
         }
     }
 }

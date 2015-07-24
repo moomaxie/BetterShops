@@ -24,7 +24,7 @@ import java.util.*;
 public class ItemUtils {
 
     public static boolean compare(ItemStack it, ItemStack item) {
-        return item.isSimilar(it) || item.toString().equals(it.toString()) && item.getData().getData() == it.getData().getData() && item.getDurability() == it.getDurability();
+        return it != null && item != null && (item.isSimilar(it) || item.toString().equals(it.toString()) && item.getData().getData() == it.getData().getData() && item.getDurability() == it.getDurability());
     }
 
     public static String toString(ItemStack i) {

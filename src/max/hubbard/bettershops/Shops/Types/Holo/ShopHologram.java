@@ -1,9 +1,9 @@
 package max.hubbard.bettershops.Shops.Types.Holo;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.handler.TouchHandler;
 import com.gmail.filoghost.holographicdisplays.api.line.ItemLine;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
+import com.gmail.filoghost.holographicdisplays.object.NamedHologram;
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Menus.MenuType;
@@ -31,12 +31,12 @@ import java.math.BigDecimal;
  */
 public class ShopHologram {
     Shop shop;
-    Hologram holo;
+    NamedHologram holo;
     ItemLine itemLine;
     TextLine shopLine;
     TextLine nameLine;
 
-    public ShopHologram(final Shop shop, Hologram hologram) {
+    public ShopHologram(final Shop shop, NamedHologram hologram) {
         this.shop = shop;
         holo = hologram;
 
@@ -325,7 +325,7 @@ public class ShopHologram {
         return shopLine;
     }
 
-    public Hologram getHologram() {
+    public NamedHologram getHologram() {
         return holo;
     }
 

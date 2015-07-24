@@ -47,26 +47,36 @@ public class Purchase implements Listener {
                                 SignChange.updateSigns(p);
                             }
                         } else {
+
                             Block face = s.getBlock().getRelative(((org.bukkit.material.Sign) (s.getData())).getAttachedFace());
                             Chest chest = (Chest) face.getState();
 
-                            if (Stocks.canAdd(SignShopManager.getItem(s), chest.getInventory(), SignShopManager.getAmounts().get(s))) {
-                                if (Stocks.getNumberInInventory(SignShopManager.getItem(s), p) >= SignShopManager.getAmounts().get(s)) {
-                                    Stocks.removeItemsFromInventory(SignShopManager.getItem(s), p, SignShopManager.getAmounts().get(s));
-                                    Core.getEconomy().depositPlayer(p, SignShopManager.getPrices().get(s));
-                                    Stocks.addItemsToInventory(SignShopManager.getItem(s), chest, SignShopManager.getAmounts().get(s));
+                            if (!SignShopManager.isOwner(s, p)) {
+                                if (Core.getEconomy().getBalance(SignShopManager.getOwner(s)) >= SignShopManager.getPrices().get(s)) {
+                                    if (Stocks.canAdd(SignShopManager.getItem(s), chest.getInventory(), SignShopManager.getAmounts().get(s))) {
+                                        if (Stocks.getNumberInInventory(SignShopManager.getItem(s), p) >= SignShopManager.getAmounts().get(s)) {
+                                            Stocks.removeItemsFromInventory(SignShopManager.getItem(s), p, SignShopManager.getAmounts().get(s));
+                                            Core.getEconomy().depositPlayer(p, SignShopManager.getPrices().get(s));
+                                            Core.getEconomy().withdrawPlayer(SignShopManager.getOwner(s), SignShopManager.getPrices().get(s));
+                                            Stocks.addItemsToInventory(SignShopManager.getItem(s), chest, SignShopManager.getAmounts().get(s));
 
-                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "SellItem"));
-                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ReceivedAmount").replaceAll("<Amount>", "" + SignShopManager.getPrices().get(s)));
-                                    SignChange.updateSigns(p);
-                                    p.updateInventory();
+                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "SellItem"));
+                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ReceivedAmount").replaceAll("<Amount>", "" + SignShopManager.getPrices().get(s)));
+                                            SignChange.updateSigns(p);
+                                            p.updateInventory();
+                                        } else {
+                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotEnough"));
+                                            SignChange.updateSigns(p);
+                                        }
+                                    } else {
+                                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoRoom"));
+                                        SignChange.updateSigns(p);
+                                    }
                                 } else {
-                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotEnough"));
-                                    SignChange.updateSigns(p);
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "OwnerMoney"));
                                 }
                             } else {
-                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoRoom"));
-                                SignChange.updateSigns(p);
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotUseOwn"));
                             }
                         }
                     } else {
@@ -86,22 +96,27 @@ public class Purchase implements Listener {
                             Block face = s.getBlock().getRelative(((org.bukkit.material.Sign) (s.getData())).getAttachedFace());
                             Chest chest = (Chest) face.getState();
 
-                            if (Stocks.getNumberInInventory(SignShopManager.getItem(s), chest) >= SignShopManager.getAmounts().get(s)) {
-                                if (Core.getEconomy().getBalance(p) >= SignShopManager.getPrices().get(s)) {
-                                    Stocks.addItemsToInventory(SignShopManager.getItem(s), p, SignShopManager.getAmounts().get(s));
-                                    Core.getEconomy().withdrawPlayer(p, SignShopManager.getPrices().get(s));
-                                    Stocks.removeItemsFromInventory(SignShopManager.getItem(s), chest, SignShopManager.getAmounts().get(s));
+                            if (!SignShopManager.isOwner(s, p)) {
+                                if (Stocks.getNumberInInventory(SignShopManager.getItem(s), chest) >= SignShopManager.getAmounts().get(s)) {
+                                    if (Core.getEconomy().getBalance(p) >= SignShopManager.getPrices().get(s)) {
+                                        Stocks.addItemsToInventory(SignShopManager.getItem(s), p, SignShopManager.getAmounts().get(s));
+                                        Core.getEconomy().withdrawPlayer(p, SignShopManager.getPrices().get(s));
+                                        Core.getEconomy().depositPlayer(SignShopManager.getOwner(s), SignShopManager.getPrices().get(s));
+                                        Stocks.removeItemsFromInventory(SignShopManager.getItem(s), chest, SignShopManager.getAmounts().get(s));
 
-                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "BuyItem"));
-                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "TakenAmount").replaceAll("<Amount>", "" + SignShopManager.getPrices().get(s)));
-                                    SignChange.updateSigns(p);
-                                    p.updateInventory();
+                                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "BuyItem"));
+                                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "TakenAmount").replaceAll("<Amount>", "" + SignShopManager.getPrices().get(s)));
+                                        SignChange.updateSigns(p);
+                                        p.updateInventory();
+                                    } else {
+                                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoMoney"));
+                                    }
                                 } else {
-                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoMoney"));
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LowStock"));
+                                    SignChange.updateSigns(p);
                                 }
                             } else {
-                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LowStock"));
-                                SignChange.updateSigns(p);
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotUseOwn"));
                             }
                         }
                     }

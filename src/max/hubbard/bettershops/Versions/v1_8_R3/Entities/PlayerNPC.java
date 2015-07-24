@@ -25,7 +25,7 @@ public class PlayerNPC extends EntityPlayer {
 
     public PlayerNPC(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile, PlayerInteractManager playerinteractmanager) {
         super(minecraftserver, worldserver, gameprofile, playerinteractmanager);
-        playerConnection = new NPCConnection(minecraftserver,this);
+        playerConnection = new NPCConnection(minecraftserver, this);
         sendPacketsTo(Bukkit.getOnlinePlayers(), new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this));
     }
 
@@ -44,7 +44,7 @@ public class PlayerNPC extends EntityPlayer {
 
     }
 
-    public static Player spawn( GameProfile pro, Location location) {
+    public static Player spawn(GameProfile pro, Location location) {
         MinecraftServer server = MinecraftServer.getServer();
         WorldServer world = server.getWorldServer(0);
         for (WorldServer ws : server.worlds) {
@@ -78,13 +78,13 @@ public class PlayerNPC extends EntityPlayer {
     public static EntityPlayer[] getHandles(Collection<? extends Player> bukkitPlayers) {
         EntityPlayer[] handles = new EntityPlayer[bukkitPlayers.size()];
         for (int i = 0; i < bukkitPlayers.size(); i++) {
-            handles[i] = getHandle((Player)bukkitPlayers.toArray()[i]);
+            handles[i] = getHandle((Player) bukkitPlayers.toArray()[i]);
         }
         return handles;
     }
 
     public static EntityPlayer getHandle(Player bukkitPlayer) {
         if (!(bukkitPlayer instanceof CraftPlayer)) return null;
-        return ((CraftPlayer)bukkitPlayer).getHandle();
+        return ((CraftPlayer) bukkitPlayer).getHandle();
     }
 }

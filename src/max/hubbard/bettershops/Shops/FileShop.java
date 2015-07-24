@@ -1,25 +1,33 @@
 package max.hubbard.bettershops.Shops;
 
+import com.gmail.filoghost.holographicdisplays.disk.HologramDatabase;
+import com.gmail.filoghost.holographicdisplays.object.NamedHologram;
+import com.gmail.filoghost.holographicdisplays.object.NamedHologramManager;
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
+import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Menus.MenuType;
 import max.hubbard.bettershops.Menus.ShopMenu;
 import max.hubbard.bettershops.Menus.ShopMenus.*;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Items.FileShopItem;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
+import max.hubbard.bettershops.Shops.Types.Holo.CreateHologram;
 import max.hubbard.bettershops.Shops.Types.Holo.HologramManager;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
-import max.hubbard.bettershops.Shops.Types.NPC.NPCManager;
-import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
+import max.hubbard.bettershops.Shops.Types.NPC.*;
 import max.hubbard.bettershops.TradeManager;
+import max.hubbard.bettershops.Utils.NPCInfo;
+import max.hubbard.bettershops.Utils.TimingsManager;
 import max.hubbard.bettershops.Utils.Transaction;
+import net.citizensnpcs.api.CitizensAPI;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -49,22 +57,22 @@ public class FileShop implements Shop {
     private boolean transLoaded;
     private History history;
 
-    public FileShop(YamlConfiguration config, File file, OfflinePlayer owner) {
+    public FileShop(final YamlConfiguration config, File file, OfflinePlayer owner) {
         this.config = config;
         this.file = file;
         this.owner = owner;
 
-        final FileShop s = this;
+        final FileShop t = this;
 
         String[] locs = config.getString("Location").split(" ");
         String world = locs[0];
         int start = 1;
-        for (int i = 1; i < locs.length; i++){
+        for (int i = 1; i < locs.length; i++) {
             try {
                 Double.parseDouble(locs[i]);
                 start = i;
                 break;
-            } catch (Exception e){
+            } catch (Exception e) {
                 world = world + " " + locs[i];
             }
         }
@@ -76,20 +84,126 @@ public class FileShop implements Shop {
         double z = Double.parseDouble(locs[start + 2]);
 
         l = new Location(w, x, y, z);
-        history = new History(s);
+        history = new History(t);
 
         Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             @Override
             public void run() {
-
                 loadItems();
                 loadMenus();
                 loadTransactions();
                 loadKeepers();
                 loadBlacklist();
-                TradeManager.loadTrades(s);
+                TradeManager.loadTrades(t);
+
+                if (isHoloShop()) {
+                    String s = "BS" + getName();
+                    try {
+                        NamedHologram holo = HologramDatabase.loadHologram(s);
+
+                        if (getHolographicShop() == null) {
+                            NamedHologramManager.removeHologram(holo);
+                            holo.delete();
+                            HologramDatabase.deleteHologram(s);
+                            HologramDatabase.saveToDisk();
+
+                        } else {
+                            holo.delete();
+                        }
+
+                    } catch (Exception e) {
+                        HologramDatabase.deleteHologram(s);
+                        HologramDatabase.trySaveToDisk();
+
+                    } finally {
+                        CreateHologram.createHolographicShop(t);
+                    }
+                }
+
+                if (isNPCShop()) {
+                    boolean made = false;
+                    if (l != null && l.getWorld() != null)
+                        for (LivingEntity entity : l.getWorld().getLivingEntities()) {
+                            if (entity.getCustomName() != null) {
+                                if (entity.getCustomName().equals("§a§l" + getName())) {
+                                    if (getNPCShop() == null) {
+                                        try {
+
+                                            if (Core.useCitizens()) {
+                                                if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
+                                                    CitizensShop s = new CitizensShop(CitizensAPI.getNPCRegistry().getNPC(entity), entity, t);
+                                                    NPCManager.addNPCShop(s);
+                                                    s.removeChest();
+                                                    setObject("NPC", true);
+                                                    if (getObject("NPCInfo") != null) {
+                                                        EntityInfo in = EntityInfo.fromString((String) getObject("NPCInfo"));
+                                                        s.setInfo(in);
+                                                    }
+                                                } else {
+                                                    CitizensShop s = new CitizensShop(EntityInfo.getInfo(entity), t);
+                                                    s.spawn();
+                                                    NPCManager.addNPCShop(s);
+                                                    s.removeChest();
+                                                    setObject("NPC", true);
+                                                    entity.remove();
+                                                }
+
+                                            } else {
+                                                ShopsNPC s = NPCInfo.createNewShopsNPC(entity, t);
+                                                NPCManager.addNPCShop(s);
+                                                s.removeChest();
+                                                setObject("NPC", true);
+                                            }
+
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        } finally {
+                                            made = true;
+                                        }
+                                    } else {
+                                        if (Core.useCitizens()) {
+                                            if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
+                                                net.citizensnpcs.api.npc.NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
+                                                npc.destroy();
+                                                CitizensAPI.getNPCRegistry().deregister(npc);
+                                            } else {
+                                                entity.remove();
+                                            }
+                                        } else {
+                                            entity.remove();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    if (!made) {
+
+                        if (getObject("NPCInfo") != null) {
+                            if (Core.useCitizens()) {
+
+                                CitizensShop s = new CitizensShop(EntityInfo.fromString((String) getObject("NPCInfo")), t);
+                                s.spawn();
+                                NPCManager.addNPCShop(s);
+                                s.removeChest();
+                                setObject("NPC", true);
+
+                            } else {
+                                ShopsNPC s = new NPCShop(EntityInfo.fromString((String) getObject("NPCInfo")), t);
+                                NPCManager.addNPCShop(s);
+                                s.removeChest();
+                                setObject("NPC", true);
+                            }
+                        } else {
+
+                            setObject("NPC", false);
+                            DeleteNPC.addChest(t);
+                        }
+                    }
+                }
             }
         });
+
+        new TimingsManager(this).startTime();
 
     }
 
@@ -125,7 +239,12 @@ public class FileShop implements Shop {
                 ShopManager.names.put(name, this);
 
                 if (isNPCShop()) {
-                    getNPCShop().entity.setCustomName("§a§l" + name);
+                    if (Core.useCitizens()) {
+                        ((CitizensShop) getNPCShop()).getNPC().setName("§a§l" + name);
+                    } else {
+                        ((NPCShop) getNPCShop()).entity.setCustomName("§a§l" + name);
+                    }
+
                 }
                 if (isHoloShop()) {
                     getHolographicShop().getNameLine().setText("§a§l" + name);
@@ -172,6 +291,7 @@ public class FileShop implements Shop {
     }
 
     public void loadItems() {
+
         if (config.isConfigurationSection("Items")) {
             for (String s : config.getConfigurationSection("Items").getKeys(false)) {
                 int id = Integer.parseInt(s);
@@ -183,8 +303,9 @@ public class FileShop implements Shop {
                 } else {
                     buy.add(item);
                 }
-
             }
+        } else {
+            convert();
         }
     }
 
@@ -214,9 +335,39 @@ public class FileShop implements Shop {
         menus.put(MenuType.TRADE_CONFIRM, new TradeConfirm(this));
         menus.put(MenuType.TRADE_CHOOSE, new TradeChoose(this));
         menus.put(MenuType.PLAYER_BLACKLIST, new PlayerBlacklist(this));
+        menus.put(MenuType.AUTO_STOCK, new AutoStock(this));
+        menus.put(MenuType.COOLDOWNS, new Cooldowns(this));
     }
 
     public ShopMenu getMenu(MenuType type) {
+        switch (type){
+            case OWNER_BUYING: return new OwnerBuying(this);
+            case OWNER_SELLING: return new OwnerSelling(this);
+            case MAIN_BUYING: return new MainBuying(this);
+            case MAIN_SELLING: return new MainSelling(this);
+            case KEEPER_MANAGER: return new KeeperManager(this);
+            case SHOP_SETTINGS: return new ShopSettings(this);
+            case HISTORY: return new max.hubbard.bettershops.Menus.ShopMenus.History(this);
+            case ITEM_MANAGER_BUYING: return new ItemManagerBuying(this);
+            case ITEM_MANAGER_SELLING: return new ItemManagerSelling(this);
+            case LIVE_ECONOMY: return new LiveEconomy(this);
+            case KEEPER_ITEM_MANAGER: return new KeeperItemManager(this);
+            case BUY_ITEM: return new BuyItem(this);
+            case SELL_ITEM: return new SellItem(this);
+            case NPC_CHOOSE: return new NPCChoose(this);
+            case NPC_CONFIGURE: return new NPCConfigure(this);
+            case REARRANGE: return new Rearrange(this);
+            case AMOUNT_CHOOSER: return new AmountChooser(this);
+            case CART: return new Cart(this);
+            case SEARCH_ENGINE: return new SearchEngine(this);
+            case TRADING: return new Trading(this);
+            case TRADE_MANAGER: return new max.hubbard.bettershops.Menus.ShopMenus.TradeManager(this);
+            case TRADE_CONFIRM: return new TradeConfirm(this);
+            case TRADE_CHOOSE: return new TradeChoose(this);
+            case PLAYER_BLACKLIST: return new PlayerBlacklist(this);
+            case AUTO_STOCK: return new AutoStock(this);
+            case COOLDOWNS: return new Cooldowns(this);
+        }
         return menus.get(type);
     }
 
@@ -449,6 +600,7 @@ public class FileShop implements Shop {
         setObject("Open", b);
 
         if (l.getWorld().getBlockAt(l).getState() instanceof Chest) {
+
             Chest chest = (Chest) l.getWorld().getBlockAt(l).getState();
 
             Block block = chest.getBlock();
@@ -456,15 +608,7 @@ public class FileShop implements Shop {
             Sign sign = null;
             if (block.getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
                 sign = (Sign) block.getRelative(1, 0, 0).getState();
-            } else if (block.getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
-                sign = (Sign) block.getRelative(-1, 0, 0).getState();
-            } else if (block.getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
-                sign = (Sign) block.getRelative(0, 0, 1).getState();
-            } else if (block.getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
-                sign = (Sign) block.getRelative(0, 0, -1).getState();
-            }
 
-            if (sign != null) {
                 if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
                     if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
                         if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
@@ -474,6 +618,61 @@ public class FileShop implements Shop {
                                 sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
                             }
                             sign.update();
+                            ShopManager.signLocs.put(sign.getLocation(), this);
+                            return;
+                        }
+                    }
+                }
+
+            }
+            if (block.getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(-1, 0, 0).getState();
+
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                            if (b) {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
+                            } else {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+                            }
+                            sign.update();
+                            ShopManager.signLocs.put(sign.getLocation(), this);
+                            return;
+                        }
+                    }
+                }
+            }
+            if (block.getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, 1).getState();
+
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                            if (b) {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
+                            } else {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+                            }
+                            sign.update();
+                            ShopManager.signLocs.put(sign.getLocation(), this);
+                        }
+                    }
+                }
+            }
+            if (block.getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, -1).getState();
+
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                            if (b) {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
+                            } else {
+                                sign.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+                            }
+                            sign.update();
+                            ShopManager.signLocs.put(sign.getLocation(), this);
                         }
                     }
                 }
@@ -498,19 +697,19 @@ public class FileShop implements Shop {
     }
 
     public boolean isNPCShop() {
-        return getObject("NPC") != null && config.getBoolean("NPC") || config.getString("NPC").equalsIgnoreCase("true");
+        return getObject("NPC") != null && config.getBoolean("NPC") || getObject("NPC") != null && config.getString("NPC").equalsIgnoreCase("true");
     }
 
     public boolean isHoloShop() {
-        return getObject("Holo") != null && config.getBoolean("Holo") || config.getString("Holo").equalsIgnoreCase("true");
+        return getObject("Holo") != null && config.getBoolean("Holo") || getObject("Holo") != null && config.getString("Holo").equalsIgnoreCase("true");
     }
 
     public boolean isServerShop() {
-        return getObject("Server") != null && config.getBoolean("Server") || config.getString("Server").equalsIgnoreCase("true");
+        return getObject("Server") != null && config.getBoolean("Server") || getObject("Server") != null && config.getString("Server").equalsIgnoreCase("true");
     }
 
     public boolean isNotify() {
-        return getObject("Notify") != null && config.getBoolean("Notify") || config.getString("Notify").equalsIgnoreCase("true");
+        return getObject("Notify") != null && config.getBoolean("Notify") || getObject("Notify") != null && config.getString("Notify").equalsIgnoreCase("true");
     }
 
     public ShopItem createShopItem(ItemStack it, int slot, int page, boolean sell) {
@@ -548,6 +747,46 @@ public class FileShop implements Shop {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            if (sell) {
+                this.sell.add(item);
+            } else {
+                buy.add(item);
+            }
+
+            return item;
+        }
+        return null;
+    }
+
+    public ShopItem createShopItem(ItemStack it, int slot, int page, int amt, double price, int stock, boolean infinite, boolean sell) {
+        if (FileShopItem.fromItemStack(this, it, sell) == null) {
+            ShopItem item = FileShopItem.createShopItem(this, it, getNextAvailableId(), sell);
+            items.add(item);
+
+            config.getConfigurationSection("Items").createSection("" + item.getId());
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Id", item.getId());
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("ItemStack", item.getItem());
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Page", page);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Slot", slot);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Selling", item.isSelling());
+
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Stock", stock);
+
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Amount", amt);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Price", price);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("OrigPrice", price);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("Infinite", infinite);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("LiveEconomy", false);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("PriceChangePercent", 1);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("DoubleAmount", 750);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("MinimumPrice", 0);
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("MaximumPrice", Config.getMaxPrice());
+
+            config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("AdjustedPrice", price);
+            config.set("NextShopId", item.getId() + 1);
+
+            saveConfig();
 
             if (sell) {
                 this.sell.add(item);
@@ -610,11 +849,143 @@ public class FileShop implements Shop {
         return 18;
     }
 
+
+    public void convert() {
+        if (!config.isInt("NextShopId")) {
+            config.set("NextShopId", 0);
+        }
+
+        if (!config.isConfigurationSection("Items")) {
+            config.createSection("Items");
+        }
+
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        if (config.isConfigurationSection("Contents")) {
+
+            for (String s : config.getConfigurationSection("Contents").getKeys(false)) {
+
+                if (config.getConfigurationSection("Contents").getConfigurationSection(s).isItemStack("ItemStack")) {
+                    ItemStack item = config.getConfigurationSection("Contents").getConfigurationSection(s).getItemStack("ItemStack");
+                    int amt = config.getConfigurationSection("Contents").getConfigurationSection(s).getInt("Slot");
+
+                    boolean infinite = config.getConfigurationSection("Contents").getConfigurationSection(s).getBoolean("Infinite");
+
+                    int amount = config.getConfigurationSection("Contents").getConfigurationSection(s).getInt("Amount");
+                    double price;
+                    if (config.getConfigurationSection("Contents").getConfigurationSection(s).isDouble("Price")) {
+                        price = config.getConfigurationSection("Contents").getConfigurationSection(s).getDouble("Price");
+                    } else {
+                        price = config.getConfigurationSection("Contents").getConfigurationSection(s).getInt("Price");
+                    }
+
+                    int stock = config.getConfigurationSection("Contents").getConfigurationSection(s).getInt("Stock");
+
+                    ShopItem shopItem = createShopItem(item, amt, getNextAvailablePage(false), amount, price, stock, infinite, false);
+                }
+            }
+        }
+
+        if (config.isConfigurationSection("Sell")) {
+
+            for (String s : config.getConfigurationSection("Sell").getKeys(false)) {
+
+                if (config.getConfigurationSection("Sell").getConfigurationSection(s).isItemStack("ItemStack")) {
+                    ItemStack item = config.getConfigurationSection("Sell").getConfigurationSection(s).getItemStack("ItemStack");
+                    int amt = config.getConfigurationSection("Sell").getConfigurationSection(s).getInt("Slot");
+                    boolean infinite = config.getConfigurationSection("Sell").getConfigurationSection(s).getBoolean("Infinite");
+                    int amount = config.getConfigurationSection("Sell").getConfigurationSection(s).getInt("Amount");
+                    double price;
+                    if (config.getConfigurationSection("Sell").getConfigurationSection(s).isDouble("Price")) {
+                        price = config.getConfigurationSection("Sell").getConfigurationSection(s).getDouble("Price");
+                    } else {
+                        price = config.getConfigurationSection("Sell").getConfigurationSection(s).getInt("Price");
+                    }
+
+                    int stock = config.getConfigurationSection("Sell").getConfigurationSection(s).getInt("Stock");
+
+                    ShopItem shopItem = createShopItem(item, amt, getNextAvailablePage(true), amount, price, stock, infinite, true);
+
+                }
+            }
+        }
+
+        //delete 'Sell' and 'Contents'
+        config.set("Contents", null);
+        config.set("Sell", null);
+
+        saveConfig();
+    }
+
     public void saveConfig() {
         try {
             config.save(file);
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    public Sign getSign(){
+        if (l.getWorld().getBlockAt(l).getState() instanceof Chest) {
+
+            Chest chest = (Chest) l.getWorld().getBlockAt(l).getState();
+
+            Block block = chest.getBlock();
+
+            Sign sign = null;
+            if (block.getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(1, 0, 0).getState();
+
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                            return sign;
+                        }
+                    }
+                }
+
+            }
+            if (block.getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(-1, 0, 0).getState();
+
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                            return sign;
+                        }
+                    }
+                }
+            }
+            if (block.getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, 1).getState();
+
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+
+                            return sign;
+                        }
+                    }
+                }
+            }
+            if (block.getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
+                sign = (Sign) block.getRelative(0, 0, -1).getState();
+
+                if (sign.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                    if (sign.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                        if (sign.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+
+                            return sign;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

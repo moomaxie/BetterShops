@@ -61,6 +61,10 @@ public class SignShopManager {
         return ids.get(s) == p.getUniqueId();
     }
 
+    public static OfflinePlayer getOwner(Sign s) {
+        return Bukkit.getOfflinePlayer(ids.get(s));
+    }
+
     public static boolean isShopSign(Sign s) {
         return signs.containsKey(s);
     }
@@ -136,7 +140,7 @@ public class SignShopManager {
                                         "(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})",
                                         "$1-$2-$3-$4-$5");
 
-                                if (!CreateShop.isAlphaNumeric(id)) {
+                                if (!CreateShop.isAlphaNumeric(id) || id.contains(" ")) {
                                     break;
                                 }
                                 OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(id));

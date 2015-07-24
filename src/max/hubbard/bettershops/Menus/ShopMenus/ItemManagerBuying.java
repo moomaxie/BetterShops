@@ -3,6 +3,9 @@ package max.hubbard.bettershops.Menus.ShopMenus;
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.Permissions;
+import max.hubbard.bettershops.Events.AmountChangeEvent;
+import max.hubbard.bettershops.Events.PriceChangeEvent;
+import max.hubbard.bettershops.Events.StockChangeEvent;
 import max.hubbard.bettershops.Menus.MenuType;
 import max.hubbard.bettershops.Menus.ShopMenu;
 import max.hubbard.bettershops.Shops.Items.Actions.ClickableItem;
@@ -25,6 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * ***********************************************************************
@@ -102,6 +106,10 @@ public class ItemManagerBuying implements ShopMenu {
                         if (can) {
                             if (amt >= 0) {
                                 if (amt <= Config.getMaxPrice()) {
+
+                                    PriceChangeEvent e = new PriceChangeEvent(it, it.getPrice(), amt);
+                                    Bukkit.getPluginManager().callEvent(e);
+
                                     it.setPrice(amt);
                                     if (shop.isHoloShop()) {
                                         ShopHologram h = shop.getHolographicShop();
@@ -170,6 +178,11 @@ public class ItemManagerBuying implements ShopMenu {
                     } else {
                         shop.getMenu(MenuType.OWNER_SELLING).draw(p, page);
                     }
+
+                    if (shop.getShopItems().size() == 0 && max.hubbard.bettershops.TradeManager.getTrades(shop).size() == 0) {
+                        shop.setObject("Removal", new Date().getTime());
+                    }
+
                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "RemoveItem"));
 
                 } else {
@@ -206,9 +219,13 @@ public class ItemManagerBuying implements ShopMenu {
 
 
                                                                     if (limit != 0 && Stocks.getNumberInInventory(it, p, shop) + it.getStock() > limit) {
+                                                                        StockChangeEvent e = new StockChangeEvent(it, it.getStock(), limit);
+                                                                        Bukkit.getPluginManager().callEvent(e);
                                                                         Stocks.addStock(it, limit - it.getStock(), p, shop);
                                                                         p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "StopStock"));
                                                                     } else {
+                                                                        StockChangeEvent e = new StockChangeEvent(it, it.getStock(), it.getStock() + Stocks.getNumberInInventory(it, p, shop));
+                                                                        Bukkit.getPluginManager().callEvent(e);
                                                                         Stocks.addAll(it, shop, p);
                                                                     }
                                                                     if (shop.isHoloShop()) {
@@ -227,9 +244,13 @@ public class ItemManagerBuying implements ShopMenu {
 
 
                                                             if (limit != 0 && amt + it.getStock() > limit) {
+                                                                StockChangeEvent e = new StockChangeEvent(it, it.getStock(), limit);
+                                                                Bukkit.getPluginManager().callEvent(e);
                                                                 Stocks.addStock(it, limit - it.getStock(), p, shop);
                                                                 p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "StopStock"));
                                                             } else {
+                                                                StockChangeEvent e = new StockChangeEvent(it, it.getStock(), it.getStock() + Stocks.getNumberInInventory(it, p, shop));
+                                                                Bukkit.getPluginManager().callEvent(e);
                                                                 Stocks.addStock(it, amt, p, shop);
                                                             }
 
@@ -262,6 +283,8 @@ public class ItemManagerBuying implements ShopMenu {
                                                         amt = Integer.parseInt(name);
                                                     } catch (Exception ex) {
                                                         if (name.equalsIgnoreCase("all")) {
+                                                            StockChangeEvent e = new StockChangeEvent(it, it.getStock(), 0);
+                                                            Bukkit.getPluginManager().callEvent(e);
                                                             Stocks.removeAll(it, shop, p);
                                                             if (shop.isHoloShop()) {
                                                                 ShopHologram h = shop.getHolographicShop();
@@ -276,7 +299,8 @@ public class ItemManagerBuying implements ShopMenu {
                                                         }
                                                     }
 
-
+                                                    StockChangeEvent e = new StockChangeEvent(it, it.getStock(), it.getStock() - amt);
+                                                    Bukkit.getPluginManager().callEvent(e);
                                                     Stocks.removeStock(it, amt, p, shop);
                                                     draw(p, page, obj);
                                                 }
@@ -314,6 +338,8 @@ public class ItemManagerBuying implements ShopMenu {
                                                     if (can) {
 
                                                         if (amt > 0 && amt <= 2304) {
+                                                            AmountChangeEvent e = new AmountChangeEvent(it, it.getAmount(), amt);
+                                                            Bukkit.getPluginManager().callEvent(e);
                                                             it.setObject("Amount", amt);
 
                                                             if (it.getLiveEco()) {
@@ -341,14 +367,10 @@ public class ItemManagerBuying implements ShopMenu {
 
         ItemStack infinite = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
         ItemMeta infiniteMeta = infinite.getItemMeta();
-        if (it.isInfinite())
-
-        {
+        if (it.isInfinite()) {
             infiniteMeta.setDisplayName(Language.getString("ItemTexts", "InfiniteDisplayNameOn"));
             infinite = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
-        } else
-
-        {
+        } else {
             infiniteMeta.setDisplayName(Language.getString("ItemTexts", "InfiniteDisplayNameOff"));
         }
 
@@ -362,7 +384,6 @@ public class ItemManagerBuying implements ShopMenu {
                                             draw(p, page, obj);
                                         }
                                     }
-
         );
 
         ItemStack eco = new ItemStack(Material.EMERALD_BLOCK);
@@ -394,13 +415,41 @@ public class ItemManagerBuying implements ShopMenu {
 
         );
 
+        ItemStack autoStock = new ItemStack(Material.DIAMOND);
+        ItemMeta autoStockMeta = autoStock.getItemMeta();
+        autoStockMeta.setDisplayName(Language.getString("Timings", "AutoStock"));
+        autoStockMeta.setLore(Arrays.asList(Language.getString("Timings", "AutoStockLore")));
+        autoStock.setItemMeta(autoStockMeta);
+        ClickableItem autoStockClick = new ClickableItem(new ShopItemStack(autoStock), inv, p);
+        autoStockClick.addLeftClickAction(new LeftClickAction() {
+                                              @Override
+                                              public void onAction(InventoryClickEvent e) {
+                                                  shop.getMenu(MenuType.AUTO_STOCK).draw(p, page, it);
+                                              }
+                                          }
+
+        );
+
+        ItemStack transCool = new ItemStack(Material.WATCH);
+        ItemMeta transCoolMeta = transCool.getItemMeta();
+        transCoolMeta.setDisplayName(Language.getString("Timings", "Transactions"));
+        transCoolMeta.setLore(Arrays.asList(Language.getString("Timings", "TransactionsLore")));
+        transCool.setItemMeta(transCoolMeta);
+        ClickableItem transCoolClick = new ClickableItem(new ShopItemStack(transCool), inv, p);
+        transCoolClick.addLeftClickAction(new LeftClickAction() {
+                                              @Override
+                                              public void onAction(InventoryClickEvent e) {
+                                                  shop.getMenu(MenuType.COOLDOWNS).draw(p, page, it);
+                                              }
+                                          }
+
+        );
+
         inv.setItem(0, back);
 
         inv.setItem(4, it.getItem());
 
-        if ((Boolean) Config.getObject("UseLiveEco") && Permissions.hasLiveEcoPerm(p))
-
-        {
+        if ((Boolean) Config.getObject("UseLiveEco") && Permissions.hasLiveEcoPerm(p)) {
             inv.setItem(8, eco);
         }
 
@@ -411,6 +460,12 @@ public class ItemManagerBuying implements ShopMenu {
         if (p.isOp() || (Boolean) Config.getObject("Permissions") && Permissions.hasInfinitePerm(p)) {
             inv.setItem(inv.firstEmpty() + 1, infinite);
         }
+
+        if (p.isOp() || (Boolean) Config.getObject("Permissions") && Permissions.hasAutostockPerm(p)) {
+            inv.setItem(50, autoStock);
+        }
+
+        inv.setItem(48, transCool);
 
 
         inv.setItem(32, removeStock);
@@ -424,7 +479,7 @@ public class ItemManagerBuying implements ShopMenu {
         inv.setItem(29, addStock);
         inv.setItem(30, addStock);
 
-       new BukkitRunnable() {
+        new BukkitRunnable() {
 
             @Override
             public void run() {

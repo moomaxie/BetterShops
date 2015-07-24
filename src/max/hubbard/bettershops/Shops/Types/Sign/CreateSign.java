@@ -3,6 +3,8 @@ package max.hubbard.bettershops.Shops.Types.Sign;
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.Permissions;
+import max.hubbard.bettershops.ShopManager;
+import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Utils.MaterialSearch;
 import max.hubbard.bettershops.Utils.WordsCapitalizer;
 import max.hubbard.bettershops.Versions.SignChange;
@@ -17,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -47,10 +50,9 @@ public class CreateSign implements Listener {
         }
 
 
-
         if (can) {
-            if (((boolean) Config.getObject("Permissions")) && !Permissions.hasCreateSignShopPerm(p)){
-                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","NoPermission"));
+            if (((boolean) Config.getObject("Permissions")) && !Permissions.hasCreateSignShopPerm(p)) {
+                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));
                 return;
             }
 
@@ -101,10 +103,10 @@ public class CreateSign implements Listener {
 
             if (m.size() > 0) {
 
-                List<String> parts = WordsCapitalizer.getParts(p.getUniqueId().toString().replaceAll("-",""), 15);
+                List<String> parts = WordsCapitalizer.getParts(p.getUniqueId().toString().replaceAll("-", ""), 15);
 
-                String mat = WordsCapitalizer.capitalizeEveryWord(m.get(0).name().replaceAll("_"," "));
-                mat = mat.replaceAll(" ","");
+                String mat = WordsCapitalizer.capitalizeEveryWord(m.get(0).name().replaceAll("_", " "));
+                mat = mat.replaceAll(" ", "");
 
                 for (int i = 0; i < parts.size(); i++) {
                     e.setLine(i, parts.get(i));
@@ -126,7 +128,7 @@ public class CreateSign implements Listener {
                         e.setLine(i + 3, parts.get(i));
                     }
                 } else {
-                    e.setLine(3,"");
+                    e.setLine(3, "");
                 }
                 if (sell)
                     e.setLine(3, e.getLine(3) + ":S:" + d + ":" + pr + ":" + am);
@@ -152,12 +154,40 @@ public class CreateSign implements Listener {
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             @Override
             public void run() {
                 SignChange.updateSigns(e.getPlayer());
             }
         }, 5L);
+        Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+            @Override
+            public void run() {
+                for (final Shop s : ShopManager.getShops()) {
+                    if (s.isHoloShop()) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                            @Override
+                            public void run() {
+                                s.getHolographicShop().getHologram().refreshAll();
+                            }
+                        });
+                    }
+
+                    if (s.isNPCShop()) {
+                        if (!s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                @Override
+                                public void run() {
+                                    s.getNPCShop().spawn();
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+
+
     }
 
     @EventHandler
@@ -172,5 +202,43 @@ public class CreateSign implements Listener {
                 }
             });
         }
+    }
+
+    @EventHandler
+    public void onTp(final PlayerTeleportEvent e) {
+
+        Bukkit.getScheduler().runTaskLaterAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+            @Override
+            public void run() {
+                SignChange.updateSigns(e.getPlayer());
+            }
+        }, 5L);
+
+        Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+            @Override
+            public void run() {
+                for (final Shop s : ShopManager.getShops()) {
+                    if (s.isHoloShop()) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                            @Override
+                            public void run() {
+                                s.getHolographicShop().getHologram().refreshAll();
+                            }
+                        });
+                    }
+
+                    if (s.isNPCShop()) {
+                        if (!s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                @Override
+                                public void run() {
+                                    s.getNPCShop().spawn();
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
     }
 }

@@ -8,7 +8,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 2.0.4
+Version: 2.1.0
 
 Prefix: '&b&lBetterShops &7&l» &d'
 
@@ -193,3 +193,6 @@ HighStock: '&cCannot add any more stock to this item.'
 StopStock: '&cSome stock was not added because the limit was reached.'
 
 Loading: '&cIt seems that this shop is still loading...'
+
+CannotUseOwn: '&cCannot use your own Sign Shop'
+

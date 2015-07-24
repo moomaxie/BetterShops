@@ -7,7 +7,7 @@ import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.LanguageMenu.GUIMessagesInv;
 import max.hubbard.bettershops.Configurations.Permissions;
 import max.hubbard.bettershops.Core;
-import max.hubbard.bettershops.Menus.MenuType;
+import max.hubbard.bettershops.Listeners.Opener;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Shops.Types.Holo.DeleteHoloShop;
@@ -51,14 +51,14 @@ public class BSCommand implements CommandExecutor {
                 if (args.length == 1) {
 
                     if (args[0].equalsIgnoreCase("migrate") && p.isOp()) {
-                        p.sendMessage(Language.getString("Messages","Prefix") + "§eStarting Shop Migration...");
+                        p.sendMessage(Language.getString("Messages", "Prefix") + "§eStarting Shop Migration...");
                         Conversion.startConversion();
 
                         try {
                             ShopManager.loadFile();
 
                             Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
-                            p.sendMessage(Language.getString("Messages","Prefix") + "§aDone");
+                            p.sendMessage(Language.getString("Messages", "Prefix") + "§aDone");
                         } catch (Exception e) {
                             e.printStackTrace();
                             p.sendMessage(Language.getString("Messages", "Prefix") + "§cAn error occurred, please inform a server administrator.");
@@ -133,6 +133,8 @@ public class BSCommand implements CommandExecutor {
                 } else if (args.length >= 2) {
                     if (args[0].equalsIgnoreCase("open")) {
                         if ((boolean) Config.getObject("Permissions") && Permissions.hasOpenCommandPerm(p) || !(boolean) Config.getObject("Permissions")) {
+
+
                             String name = args[1];
 
                             for (int i = 2; i < args.length; i++) {
@@ -141,63 +143,27 @@ public class BSCommand implements CommandExecutor {
 
                             Shop shop = ShopManager.fromString(p, name);
 
+                            if ((boolean) Config.getObject("Permissions") && !Permissions.hasOpenCommandWorldPerm(p, shop.getLocation().getWorld())) {
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));
+                                return true;
+                            }
+
                             if (shop != null) {
-                                if (shop.getOwner() != null) {
-                                    if (shop.isOpen()) {
-                                        if (!shop.getOwner().getUniqueId().equals(p.getUniqueId()) || !shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) || shop.isServerShop()) {
-                                            if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
-                                                shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
-                                            } else {
-                                                if ((boolean) Config.getObject("SellingShops")) {
-                                                    shop.getMenu(MenuType.MAIN_SELLING).draw(p, 1);
-                                                } else {
-                                                    shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
-                                                }
-                                            }
-                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "OpenShop"));
-                                        } else if (shop.getOwner().getUniqueId().equals(p.getUniqueId()) || shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
-                                            if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
-                                                shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
-                                            } else {
-                                                if ((boolean) Config.getObject("SellingShops")) {
-                                                    shop.getMenu(MenuType.OWNER_SELLING).draw(p, 1);
-                                                } else {
-                                                    shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
-                                                }
-                                            }
-                                        }
+                                if (!shop.getBlacklist().contains(p)) {
+                                    if (shop.getOwner() != null) {
+                                        Opener.open(p, shop);
                                     } else {
-                                        if (!shop.getOwner().getUniqueId().equals(p.getUniqueId()) || !shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString())) {
-                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
-                                        } else {
-                                            if (!shop.isServerShop()) {
-                                                if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
-                                                    shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
-                                                } else {
-                                                    if ((boolean) Config.getObject("SellingShops")) {
-                                                        shop.getMenu(MenuType.OWNER_SELLING).draw(p, 1);
-                                                    } else {
-                                                        shop.getMenu(MenuType.OWNER_BUYING).draw(p, 1);
-                                                    }
-                                                }
-                                            } else {
-                                                if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
-                                                    shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
-                                                } else {
-                                                    if ((boolean) Config.getObject("SellingShops")) {
-                                                        shop.getMenu(MenuType.MAIN_SELLING).draw(p, 1);
-                                                    } else {
-                                                        shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "FakeShop"));
                                     }
                                 } else {
-                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "FakeShop"));
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotAllowed"));
                                 }
                             } else {
-                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "FakeShop"));
+                                if (ShopManager.loadingTotal == ShopManager.getShops().size()) {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidShop"));
+                                } else {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                                }
                             }
                         } else {
                             p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));

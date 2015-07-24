@@ -117,6 +117,8 @@ public class AddItemListener implements Listener {
                                                     } else {
                                                         p.getInventory().setItem(slot, new ItemStack(Material.AIR));
                                                     }
+
+                                                    shop.setObject("Removal", "");
                                                 } else {
 
                                                     int limit = (int) Config.getObject("StockLimit");
@@ -177,6 +179,8 @@ public class AddItemListener implements Listener {
                                                     } else {
                                                         shop.getMenu(MenuType.OWNER_SELLING).draw(p, page);
                                                     }
+
+                                                    shop.setObject("Removal", "");
 
                                                 } else {
                                                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "AlreadyHave"));

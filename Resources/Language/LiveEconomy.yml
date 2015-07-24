@@ -7,11 +7,15 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 2.0.4
+Version: 2.1.0
 
 LiveEcoOn: '&e&lLive Economy &7- &aOn'
 LiveEcoOff: '&e&lLive Economy &7- &cOff'
 LiveEcoLore: '&3&lClick &7to toggle'
+
+SellEcoOn: '&e&lCustom Sell Price &7- &aOn'
+SellEcoOff: '&e&lCustom Sell Price &7- &cOff'
+SellEcoLore: '&3&lClick &7to toggle'
 
 Information: '&d&l&nInformation'
 Info1: '&7If enabled, the following will occur'

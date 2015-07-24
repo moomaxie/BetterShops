@@ -1,6 +1,7 @@
 package max.hubbard.bettershops.Shops.Items;
 
 import max.hubbard.bettershops.Shops.Shop;
+import max.hubbard.bettershops.Utils.Timing;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -46,6 +47,16 @@ public interface ShopItem {
     public boolean isInfinite();
 
     public boolean getLiveEco();
+
+    public boolean isAutoStock();
+
+    public boolean isTransCooldown();
+
+    public boolean isSellEco();
+
+    public Timing getAutoStockTiming();
+
+    public Timing getTransCooldownTiming();
 
     public int getPage();
 

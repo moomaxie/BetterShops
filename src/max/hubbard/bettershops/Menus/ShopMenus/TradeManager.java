@@ -383,6 +383,7 @@ public class TradeManager implements ShopMenu {
                 max.hubbard.bettershops.TradeManager.removeTrade(orig, shop);
                 max.hubbard.bettershops.TradeManager.addTrade(p,trade, shop);
                 shop.getMenu(MenuType.TRADING).draw(p, page);
+                shop.setObject("Removal", "");
             }
         });
 

@@ -3,6 +3,7 @@ package max.hubbard.bettershops.Configurations;
 import max.hubbard.bettershops.Shops.Shop;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
 /**
@@ -29,6 +30,7 @@ public class Permissions {
     // bettershops.shop.liveeco
     // bettershops.shop.arrange
     // bettershops.shop.blacklist
+    // bettershops.shop.autostock
 
     // bettershops.edit.*
     // bettershops.edit.SHOP
@@ -85,6 +87,10 @@ public class Permissions {
         return p.isOp() || p.getPlayer().hasPermission("bettershops.shop.playerblacklist") || p.getPlayer().hasPermission("bettershops.shop.*");
     }
 
+    public static boolean hasAutostockPerm(OfflinePlayer p) {
+        return p.isOp() || p.getPlayer().hasPermission("bettershops.shop.autostock") || p.getPlayer().hasPermission("bettershops.shop.*");
+    }
+
     public static boolean hasConfigGUIPerm(OfflinePlayer p) {
         return p.isOp() || p.getPlayer().hasPermission("bettershops.command.config") || p.getPlayer().hasPermission("bettershops.command.*");
     }
@@ -95,6 +101,10 @@ public class Permissions {
 
     public static boolean hasOpenCommandPerm(OfflinePlayer p) {
         return p.isOp() || p.getPlayer().hasPermission("bettershops.command.open") || p.getPlayer().hasPermission("bettershops.command.*");
+    }
+
+    public static boolean hasOpenCommandWorldPerm(OfflinePlayer p, World w) {
+        return p.isOp() || p.getPlayer().hasPermission("bettershops.command.open." + w.getName()) || p.getPlayer().hasPermission("bettershops.command.open.*") || p.getPlayer().hasPermission("bettershops.command.*");
     }
 
     public static boolean hasListPerm(OfflinePlayer p) {

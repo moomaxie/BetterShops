@@ -3,6 +3,7 @@ package max.hubbard.bettershops.Events;
 
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
+import max.hubbard.bettershops.Utils.Transaction;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Event;
@@ -23,33 +24,40 @@ public class ShopBuyItemEvent extends Event {
     private Shop shop;
     private ShopItem item;
     private OfflinePlayer buyer;
+    private Transaction t;
 
-    public ShopBuyItemEvent(ShopItem item, Shop shop,OfflinePlayer buyer) {
+    public ShopBuyItemEvent(ShopItem item, Shop shop, OfflinePlayer buyer, Transaction t) {
         this.shop = shop;
         this.item = item;
+        this.buyer = buyer;
+        this.t = t;
     }
 
-    public Shop getShop(){
+    public Shop getShop() {
         return shop;
     }
 
-    public ShopItem getItem(){
+    public ShopItem getItem() {
         return item;
     }
 
-    public OfflinePlayer getCustomer(){
+    public OfflinePlayer getCustomer() {
         return buyer;
     }
 
-    public OfflinePlayer getOwner(){
+    public OfflinePlayer getOwner() {
         return shop.getOwner();
     }
 
-    public Location getLocation(){
+    public Location getLocation() {
         return shop.getLocation();
     }
 
-    public String getShopName(){
+    public Transaction getTransaction() {
+        return t;
+    }
+
+    public String getShopName() {
         return shop.getName();
     }
 

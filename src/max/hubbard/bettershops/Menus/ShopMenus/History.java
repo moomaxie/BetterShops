@@ -169,7 +169,7 @@ public class History implements ShopMenu {
                     s = "Selling";
                 }
 
-                sk.setDisplayName("§a" + trans.getPlayer().getName());
+                sk.setDisplayName("§a" + trans.getPlayerName());
 
                 sk.setLore(Arrays.asList(Language.getString("History" , "Date") + " §8" + trans.getDate().toLocaleString(),
                         Language.getString("History" , "Item") + " §8" + trans.getItem(),

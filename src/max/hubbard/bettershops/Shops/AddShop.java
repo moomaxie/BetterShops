@@ -1,5 +1,6 @@
 package max.hubbard.bettershops.Shops;
 
+import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.ShopManager;
@@ -94,7 +95,7 @@ public class AddShop {
 
             try {
                 Statement s = Core.getConnection().createStatement();
-                s.executeUpdate("INSERT INTO Shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
+                s.executeUpdate("INSERT INTO " + Config.getObject("prefix") + "Shops(`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
                         " ('" + name + "', '" + p.getUniqueId().toString() + "', '" + Language.getString("MainGUI", "NoDescription") + "', '" + c.getLocation().getWorld().getName() + "', '" + c.getLocation().getX() + "', '" + c.getLocation().getY() + "', '" + c.getLocation().getZ() + "', '"
                         + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 7 + "');");
 
@@ -179,7 +180,7 @@ public class AddShop {
         } else {
             try {
                 Statement s = Core.getConnection().createStatement();
-                s.executeUpdate("INSERT INTO Shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
+                s.executeUpdate("INSERT INTO " + Config.getObject("prefix") + "Shops (`Name`, `Owner`, `Description`, `World`, `X`, `Y`, `Z`, `NextShopId`, `Open`, `Notify`, `Server`, `NPC`, `Holo`, `Frame`) VALUES" +
                         " ('" + name + "', '" + p.getUniqueId().toString() + "', '" + Language.getString("MainGUI", "NoDescription") + "', '" + chest.getLocation().getWorld().getName() + "', '" + chest.getLocation().getX() + "', '" + chest.getLocation().getY() + "', '" + chest.getLocation().getZ() + "', '"
                         + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 0 + "', '" + 7 + "');");
 

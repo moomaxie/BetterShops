@@ -17,6 +17,7 @@ import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Utils.Stocks;
+import max.hubbard.bettershops.Utils.Transaction;
 import max.hubbard.bettershops.Utils.WordsCapitalizer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -189,11 +190,11 @@ public class Cart implements ShopMenu {
                                     ite.setItemMeta(meta);
                                 }
                                 inv.setItem(inv.firstEmpty(), ite);
-                                final ClickableItem iteClick = new ClickableItem(new ShopItemStack(ite),inv,p);
+                                final ClickableItem iteClick = new ClickableItem(new ShopItemStack(ite), inv, p);
                                 iteClick.addLeftClickAction(new LeftClickAction() {
                                     @Override
                                     public void onAction(InventoryClickEvent e) {
-                                        removeItem(it,p,ite);
+                                        removeItem(it, p, ite);
                                     }
                                 });
 
@@ -224,7 +225,7 @@ public class Cart implements ShopMenu {
         }
 
 
-       new BukkitRunnable() {
+        new BukkitRunnable() {
 
             @Override
             public void run() {
@@ -359,16 +360,16 @@ public class Cart implements ShopMenu {
     }
 
     public void buyItems(Player p) {
-        if (!shop.isOpen() && !(boolean)Config.getObject("UseOnClose")) {
+        if (!shop.isOpen() && !(boolean) Config.getObject("UseOnClose")) {
             p.closeInventory();
-            p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","ShopClosed"));
+            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
             return;
         }
 
         for (int i = 9; i < inv.getContents().length; i++) {
             ItemStack item = inv.getItem(i);
             ShopItem shopItem;
-            if (shop instanceof FileShop){
+            if (shop instanceof FileShop) {
                 shopItem = FileShopItem.fromItemStack(shop, item, false);
             } else {
                 shopItem = SQLShopItem.fromItemStack(shop, item, false);
@@ -377,14 +378,14 @@ public class Cart implements ShopMenu {
             if (shopItem != null && item != null && item.getItemMeta().getLore() != null) {
                 List<String> lore = item.getItemMeta().getLore();
 
-                double pr = (double)Config.getObject("DefaultPrice");
+                double pr = (double) Config.getObject("DefaultPrice");
                 int amt = 1;
                 for (String s : lore) {
-                    if (s.contains(Language.getString("MainGUI","Price"))) {
-                        pr = Double.parseDouble(s.substring(Language.getString("MainGUI","Price").length() + 3));
+                    if (s.contains(Language.getString("MainGUI", "Price"))) {
+                        pr = Double.parseDouble(s.substring(Language.getString("MainGUI", "Price").length() + 3));
                     }
-                    if (s.contains(Language.getString("MainGUI","Amount"))) {
-                        amt = Integer.parseInt(s.substring(Language.getString("MainGUI","Amount").length() + 3));
+                    if (s.contains(Language.getString("MainGUI", "Amount"))) {
+                        amt = Integer.parseInt(s.substring(Language.getString("MainGUI", "Amount").length() + 3));
                     }
                 }
 
@@ -395,9 +396,9 @@ public class Cart implements ShopMenu {
                 if (bd.doubleValue() != shopItem.getPrice()) {
                     p.closeInventory();
                     if (item.getItemMeta().getDisplayName() != null) {
-                        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","PriceChange").replaceAll("<Item>", item.getItemMeta().getDisplayName()));
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "PriceChange").replaceAll("<Item>", item.getItemMeta().getDisplayName()));
                     } else {
-                        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","PriceChange").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(item.getType().name().replaceAll("_", " "))));
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "PriceChange").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(item.getType().name().replaceAll("_", " "))));
                     }
 
                     return;
@@ -444,26 +445,26 @@ public class Cart implements ShopMenu {
                             ItemStack ite = it.getItem().clone();
 
                             if (lore != null) {
-                                if (!lore.contains(Language.getString("Checkout","ClickToRemove"))) {
+                                if (!lore.contains(Language.getString("Checkout", "ClickToRemove"))) {
                                     if (ie.get(i) != null) {
-                                        lore.add(Language.getString("MainGUI","Amount") + " §7" + ie.get(i));
+                                        lore.add(Language.getString("MainGUI", "Amount") + " §7" + ie.get(i));
                                         amt = ie.get(i);
                                     } else {
-                                        lore.add(Language.getString("MainGUI","Amount") + " §71");
+                                        lore.add(Language.getString("MainGUI", "Amount") + " §71");
                                     }
                                     if (ie.get(i) != null) {
                                         BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * ie.get(i));
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-                                        lore.add(Language.getString("MainGUI","Price") + " §7" + bd.doubleValue());
+                                        lore.add(Language.getString("MainGUI", "Price") + " §7" + bd.doubleValue());
                                         total = total + bd.doubleValue();
                                     } else {
                                         BigDecimal bd = new BigDecimal((it.getPrice() / it.getAmount()) * 1);
                                         bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-                                        lore.add(Language.getString("MainGUI","Price") + " §7" + bd.doubleValue());
+                                        lore.add(Language.getString("MainGUI", "Price") + " §7" + bd.doubleValue());
                                         total = total + bd.doubleValue();
                                     }
                                     lore.add(" ");
-                                    lore.add(Language.getString("Checkout","ClickToRemove"));
+                                    lore.add(Language.getString("Checkout", "ClickToRemove"));
                                     meta.setLore(lore);
                                     ite.setItemMeta(meta);
                                 }
@@ -471,13 +472,21 @@ public class Cart implements ShopMenu {
 
                             boolean c = true;
 
-                            if ((boolean)Config.getObject("Permissions")) {
+                            if ((boolean) Config.getObject("Permissions")) {
                                 if (!Permissions.hasBuyItemPerm(p, it.getItem().getType())) {
                                     c = false;
                                 }
                             }
 
                             if (c) {
+
+                                boolean g = false;
+                                if (it.isTransCooldown()) {
+                                    if (Cooldowns.getAmount(p,it) < amt) {
+                                        amt = (int) Cooldowns.getAmount(p, it);
+                                        g = true;
+                                    }
+                                }
 
                                 if (it.getStock() >= amt) {
                                     if (Core.getEconomy().getBalance(p) >= it.getPrice() * amt) {
@@ -495,14 +504,14 @@ public class Cart implements ShopMenu {
 
                                             if (shop.isNotify()) {
                                                 if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                                    shop.getOwner().getPlayer().sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
-                                                    shop.getOwner().getPlayer().sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                    shop.getOwner().getPlayer().sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                    shop.getOwner().getPlayer().sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
                                                     if (Core.isAboveEight() && (boolean) Config.getObject("Titles") && Core.getTitleManager() != null) {
 
                                                         Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                                        Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Language.getString("Messages","NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
-                                                        Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Language.getString("Messages","ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                        Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Language.getString("Messages", "NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                        Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Language.getString("Messages", "ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
 
                                                     }
@@ -526,7 +535,7 @@ public class Cart implements ShopMenu {
 
                                         shop.getHistory().addTransaction(p, new Date(), it, value, amt, false, true);
 
-                                        ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop, p);
+                                        ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop, p,new Transaction(p, new Date(), it, value, amt, false));
 
                                         Bukkit.getPluginManager().callEvent(ev);
 
@@ -538,20 +547,31 @@ public class Cart implements ShopMenu {
 
                                     } else {
                                         if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                            if (!Language.getString("Messages","CannotAfford").contains("<Item>")) {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford") + ite.getItemMeta().getDisplayName());
+                                            if (!Language.getString("Messages", "CannotAfford").contains("<Item>")) {
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford") + ite.getItemMeta().getDisplayName());
                                             } else {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
                                             }
                                         } else {
-                                            if (!Language.getString("Messages","CannotAfford").contains("<Item>")) {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                            if (!Language.getString("Messages", "CannotAfford").contains("<Item>")) {
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                             } else {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
                                             }
                                         }
                                         p.closeInventory();
                                         return;
+                                    }
+                                    if (g) {
+                                        if (it.getDisplayName() != null) {
+                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CanOnlyBuy") + amt + " §cof §d" + it.getDisplayName());
+                                        } else {
+                                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CanOnlyBuy") + amt + " §cof §d" + it.getItem().getType().name().replaceAll("_", " "));
+                                        }
+                                    }
+
+                                    if (it.isTransCooldown()) {
+                                        Cooldowns.addAmount(p, it, amt);
                                     }
                                 } else {
                                     if (it.getStock() > 0 || it.getStock() <= 0 && it.isInfinite()) {
@@ -566,14 +586,14 @@ public class Cart implements ShopMenu {
                                                 value = bd.doubleValue();
                                                 if (shop.isNotify()) {
                                                     if (shop.getOwner() != null && shop.getOwner().isOnline()) {
-                                                        shop.getOwner().getPlayer().sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
-                                                        shop.getOwner().getPlayer().sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                        shop.getOwner().getPlayer().sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                        shop.getOwner().getPlayer().sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
                                                         if (Core.isAboveEight() && (boolean) Config.getObject("Titles") && Core.getTitleManager() != null) {
 
                                                             Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
-                                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Language.getString("Messages","NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
-                                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Language.getString("Messages","ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
+                                                            Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Language.getString("Messages", "NotifyBuy").replaceAll("<Player>", p.getDisplayName()));
+                                                            Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Language.getString("Messages", "ReceivedAmount").replaceAll("<Amount>", "" + bd.doubleValue()));
 
 
                                                         }
@@ -595,21 +615,30 @@ public class Cart implements ShopMenu {
 
                                             if (!it.isInfinite()) {
                                                 if (it.getDisplayName() != null) {
-                                                    p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CanOnlyBuy") + it.getStock() + " §cof §d" + it.getDisplayName());
+                                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CanOnlyBuy") + it.getStock() + " §cof §d" + it.getDisplayName());
                                                 } else {
-                                                    p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CanOnlyBuy") + it.getStock() + " §cof §d" + it.getItem().getType().name().replaceAll("_", " "));
+                                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CanOnlyBuy") + it.getStock() + " §cof §d" + it.getItem().getType().name().replaceAll("_", " "));
                                                 }
                                             }
 
                                             if (!it.isInfinite())
-                                                it.setObject("Stock",0);
+                                                it.setObject("Stock", 0);
 
                                             if (shop.getHistory() == null) {
                                                 shop.loadTransactions();
                                             }
+
+                                            if (it.isTransCooldown()) {
+                                                if (it.isInfinite()) {
+                                                    Cooldowns.addAmount(p, it, it.getStock());
+                                                } else {
+                                                    Cooldowns.addAmount(p, it, amt);
+                                                }
+                                            }
+
                                             shop.getHistory().addTransaction(p, new Date(), it, value, amt, false, true);
 //
-                                            ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop, p);
+                                            ShopBuyItemEvent ev = new ShopBuyItemEvent(it, shop, p,new Transaction(p, new Date(), it, value, amt, false));
 
                                             Bukkit.getPluginManager().callEvent(ev);
 
@@ -620,16 +649,16 @@ public class Cart implements ShopMenu {
 
                                         } else {
                                             if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                                if (!Language.getString("Messages","CannotAfford").contains("<Item>")) {
-                                                    p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford") + ite.getItemMeta().getDisplayName());
+                                                if (!Language.getString("Messages", "CannotAfford").contains("<Item>")) {
+                                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford") + ite.getItemMeta().getDisplayName());
                                                 } else {
-                                                    p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
+                                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
                                                 }
                                             } else {
-                                                if (!Language.getString("Messages","CannotAfford").contains("<Item>")) {
-                                                    p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                                if (!Language.getString("Messages", "CannotAfford").contains("<Item>")) {
+                                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                                 } else {
-                                                    p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CannotAfford").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
+                                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CannotAfford").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
                                                 }
                                             }
                                             p.closeInventory();
@@ -638,16 +667,16 @@ public class Cart implements ShopMenu {
                                     } else {
 
                                         if (ite.getItemMeta() != null && ite.getItemMeta().getDisplayName() != null) {
-                                            if (!Language.getString("Messages","OutOfStock").contains("<Item>")) {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","OutOfStock") + ite.getItemMeta().getDisplayName());
+                                            if (!Language.getString("Messages", "OutOfStock").contains("<Item>")) {
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "OutOfStock") + ite.getItemMeta().getDisplayName());
                                             } else {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","OutOfStock").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "OutOfStock").replaceAll("<Item>", ite.getItemMeta().getDisplayName()));
                                             }
                                         } else {
-                                            if (!Language.getString("Messages","OutOfStock").contains("<Item>")) {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","OutOfStock") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
+                                            if (!Language.getString("Messages", "OutOfStock").contains("<Item>")) {
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "OutOfStock") + WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " ")));
                                             } else {
-                                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","OutOfStock").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
+                                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "OutOfStock").replaceAll("<Item>", WordsCapitalizer.capitalizeEveryWord(ite.getType().name().replaceAll("_", " "))));
                                             }
                                         }
                                         p.closeInventory();
@@ -655,15 +684,15 @@ public class Cart implements ShopMenu {
                                     }
                                 }
                             } else {
-                                p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages", "NoPermissionItem").replaceAll("<Item>", it.getItem().getType().name()));
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermissionItem").replaceAll("<Item>", it.getItem().getType().name()));
                             }
                         }
                     }
                 }
             }
         }
-        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","BuyItem"));
-        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","TakenAmount").replaceAll("<Amount>", "" + t));
+        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "BuyItem"));
+        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "TakenAmount").replaceAll("<Amount>", "" + t));
 
 
         if (Core.isAboveEight() && (boolean) Config.getObject("Titles") && Core.getTitleManager() != null) {
@@ -671,13 +700,13 @@ public class Cart implements ShopMenu {
             p.closeInventory();
 
             Core.getTitleManager().setTimes(p, 20, 60, 20);
-            Core.getTitleManager().sendTitle(p, Language.getString("Messages","BuyItem"));
-            Core.getTitleManager().sendSubTitle(p, Language.getString("Messages","TakenAmount").replaceAll("<Amount>", "" + t));
+            Core.getTitleManager().sendTitle(p, Language.getString("Messages", "BuyItem"));
+            Core.getTitleManager().sendSubTitle(p, Language.getString("Messages", "TakenAmount").replaceAll("<Amount>", "" + t));
 
             p.closeInventory();
 
         } else {
-            shop.getMenu(MenuType.MAIN_BUYING).draw(p,1);
+            shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
         }
         cart.remove(k);
 

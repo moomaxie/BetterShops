@@ -1,5 +1,6 @@
 package max.hubbard.bettershops.Shops;
 
+import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Utils.Transaction;
@@ -10,7 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.UUID;
 
 /**
  * ***********************************************************************
@@ -26,6 +29,9 @@ public class History {
     private LinkedList<Transaction> Buytransactions = new LinkedList<>();
     private LinkedList<Transaction> transactions = new LinkedList<>();
     private LinkedList<Transaction> Selltransactions = new LinkedList<>();
+
+    public HashMap<UUID, LinkedList<Transaction>> playerTrans = new HashMap<>();
+    public HashMap<String, LinkedList<Transaction>> nameTrans = new HashMap<>();
 
     public YamlConfiguration config = null;
     private File file = null;
@@ -60,6 +66,16 @@ public class History {
 
         transactions.add(trans);
 
+        if (playerTrans.containsKey(p.getUniqueId())) {
+            LinkedList<Transaction> tr = playerTrans.get(p.getUniqueId());
+            tr.add(trans);
+            playerTrans.put(p.getUniqueId(), tr);
+        } else {
+            LinkedList<Transaction> tr = new LinkedList<>();
+            tr.add(trans);
+            playerTrans.put(p.getUniqueId(), tr);
+        }
+
         if (save) {
             if (shop instanceof FileShop) {
                 shop.saveTransaction(trans, true);
@@ -86,6 +102,16 @@ public class History {
 
         transactions.add(trans);
 
+        if (nameTrans.containsKey(p)) {
+            LinkedList<Transaction> tr = nameTrans.get(p);
+            tr.add(trans);
+            nameTrans.put(p, tr);
+        } else {
+            LinkedList<Transaction> tr = new LinkedList<>();
+            tr.add(trans);
+            nameTrans.put(p, tr);
+        }
+
         if (save) {
             if (shop instanceof FileShop) {
                 shop.saveTransaction(trans, true);
@@ -111,6 +137,16 @@ public class History {
         }
 
         transactions.add(trans);
+
+        if (playerTrans.containsKey(p.getUniqueId())) {
+            LinkedList<Transaction> tr = playerTrans.get(p.getUniqueId());
+            tr.add(trans);
+            playerTrans.put(p.getUniqueId(), tr);
+        } else {
+            LinkedList<Transaction> tr = new LinkedList<>();
+            tr.add(trans);
+            playerTrans.put(p.getUniqueId(), tr);
+        }
 
         if (save) {
             if (shop instanceof FileShop) {
@@ -169,7 +205,7 @@ public class History {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
             }
         }
@@ -215,7 +251,7 @@ public class History {
         double price = t.getPrice();
         int amt = t.getAmount();
 
-        statement.executeUpdate("INSERT INTO Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
+        statement.executeUpdate("INSERT INTO " + Config.getObject("prefix") + "Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
                 " ('" + shop.getName() + "', '" + item + "', '" + player + "', '" + owner + "', '" + price + "', '" + amt + "', "
                 + sell + ", '" + date + "'" +
                 ");");
@@ -243,7 +279,7 @@ public class History {
                     int amt = c.getConfigurationSection(s).getInt("Amount");
 
 
-                    statement.executeUpdate("INSERT IGNORE INTO Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
+                    statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Transactions (`Shop`, `Item`, `Player`, `Owner`, `Price`, `Amount`, `Selling`, `Date`) VALUES" +
                             " ('" + f.getName().substring(0, f.getName().length() - 4) + "', '" + item + "', '" + player + "', '" + owner + "', '" + price + "', '" + amt + "', "
                             + sell + ", '" + date + "'" +
                             ");");

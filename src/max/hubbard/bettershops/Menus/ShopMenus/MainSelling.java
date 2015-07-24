@@ -1,5 +1,6 @@
 package max.hubbard.bettershops.Menus.ShopMenus;
 
+import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.Permissions;
 import max.hubbard.bettershops.Menus.MenuType;
@@ -190,8 +191,8 @@ public class MainSelling implements ShopMenu {
                 shop.getMenu(MenuType.TRADE_CHOOSE).draw(p, page, obj);
             }
         });
-
-        inv.setItem(1, trade);
+        if (Config.getObject("Trades") instanceof Boolean && (boolean) Config.getObject("Trades") ||Config.getObject("Trades") instanceof String &&  ((String) Config.getObject("Trades")).equalsIgnoreCase("True"))
+            inv.setItem(1, trade);
         inv.setItem(3, info);
         inv.setItem(4, cart);
         inv.setItem(5, options);
@@ -216,6 +217,14 @@ public class MainSelling implements ShopMenu {
                                 lore.add(s);
                             }
                         }
+
+                        if (it.isTransCooldown()){
+                            if (!Cooldowns.canTransaction(p,it,1)) {
+                                lore.add(Language.getString("Timings", "Available") + it.getTransCooldownTiming().getDifferenceString());
+                                lore.add(" ");
+                            }
+                        }
+
                         lore.add(Language.getString("MainGUI", "AskingAmount") + " §7" + it.getAmount());
                         if (!it.getLiveEco()) {
                             if (it.getPrice() > 0) {
@@ -238,6 +247,7 @@ public class MainSelling implements ShopMenu {
                         lore.add(Language.getString("MainGUI", "SellItem"));
                         meta.setLore(lore);
                         itemStack.setItemMeta(meta);
+                        itemStack.setAmount(it.getAmount());
                         inv.setItem(it.getSlot(), itemStack);
 
                         ClickableItem itemClick = new ClickableItem(new ShopItemStack(itemStack), inv, p);
@@ -284,6 +294,14 @@ public class MainSelling implements ShopMenu {
                                 lore.add(s);
                             }
                         }
+
+                        if (it.isTransCooldown()){
+                            if (!Cooldowns.canTransaction(p,it,1)) {
+                                lore.add(Language.getString("Timings", "Available") + it.getTransCooldownTiming().getDifferenceString());
+                                lore.add(" ");
+                            }
+                        }
+
                         lore.add(Language.getString("MainGUI", "AskingAmount") + " §7" + it.getAmount());
                         if (!it.getLiveEco()) {
                             if (it.getPrice() > 0) {
@@ -306,6 +324,7 @@ public class MainSelling implements ShopMenu {
                         lore.add(Language.getString("MainGUI", "SellItem"));
                         meta.setLore(lore);
                         itemStack.setItemMeta(meta);
+                        itemStack.setAmount(it.getAmount());
                         inv.setItem(inv.firstEmpty(), itemStack);
 
                         ClickableItem itemClick = new ClickableItem(new ShopItemStack(itemStack), inv, p);

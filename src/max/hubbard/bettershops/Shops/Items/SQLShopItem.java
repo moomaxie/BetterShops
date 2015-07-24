@@ -6,6 +6,7 @@ import max.hubbard.bettershops.Shops.SQLShop;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Utils.ItemUtils;
 import max.hubbard.bettershops.Utils.SQLUtil;
+import max.hubbard.bettershops.Utils.Timing;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -39,12 +40,14 @@ public class SQLShopItem implements ShopItem {
     private List<String> lore;
     private String displayName;
     private double priceChangePercent = 1.0;
-    private int amountToDouble = 750;
+    private int amountToDouble = 420;
     private double minPrice = 0;
     private double adjustedPrice;
     private double maxPrice = 10000000;
     private double amountTo;
     private Statement statement;
+    private Timing autoStock;
+    private Timing transCool;
 
     public static ShopItem createShopItem(Shop shop, ItemStack item, int id, int page, int slot, boolean sell) {
         return new SQLShopItem(shop, item, id, page, slot, sell);
@@ -92,6 +95,21 @@ public class SQLShopItem implements ShopItem {
             }
             data = item.getData().getData();
             durability = item.getDurability();
+
+            if (getObject("AutoStock") != null) {
+                autoStock = new Timing(this, (String) getObject("AutoStock"), true);
+            } else {
+                autoStock = new Timing(this, 0, 0, 0, 0, 0, true);
+                setObject("AutoStock", autoStock.toString());
+            }
+
+            if (getObject("TransCool") != null) {
+                transCool = new Timing(this, (String) getObject("TransCool"), false);
+            } else {
+                transCool = new Timing(this, 0, 0, 0, 0, 0, false);
+                setObject("TransCool", transCool.toString());
+            }
+
             try {
                 this.statement = Core.getConnection().createStatement();
                 String l = null;
@@ -109,7 +127,7 @@ public class SQLShopItem implements ShopItem {
                     }
                 }
 
-                statement.executeUpdate("INSERT INTO Items (Shop, Id, Item, DisplayName, Lore, Enchants, Page, Slot, Selling, Stock, Amount, Price, OrigPrice, Infinite, " +
+                statement.executeUpdate("INSERT INTO " + Config.getObject("prefix") + "Items (Shop, Id, Item, DisplayName, Lore, Enchants, Page, Slot, Selling, Stock, Amount, Price, OrigPrice, Infinite, " +
                         "LiveEconomy, PriceChangePercent, DoubleAmount, MinimumPrice, MaximumPrice, AdjustedPrice, SellLimit) VALUES " +
                         "('" + shop.getName() + "', '" + id + "', '" + ItemUtils.toString(item) + "', '" + displayName + "', '" + l + "', '" + enchants + "', '" + page + "', '" + slot + "', '" + SQLUtil.getBoolValue(sell) + "', '" + 0 + "', " +
                         "'" + 1 + "', '" + Config.getObject("DefaultPrice") + "', '" + Config.getObject("DefaultPrice") + "', '" + 0 + "', '" + 0 + "', '" + priceChangePercent + "', " +
@@ -132,7 +150,7 @@ public class SQLShopItem implements ShopItem {
 
             try {
                 this.statement = Core.getConnection().createStatement();
-                ResultSet set = statement.executeQuery("SELECT * FROM Items WHERE Shop='" + shop.getName() + "' AND Id='" + id + "';");
+                ResultSet set = statement.executeQuery("SELECT * FROM " + Config.getObject("prefix") + "Items WHERE Shop='" + shop.getName() + "' AND Id='" + id + "';");
                 set.next();
                 String ite = set.getString("Item");
                 Map<String, Object> m = ItemUtils.deserialize(ite);
@@ -180,13 +198,27 @@ public class SQLShopItem implements ShopItem {
                 priceChangePercent = set.getDouble("PriceChangePercent");
                 amountToDouble = set.getInt("DoubleAmount");
                 minPrice = set.getDouble("MinimumPrice");
-                maxPrice = set.getBigDecimal("MaximumPrice").doubleValue();
-                adjustedPrice = set.getBigDecimal("AdjustedPrice").doubleValue();
+                maxPrice = set.getDouble("MaximumPrice");
+                adjustedPrice = set.getDouble("AdjustedPrice");
 
                 if (!getLiveEco()) {
                     setAdjustedPrice(getPrice());
                 } else {
                     calculateAmountTo();
+                }
+
+                if (getObject("AutoStock") != null) {
+                    autoStock = new Timing(this, (String) getObject("AutoStock"), true);
+                } else {
+                    autoStock = new Timing(this, 0, 0, 0, 0, 0, true);
+                    setObject("AutoStock", autoStock.toString());
+                }
+
+                if (getObject("TransCool") != null) {
+                    transCool = new Timing(this, (String) getObject("TransCool"), false);
+                } else {
+                    transCool = new Timing(this, 0, 0, 0, 0, 0, false);
+                    setObject("TransCool", transCool.toString());
                 }
 
 
@@ -198,17 +230,25 @@ public class SQLShopItem implements ShopItem {
         }
     }
 
-    public static ShopItem loadShopItem(Shop shop, int id, ResultSet set) {
+    public static ShopItem loadShopItem(Shop shop, int id) {
         return new SQLShopItem(shop, id);
     }
 
     public Object getObject(String s) {
         ResultSet set;
-        try {
-            set = statement.executeQuery("SELECT * FROM Items WHERE Shop='" + shop.getName() + "' AND Id='" + id + "';");
 
-            if (set.next()) {
-                return set.getObject(s);
+        try {
+            if (statement == null || statement.isClosed()) {
+                statement = Core.getConnection().createStatement();
+            }
+            set = statement.executeQuery("SELECT * FROM " + Config.getObject("prefix") + "Items WHERE Shop='" + shop.getName() + "' AND Id='" + id + "';");
+
+            if (set != null && !set.isClosed() && set.next()) {
+                try {
+                    return set.getObject(s);
+                } catch (Exception e1) {
+                    return getObject(s);
+                }
             }
         } catch (SQLException r) {
             r.printStackTrace();
@@ -221,7 +261,7 @@ public class SQLShopItem implements ShopItem {
             o = SQLUtil.getBoolValue((boolean) o);
         }
         try {
-            statement.executeUpdate("UPDATE Items SET `" + s + "` = '" + o + "' WHERE Shop='" + shop.getName() + "' AND Id='" + id + "';");
+            statement.executeUpdate("UPDATE " + Config.getObject("prefix") + "Items SET `" + s + "` = '" + o + "' WHERE Shop='" + shop.getName() + "' AND Id='" + id + "';");
         } catch (SQLException r) {
             r.printStackTrace();
         }
@@ -245,6 +285,46 @@ public class SQLShopItem implements ShopItem {
 
     public boolean getLiveEco() {
         return (Boolean) getObject("LiveEconomy");
+    }
+
+    @Override
+    public boolean isAutoStock() {
+        if (getObject("Auto") != null) {
+            return (Boolean) getObject("Auto");
+        } else {
+            setObject("Auto", false);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isTransCooldown() {
+        if (getObject("Trans") != null) {
+            return (Boolean) getObject("Trans");
+        } else {
+            setObject("Trans", false);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isSellEco() {
+        if (getObject("SellEco") != null)
+            return (Boolean) getObject("SellEco");
+        else {
+            setObject("SellEco", false);
+            return false;
+        }
+    }
+
+    @Override
+    public Timing getAutoStockTiming() {
+        return autoStock;
+    }
+
+    @Override
+    public Timing getTransCooldownTiming() {
+        return transCool;
     }
 
     public int getPage() {
@@ -280,7 +360,7 @@ public class SQLShopItem implements ShopItem {
     }
 
     public double getPrice() {
-        return ((BigDecimal) getObject("Price")).doubleValue();
+        return ((Double) getObject("Price"));
     }
 
     public byte getData() {
@@ -326,10 +406,8 @@ public class SQLShopItem implements ShopItem {
     }
 
     public double getAdjustedPrice() {
-        BigDecimal dec = (BigDecimal) getObject("AdjustedPrice");
-        dec = dec.setScale(2, BigDecimal.ROUND_HALF_UP);
 
-        return dec.doubleValue();
+        return (double) getObject("AdjustedPrice");
     }
 
     public String getAdjustedPriceAsString() {
@@ -354,17 +432,17 @@ public class SQLShopItem implements ShopItem {
         if (getLiveEco()) {
             setObject("Price", adjustedPrice);
         }
-        calculatePriceChangePercent();
 
         if (!sell) {
             if (getSister() != null) {
-                getSister().setAdjustedPrice(dec.doubleValue() / 2);
+                if (!isSellEco())
+                    getSister().setAdjustedPrice(dec.doubleValue() / 2);
             }
         }
     }
 
     public void setAmountTo(double amt) {
-        if (!sell) {
+        if (!sell || isSellEco()) {
             amountTo = amt;
             calculatePricePercent();
             calculatePrice();
@@ -389,6 +467,9 @@ public class SQLShopItem implements ShopItem {
     public void setAmountToDouble(int amt) {
         this.amountToDouble = amt;
         setObject("DoubleAmount", amt);
+        if (!sell && getSister() != null) {
+            getSister().setAmountToDouble(amt);
+        }
         calculatePricePercent();
         calculatePrice();
 
@@ -399,7 +480,7 @@ public class SQLShopItem implements ShopItem {
     }
 
     public void calculatePricePercent() {
-        priceChangePercent = getAmountTo() / getAmountToDouble();
+        priceChangePercent = (amountTo / amountToDouble);
         setObject("PriceChangePercent", priceChangePercent);
     }
 
@@ -417,7 +498,7 @@ public class SQLShopItem implements ShopItem {
     }
 
     public double getOrigPrice() {
-        return ((BigDecimal) getObject("OrigPrice")).doubleValue();
+        return ((Double) getObject("OrigPrice"));
     }
 
     public ShopItem getSister() {
@@ -429,15 +510,23 @@ public class SQLShopItem implements ShopItem {
     }
 
     public void calculatePrice() {
-        double p = getOrigPrice() * (getPriceChangePercent() / 100);
+        double p = getOrigPrice() + (getOrigPrice() * (priceChangePercent/100));
 
-        if (getAdjustedPrice() + p < minPrice) {
+        if (p < minPrice) {
             setAdjustedPrice(minPrice);
-        } else if (getAdjustedPrice() + p > maxPrice) {
+        } else if (p > maxPrice) {
             setAdjustedPrice(maxPrice);
         } else {
 
-            setAdjustedPrice(getAdjustedPrice() + p);
+            setAdjustedPrice(p);
         }
+        if (!sell) {
+            getSister().setObject("LiveEconomy", true);
+            if (!isSellEco()) {
+                getSister().setAdjustedPrice(p / 2);
+            }
+        }
+
+
     }
 }

@@ -10,9 +10,7 @@ import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Shops.Types.Holo.CreateHologram;
 import max.hubbard.bettershops.Shops.Types.Holo.DeleteHoloShop;
-import max.hubbard.bettershops.Shops.Types.NPC.DeleteNPC;
-import max.hubbard.bettershops.Shops.Types.NPC.NPCManager;
-import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
+import max.hubbard.bettershops.Shops.Types.NPC.*;
 import max.hubbard.bettershops.Utils.ShopDeleter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -124,7 +122,15 @@ public class Updater {
                                 }
                                 if (s2.equals("NPC SHOP")) {
                                     if (config.getConfigurationSection(s).getConfigurationSection(s1).getBoolean(s2)) {
-                                        NPCManager.addNPCShop(new ShopsNPC(EntityType.VILLAGER, new ArrayList<String>(), shop));
+
+                                        if (Core.useCitizens()){
+                                            ShopsNPC npc = new CitizensShop(new EntityInfo(EntityType.VILLAGER,new ArrayList<String>(),false,false,false),shop);
+                                            npc.spawn();
+                                            NPCManager.addNPCShop(npc);
+                                        } else {
+                                            NPCManager.addNPCShop(new NPCShop(EntityType.VILLAGER, new ArrayList<String>(), shop,false,false,false));
+                                        }
+
 
                                         shop.setObject("NPC", true);
                                         shop.setOpen(true);

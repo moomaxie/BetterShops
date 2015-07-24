@@ -1,5 +1,6 @@
 package max.hubbard.bettershops;
 
+import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Shops.FileShop;
 import max.hubbard.bettershops.Shops.SQLShop;
 import max.hubbard.bettershops.Shops.Shop;
@@ -76,9 +77,9 @@ public class TradeManager {
             Statement statement = ((SQLShop) shop).statement;
 
             try {
-                ResultSet set = statement.executeQuery("SELECT * FROM Trades WHERE Shop = '" + shop.getName() + "';");
+                ResultSet set = statement.executeQuery("SELECT * FROM " + Config.getObject("prefix") + "Trades WHERE Shop = '" + shop.getName() + "';");
 
-                while (set.next()) {
+                while (!set.isClosed() && set.next()) {
 
                     List<ItemStack> items = new ArrayList<>();
                     List<ItemStack> recItems = new ArrayList<>();
@@ -138,7 +139,7 @@ public class TradeManager {
             Statement statement = ((SQLShop) shop).statement;
 
             try {
-                statement.executeUpdate("UPDATE Trades SET Traded = '" + SQLUtil.getBoolValue(traded) + "' WHERE Shop = '" + shop.getName() + "' AND Id = '" + trade.getId() + "';");
+                statement.executeUpdate("UPDATE " + Config.getObject("prefix") + "Trades SET Traded = '" + SQLUtil.getBoolValue(traded) + "' WHERE Shop = '" + shop.getName() + "' AND Id = '" + trade.getId() + "';");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -203,7 +204,7 @@ public class TradeManager {
                     s2 = s2 + s1 + "###";
                 }
 
-                statement.executeUpdate("INSERT INTO Trades (`Shop`, `Id`, `TradeItems`, `ReceiveItems`, `Gold`, `RecGold`, `Traded`) VALUES" +
+                statement.executeUpdate("INSERT INTO " + Config.getObject("prefix") + "Trades (`Shop`, `Id`, `TradeItems`, `ReceiveItems`, `Gold`, `RecGold`, `Traded`) VALUES" +
                         " ('" + shop.getName() + "', '" + trade.getId() + "', '" + s + "', '" + s2 + "', '" + trade.getTradeGold() + "', '" + trade.getReceivingGold() + "', '"
                         + SQLUtil.getBoolValue(trade.isTraded()) + "');");
             } catch (Exception e) {
@@ -238,7 +239,7 @@ public class TradeManager {
             }
 
             try {
-                statement.executeUpdate("DELETE FROM Trades WHERE Shop = '" + shop.getName() + "' AND Id = '" + trade.getId() + "';");
+                statement.executeUpdate("DELETE FROM " + Config.getObject("prefix") + "Trades WHERE Shop = '" + shop.getName() + "' AND Id = '" + trade.getId() + "';");
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -266,7 +267,7 @@ public class TradeManager {
             Statement statement = ((SQLShop) shop).statement;
 
             try {
-                statement.executeUpdate("DELETE FROM Trades WHERE Shop = '" + shop.getName() + "' AND Id = '" + trade.getId() + "';");
+                statement.executeUpdate("DELETE FROM " + Config.getObject("prefix") + "Trades WHERE Shop = '" + shop.getName() + "' AND Id = '" + trade.getId() + "';");
 
             } catch (SQLException e) {
                 e.printStackTrace();

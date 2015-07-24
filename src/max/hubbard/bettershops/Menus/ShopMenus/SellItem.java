@@ -14,6 +14,7 @@ import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Utils.Stocks;
+import max.hubbard.bettershops.Utils.Transaction;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * ***********************************************************************
@@ -136,11 +138,33 @@ public class SellItem implements ShopMenu {
         enough3Meta.setLore(Arrays.asList(Language.getString("BuyingAndSelling", "NoAccountLore")));
         enough3.setItemMeta(enough3Meta);
 
+        ItemStack enough4 = new ItemStack(Material.WOOL, 1, (byte) 0);
+        ItemMeta enough4Meta = enough4.getItemMeta();
+        enough4Meta.setDisplayName(Language.getString("Timings", "CannotSell"));
+        enough4Meta.setLore(Arrays.asList(Language.getString("Timings", "Available") + shopItem.getTransCooldownTiming().getDifferenceString()));
+        enough4.setItemMeta(enough4Meta);
+
+        ItemStack limit = new ItemStack(Material.WOOL, 1, (byte) 5);
+        ItemMeta limitMeta = limit.getItemMeta();
+
+        final double a1 = Cooldowns.getAmount(p, shopItem);
+        double pri = shopItem.getPrice();
+        pri = pri / shopItem.getAmount();
+        pri = pri * a1;
+        limitMeta.setDisplayName(Language.getString("Timings", "OnlySell").replaceAll("<Amount>", "" + a1).replaceAll("<Price>", pri + ""));
+        limitMeta.setLore(Arrays.asList(Language.getString("BuyingAndSelling", "SellItemLore")));
+        limit.setItemMeta(limitMeta);
+        ClickableItem alClick = new ClickableItem(new ShopItemStack(limit), inv, p);
+        alClick.addLeftClickAction(new LeftClickAction() {
+            @Override
+            public void onAction(InventoryClickEvent e) {
+                sellItem(shopItem, p, (int) a1);
+                shop.getMenu(MenuType.MAIN_SELLING).draw(p, shopItem.getPage());
+            }
+        });
+
         inv.setItem(4, it);
 
-        boolean can = false;
-
-        ItemStack i = null;
 
         ItemMeta meta = it.getItemMeta();
         List<String> l = meta.getLore();
@@ -160,73 +184,137 @@ public class SellItem implements ShopMenu {
             it.setItemMeta(meta);
         }
 
-        for (ItemStack ite : p.getInventory().getContents()) {
-            if (ite != null) {
-                int amt = ite.getAmount();
+        boolean c = true;
 
-                ite.setAmount(1);
+        if (shopItem.isTransCooldown()) {
+            if (a1 > 0) {
+                if (Cooldowns.canTransaction(p, shopItem, (int) a1)) {
+                    if (a1 < shopItem.getAmount()) {
+                        c = false;
+                        if (Core.getEconomy().getBalance(shop.getOwner()) >= shopItem.getPrice() && Stocks.getNumberInInventory(shopItem, p, shop) >= shopItem.getAmount() || shop.isServerShop() && Stocks.getNumberInInventory(shopItem, p, shop) >= shopItem.getAmount() || Stocks.getNumberInInventory(shopItem, p, shop) >= shopItem.getAmount()) {
 
-                if (it.equals(ite)) {
-                    can = true;
-                    ite.setAmount(amt);
-                    i = ite;
+                            inv.setItem(18, limit);
+                            inv.setItem(19, limit);
+
+                            int t = Stocks.getNumberInInventory(shopItem, p, shop);
+                            if (Stocks.getNumberInInventory(shopItem, p, shop) <= Cooldowns.getAmount(p, shopItem)) {
+                                if (shop.isServerShop() || Core.getEconomy().getBalance(shop.getOwner()) >= ((shopItem.getPrice() / shopItem.getAmount()) * t))
+                                    inv.setItem(22, all);
+                            }
+
+                        } else {
+                            if (Stocks.getNumberInInventory(shopItem, p, shop) < shopItem.getAmount()) {
+
+                                if (Stocks.getNumberInInventory(shopItem, p, shop) == 0) {
+                                    inv.setItem(18, enough);
+                                    inv.setItem(19, enough);
+                                } else {
+
+                                    double price = shopItem.getPrice();
+
+                                    int amt = shopItem.getAmount();
+
+                                    double pr = price / amt;
+
+                                    int a = Stocks.getNumberInInventory(shopItem, p, shop);
+
+                                    double adj = pr * a;
+
+
+                                    ItemStack adjust = new ItemStack(Material.WOOL, 1, (byte) 5);
+                                    ItemMeta adjustMeta = adjust.getItemMeta();
+                                    adjustMeta.setDisplayName(Language.getString("BuyingAndSelling", "AdjustedPrice"));
+                                    adjustMeta.setLore(Arrays.asList(Language.getString("BuyingAndSelling", "AdjustedPriceLore").replaceAll("<Amount>", "" + adj)));
+                                    adjust.setItemMeta(adjustMeta);
+
+                                    inv.setItem(18, adjust);
+                                    inv.setItem(19, adjust);
+                                }
+                            }
+                        }
+                        if (Core.getEconomy().getBalance(shop.getOwner()) < shopItem.getPrice() && !shop.isServerShop()) {
+                            inv.setItem(18, enough2);
+                            inv.setItem(19, enough2);
+                        }
+                    } else {
+                        c = true;
+                    }
+                } else {
+                    c = false;
+                    inv.setItem(18, enough4);
+                    inv.setItem(19, enough4);
                 }
-
-                ite.setAmount(amt);
-
+            } else {
+                c = false;
+                inv.setItem(18, enough4);
+                inv.setItem(19, enough4);
             }
         }
 
+        if (c) {
+            if (Core.getEconomy().hasAccount(Bukkit.getOfflinePlayer(p.getUniqueId())) && Core.getEconomy().hasAccount(shop.getOwner())) {
 
-        if (i != null && Core.getEconomy().hasAccount(Bukkit.getOfflinePlayer(p.getUniqueId())) && Core.getEconomy().hasAccount(shop.getOwner())) {
-            if (Core.getEconomy().getBalance(shop.getOwner()) >= shopItem.getPrice() && i.getAmount() >= shopItem.getAmount() || shop.isServerShop() && i.getAmount() >= shopItem.getAmount() || Stocks.getNumberInInventory(shopItem, p, shop) >= shopItem.getAmount()) {
+                if (shopItem.isTransCooldown()) {
+                    int t = Stocks.getNumberInInventory(shopItem, p, shop);
+                    if (Stocks.getNumberInInventory(shopItem, p, shop) <= Cooldowns.getAmount(p, shopItem)) {
+                        if (shop.isServerShop() || Core.getEconomy().getBalance(shop.getOwner()) >= ((shopItem.getPrice() / shopItem.getAmount()) * t))
+                            inv.setItem(22, all);
+                    }
+                } else {
+                    if (shop.isServerShop() || Core.getEconomy().getBalance(shop.getOwner()) >= ((shopItem.getPrice() / shopItem.getAmount()) * Stocks.getNumberInInventory(shopItem, p, shop)))
+                        inv.setItem(22, all);
+                }
+                if (Core.getEconomy().getBalance(shop.getOwner()) >= shopItem.getPrice() && Stocks.getNumberInInventory(shopItem, p, shop) >= shopItem.getAmount() || shop.isServerShop() && Stocks.getNumberInInventory(shopItem, p, shop) >= shopItem.getAmount() || Stocks.getNumberInInventory(shopItem, p, shop) >= shopItem.getAmount()) {
 
-                inv.setItem(18, buy);
-                inv.setItem(19, buy);
-
-                if (shop.isServerShop() || Core.getEconomy().getBalance(shop.getOwner()) >= ((shopItem.getPrice() / shopItem.getAmount()) * Stocks.getNumberInInventory(shopItem, p, shop)))
-                    inv.setItem(22, all);
-            } else {
-                if (i.getAmount() < shopItem.getAmount() || Stocks.getNumberInInventory(shopItem, p, shop) < shopItem.getAmount()) {
-
-                    if (Stocks.getNumberInInventory(shopItem, p, shop) == 0) {
-                        inv.setItem(18, enough);
-                        inv.setItem(19, enough);
-                    } else {
-
-                        double price = shopItem.getPrice();
-
-                        int amt = shopItem.getAmount();
-
-                        double pr = price / amt;
-
-                        int a = Stocks.getNumberInInventory(shopItem, p, shop);
-
-                        double adj = pr * a;
+                    inv.setItem(18, buy);
+                    inv.setItem(19, buy);
 
 
-                        ItemStack adjust = new ItemStack(Material.WOOL, 1, (byte) 5);
-                        ItemMeta adjustMeta = adjust.getItemMeta();
-                        adjustMeta.setDisplayName(Language.getString("BuyingAndSelling", "AdjustedPrice"));
-                        adjustMeta.setLore(Arrays.asList(Language.getString("BuyingAndSelling", "AdjustedPriceLore").replaceAll("<Amount>", "" + adj)));
-                        adjust.setItemMeta(adjustMeta);
+                } else {
+                    if (Stocks.getNumberInInventory(shopItem, p, shop) < shopItem.getAmount()) {
 
-                        inv.setItem(18, adjust);
-                        inv.setItem(19, adjust);
+                        if (Stocks.getNumberInInventory(shopItem, p, shop) == 0) {
+                            inv.setItem(18, enough);
+                            inv.setItem(19, enough);
+                        } else {
+
+                            double price = shopItem.getPrice();
+
+                            int amt = shopItem.getAmount();
+
+                            double pr = price / amt;
+
+                            int a = Stocks.getNumberInInventory(shopItem, p, shop);
+
+                            double adj = pr * a;
+
+
+                            ItemStack adjust = new ItemStack(Material.WOOL, 1, (byte) 5);
+                            ItemMeta adjustMeta = adjust.getItemMeta();
+                            adjustMeta.setDisplayName(Language.getString("BuyingAndSelling", "AdjustedPrice"));
+                            adjustMeta.setLore(Arrays.asList(Language.getString("BuyingAndSelling", "AdjustedPriceLore").replaceAll("<Amount>", "" + adj)));
+                            adjust.setItemMeta(adjustMeta);
+
+                            inv.setItem(18, adjust);
+                            inv.setItem(19, adjust);
+                        }
                     }
                 }
-            }
-            if (Core.getEconomy().getBalance(shop.getOwner()) < shopItem.getPrice() && !shop.isServerShop()) {
-                inv.setItem(18, enough2);
-                inv.setItem(19, enough2);
-            }
-        } else {
-            if (!Core.getEconomy().hasAccount(Bukkit.getOfflinePlayer(p.getUniqueId()))) {
-                inv.setItem(18, enough3);
-                inv.setItem(19, enough3);
+                if (Core.getEconomy().getBalance(shop.getOwner()) < shopItem.getPrice() && !shop.isServerShop()) {
+                    inv.setItem(18, enough2);
+                    inv.setItem(19, enough2);
+                }
             } else {
-                inv.setItem(18, enough);
-                inv.setItem(19, enough);
+                if (!Core.getEconomy().hasAccount(Bukkit.getOfflinePlayer(p.getUniqueId()))) {
+                    inv.setItem(18, enough3);
+                    inv.setItem(19, enough3);
+                } else {
+                    inv.setItem(18, enough);
+                    inv.setItem(19, enough);
+
+                    if (shop.isServerShop() || Core.getEconomy().getBalance(shop.getOwner()) >= ((shopItem.getPrice() / shopItem.getAmount()) * Stocks.getNumberInInventory(shopItem, p, shop)))
+                        inv.setItem(22, all);
+                }
             }
         }
 
@@ -293,7 +381,7 @@ public class SellItem implements ShopMenu {
 
                 double pr = pri * price;
 
-                if ((boolean) Config.getObject("SellToBuy") || Config.getObject("SellToBuy").equals("True")) {
+                if (Config.getObject("SellToBuy") instanceof Boolean && (boolean) Config.getObject("SellToBuy") || Config.getObject("SellToBuy") instanceof String && ((String) Config.getObject("SellToBuy")).equalsIgnoreCase("True")) {
                     if (shopItem.getSister() != null) {
 
                         int limit = (int) Config.getObject("StockLimit");
@@ -356,9 +444,13 @@ public class SellItem implements ShopMenu {
                 }
                 shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
 
-                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p);
+                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p,new Transaction(p, new Date(), shopItem, pr, price, true));
 
                 Bukkit.getPluginManager().callEvent(ev);
+
+                if (shopItem.isTransCooldown()) {
+                    Cooldowns.addAmount(p, shopItem, price);
+                }
 
                 if (shopItem.getLiveEco()) {
                     shopItem.setAmountTo(shopItem.getSister().getAmountTo() - 2);
@@ -400,7 +492,10 @@ public class SellItem implements ShopMenu {
 
                 double pr = pri * a;
 
-                pr = Double.parseDouble(new DecimalFormat("#.00").format(pr));
+                String g = new DecimalFormat("#.00").format(pr);
+                g = g.replaceAll(Pattern.quote(","), ".");
+
+                pr = Double.parseDouble(g);
 
                 int price = a;
 
@@ -466,11 +561,15 @@ public class SellItem implements ShopMenu {
                 }
                 shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
 
-                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p);
+                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p,new Transaction(p, new Date(), shopItem, pr, price, true));
 
                 Bukkit.getPluginManager().callEvent(ev);
 
                 shop.getMenu(MenuType.MAIN_SELLING).draw(p, shopItem.getPage());
+
+                if (shopItem.isTransCooldown()) {
+                    Cooldowns.addAmount(p, shopItem, price);
+                }
 
                 if (shopItem.getLiveEco()) {
                     double o = price / shopItem.getAmount();
@@ -483,6 +582,132 @@ public class SellItem implements ShopMenu {
                 }
 
 
+            } else {
+                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LimitReached"));
+            }
+        }
+    }
+
+    public void sellItem(ShopItem shopItem, Player p, int price) {
+        boolean c = true;
+
+        if ((boolean) Config.getObject("Permissions")) {
+            if (!Permissions.hasSellItemPerm(p, shopItem.getItem().getType())) {
+                c = false;
+            }
+        }
+
+        if (c) {
+            ItemStack item = inv.getItem(4);
+
+            if (item.getItemMeta() != null && item.getItemMeta().getLore() != null && !shopItem.getLiveEco()) {
+                for (String s : item.getItemMeta().getLore()) {
+                    if (s.contains(Language.getString("MainGUI", "AskingPrice"))) {
+                        double pr = 0.0;
+                        if (!s.substring(Language.getString("MainGUI", "Price").length() + 3).equals(Language.getString("MainGUI", "Free")))
+                            pr = Double.parseDouble(s.substring(Language.getString("MainGUI", "Price").length() + 3));
+
+                        if (pr != shopItem.getPrice()) {
+                            p.closeInventory();
+                            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Fraud"));
+
+                            return;
+                        }
+                    }
+                }
+            }
+
+            double pric = shopItem.getPrice();
+
+            if (shopItem.getLimit() == 0 || shopItem.getStock() < shopItem.getLimit()) {
+
+                if (shopItem.getLimit() != 0 && shopItem.getAmount() + shopItem.getStock() >= shopItem.getLimit()) {
+                    price = shopItem.getLimit() - shopItem.getStock();
+                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "SellLimit").replaceAll("<Amount>", "" + price));
+                }
+
+                double pri = pric / shopItem.getAmount();
+
+                double pr = pri * price;
+
+                if (Config.getObject("SellToBuy") instanceof Boolean && (boolean) Config.getObject("SellToBuy") || Config.getObject("SellToBuy") instanceof String && ((String) Config.getObject("SellToBuy")).equalsIgnoreCase("True")) {
+                    if (shopItem.getSister() != null) {
+
+                        int limit = (int) Config.getObject("StockLimit");
+
+                        if (limit == 0 || shopItem.getSister().getStock() < limit) {
+
+                            if (limit == 0 || shopItem.getSister().getStock() + shopItem.getStock() < (int) Config.getObject("StockLimit")) {
+                                shopItem.getSister().setObject("Stock", shopItem.getSister().getStock() + shopItem.getStock());
+                            }
+
+                            if (limit == 0 || shopItem.getSister().getStock() + price <= (int) Config.getObject("StockLimit")) {
+                                shopItem.getSister().setObject("Stock", shopItem.getSister().getStock() + price);
+                                shopItem.setObject("Stock", 0);
+                            } else {
+                                shopItem.setObject("Stock", shopItem.getStock() + price);
+                            }
+                        } else {
+                            shopItem.setObject("Stock", shopItem.getStock() + price);
+                        }
+                    } else {
+                        shopItem.setObject("Stock", shopItem.getStock() + price);
+                    }
+                } else {
+                    shopItem.setObject("Stock", shopItem.getStock() + price);
+                }
+
+                if (!shop.isServerShop()) {
+                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+
+
+                    if (shop.isNotify()) {
+                        if (shop.getOwner() != null && shop.getOwner().isOnline()) {
+                            shop.getOwner().getPlayer().sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                            shop.getOwner().getPlayer().sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "TakenAmount").replaceAll("<Amount>", "" + pr));
+
+                            if (Core.isAboveEight() && (boolean) Config.getObject("Titles") && Core.getTitleManager() != null) {
+
+                                Core.getTitleManager().setTimes(shop.getOwner().getPlayer(), 20, 60, 20);
+                                Core.getTitleManager().sendTitle(shop.getOwner().getPlayer(), Language.getString("Messages", "NotifySell").replaceAll("<Player>", p.getDisplayName()));
+                                Core.getTitleManager().sendSubTitle(shop.getOwner().getPlayer(), Language.getString("Messages", "TakenAmount").replaceAll("<Amount>", "" + pr));
+
+
+                            }
+                        }
+                    }
+                } else {
+                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                }
+
+                Stocks.removeItemsFromInventory(shopItem, p, shop, price);
+
+                shop.getMenu(MenuType.MAIN_SELLING).draw(p, shopItem.getPage());
+
+                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "SellItem"));
+                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ReceivedAmount").replaceAll("<Amount>", "" + pr));
+
+                if (shop.getHistory() == null) {
+                    shop.loadTransactions();
+                }
+                shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
+
+                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p,new Transaction(p, new Date(), shopItem, pr, price, true));
+
+                Bukkit.getPluginManager().callEvent(ev);
+
+                if (shopItem.isTransCooldown()) {
+                    Cooldowns.addAmount(p, shopItem, price);
+                }
+
+                if (shopItem.getLiveEco()) {
+                    shopItem.setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                }
+                if (shop.isHoloShop()) {
+                    ShopHologram holo = shop.getHolographicShop();
+                    holo.updateItemLines(holo.getItemLine(), true);
+                }
             } else {
                 p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LimitReached"));
             }

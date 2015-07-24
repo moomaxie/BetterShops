@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 /**
@@ -84,7 +85,33 @@ public class LiveEconomy implements ShopMenu {
                 item.setObject("LiveEconomy", !item.getLiveEco());
                 if (item.getSister() == null)
                     shop.createShopItem(item.getItem(), shop.getNextSlotForPage(shop.getNextAvailablePage(!item.isSelling()), !item.isSelling()), shop.getNextAvailablePage(!item.isSelling()), !item.isSelling());
-                item.getSister().setPrice(item.getAdjustedPrice() / 2);
+                item.getSister().setObject("SellEco",item.isSellEco());
+                if (!item.isSellEco()) {
+                    item.getSister().setPrice(item.getAdjustedPrice() / 2);
+                } else {
+                    item.getSister().setPrice(item.getSister().getPrice());
+                }
+
+                item.getSister().setObject("LiveEconomy", item.getLiveEco());
+                draw(p, page, obj);
+            }
+        });
+
+        ItemStack sellEco = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+        ItemMeta sellEcoMeta = sellEco.getItemMeta();
+        if (item.isSellEco()) {
+            sellEcoMeta.setDisplayName(Language.getString("LiveEconomy", "SellEcoOn"));
+            sellEco = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
+        } else {
+            sellEcoMeta.setDisplayName(Language.getString("LiveEconomy", "SellEcoOff"));
+        }
+        sellEcoMeta.setLore(Arrays.asList(Language.getString("LiveEconomy", "SellEcoLore")));
+        sellEco.setItemMeta(sellEcoMeta);
+        ClickableItem sellEcoClick = new ClickableItem(new ShopItemStack(sellEco), inv, p);
+        sellEcoClick.addLeftClickAction(new LeftClickAction() {
+            @Override
+            public void onAction(InventoryClickEvent e) {
+                item.setObject("SellEco", !item.isSellEco());
                 draw(p, page, obj);
             }
         });
@@ -133,7 +160,9 @@ public class LiveEconomy implements ShopMenu {
 
         ItemStack percent = new ItemStack(Material.DIAMOND);
         ItemMeta percentMeta = percent.getItemMeta();
-        percentMeta.setDisplayName(Language.getString("LiveEconomy", "PriceChange").replaceAll("<Value>", item.getPriceChangePercent() + "%"));
+        BigDecimal dec = new BigDecimal(item.getPriceChangePercent());
+        dec = dec.setScale(3, BigDecimal.ROUND_HALF_UP);
+        percentMeta.setDisplayName(Language.getString("LiveEconomy", "PriceChange").replaceAll("<Value>", dec.doubleValue() + "%"));
         percent.setItemMeta(percentMeta);
 
         ItemStack info = new ItemStack(Material.SIGN);
@@ -214,6 +243,7 @@ public class LiveEconomy implements ShopMenu {
         inv.setItem(25, info);
         inv.setItem(36, doubleAmt);
         inv.setItem(45, percent);
+        inv.setItem(47, sellEco);
         inv.setItem(4, item.getItem());
 
         new BukkitRunnable() {

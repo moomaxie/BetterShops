@@ -18,16 +18,23 @@ import org.bukkit.entity.Player;
 public class CreationCost {
 
     public static boolean useCost(Player p) {
-        if ((boolean)Config.getObject("CostOnShops")) {
-            double amt = (double)Config.getObject("CostForShops");
-            if ((boolean)Config.getObject("Permissions")) {
+        if ((boolean) Config.getObject("CostOnShops")) {
+            double am;
+            if (Config.getObject("CostForShops") instanceof Double) {
+                am = (double) Config.getObject("CostForShops");
+            } else {
+                int amt = (int) Config.getObject("CostForShops");
+                am = (double) amt;
+            }
+
+            if ((boolean) Config.getObject("Permissions")) {
                 if (!Permissions.hasCostCreationPerm(p)) {
-                    if (Core.getEconomy().getBalance(p) >= amt) {
-                        Core.getEconomy().withdrawPlayer(p, amt);
-                        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages", "CreationCostAllow").replaceAll("<Amount>","" + amt));
+                    if (Core.getEconomy().getBalance(p) >= am) {
+                        Core.getEconomy().withdrawPlayer(p, am);
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CreationCostAllow").replaceAll("<Amount>", "" + am));
                         return true;
                     } else {
-                        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CreationCostDeny").replaceAll("<Amount>","" + amt));
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CreationCostDeny").replaceAll("<Amount>", "" + am));
                         return false;
                     }
                 } else {
@@ -35,12 +42,12 @@ public class CreationCost {
                 }
             } else {
                 if (!p.isOp()) {
-                    if (Core.getEconomy().getBalance(p) >= amt) {
-                        Core.getEconomy().withdrawPlayer(p, amt);
-                        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CreationCostAllow").replaceAll("<Amount>", "" + amt));
+                    if (Core.getEconomy().getBalance(p) >= am) {
+                        Core.getEconomy().withdrawPlayer(p, am);
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CreationCostAllow").replaceAll("<Amount>", "" + am));
                         return true;
                     } else {
-                        p.sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","CreationCostDeny").replaceAll("<Amount>", "" + amt));
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "CreationCostDeny").replaceAll("<Amount>", "" + am));
                         return false;
                     }
                 } else {
