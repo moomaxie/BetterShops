@@ -379,7 +379,7 @@ public class SellItem implements ShopMenu {
 
                 double pri = pric / shopItem.getAmount();
 
-                double pr = pri * price;
+                final double pr = pri * price;
 
                 if (Config.getObject("SellToBuy") instanceof Boolean && (boolean) Config.getObject("SellToBuy") || Config.getObject("SellToBuy") instanceof String && ((String) Config.getObject("SellToBuy")).equalsIgnoreCase("True")) {
                     if (shopItem.getSister() != null) {
@@ -410,7 +410,12 @@ public class SellItem implements ShopMenu {
 
                 if (!shop.isServerShop()) {
                     Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                        }
+                    });
 
 
                     if (shop.isNotify()) {
@@ -429,7 +434,12 @@ public class SellItem implements ShopMenu {
                         }
                     }
                 } else {
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                        }
+                    });
                 }
 
                 Stocks.removeItemsFromInventory(shopItem, p, shop, price);
@@ -490,12 +500,14 @@ public class SellItem implements ShopMenu {
 
                 double pri = pric / amt;
 
-                double pr = pri * a;
+                double pc = pri * a;
 
-                String g = new DecimalFormat("#.00").format(pr);
+                String g = new DecimalFormat("#.00").format(pc);
                 g = g.replaceAll(Pattern.quote(","), ".");
 
-                pr = Double.parseDouble(g);
+                pc = Double.parseDouble(g);
+
+                final double pr = pc;
 
                 int price = a;
 
@@ -528,7 +540,12 @@ public class SellItem implements ShopMenu {
 
                 if (!shop.isServerShop()) {
                     Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                        }
+                    });
 
 
                     if (shop.isNotify()) {
@@ -547,7 +564,12 @@ public class SellItem implements ShopMenu {
                         }
                     }
                 } else {
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                        }
+                    });
                 }
 
                 Stocks.removeItemsFromInventory(shopItem, p, shop, price);
@@ -628,7 +650,7 @@ public class SellItem implements ShopMenu {
 
                 double pri = pric / shopItem.getAmount();
 
-                double pr = pri * price;
+                final double pr = pri * price;
 
                 if (Config.getObject("SellToBuy") instanceof Boolean && (boolean) Config.getObject("SellToBuy") || Config.getObject("SellToBuy") instanceof String && ((String) Config.getObject("SellToBuy")).equalsIgnoreCase("True")) {
                     if (shopItem.getSister() != null) {
@@ -658,7 +680,12 @@ public class SellItem implements ShopMenu {
                 }
 
                 if (!shop.isServerShop()) {
-                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                        }
+                    });
                     Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
 
 
@@ -678,7 +705,12 @@ public class SellItem implements ShopMenu {
                         }
                     }
                 } else {
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                        }
+                    });
                 }
 
                 Stocks.removeItemsFromInventory(shopItem, p, shop, price);

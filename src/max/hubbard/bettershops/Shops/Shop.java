@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * ***********************************************************************
@@ -36,7 +37,6 @@ public interface Shop {
     HashMap<MenuType, ShopMenu> menus = new HashMap<>();
     boolean transLoaded = false;
     History history = null;
-
 
     public OfflinePlayer getOwner();
 
@@ -61,6 +61,8 @@ public interface Shop {
     public void loadTransactions();
 
     public void deleteShopItem(ShopItem item);
+
+    public HashMap<UUID, ShopItem> getArrange();
 
     public void deleteFirstTransaction();
 

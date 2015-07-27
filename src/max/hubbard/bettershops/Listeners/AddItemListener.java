@@ -5,7 +5,6 @@ import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.Permissions;
 import max.hubbard.bettershops.Menus.MenuType;
-import max.hubbard.bettershops.Menus.ShopMenus.Rearrange;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.FileShop;
 import max.hubbard.bettershops.Shops.Items.Actions.ClickableItem;
@@ -240,9 +239,7 @@ public class AddItemListener implements Listener {
                 final Player p = (Player) e.getWhoClicked();
 
                 if (e.isLeftClick()) {
-
                     if (p.getOpenInventory() != null && p.getOpenInventory().getTopInventory().getName().contains(Language.getString("MainGUI", "ShopHeader"))) {
-
                         e.setCancelled(true);
                         String name = p.getOpenInventory().getTopInventory().getName();
                         name = name.substring(Language.getString("MainGUI", "ShopHeader").length());
@@ -253,11 +250,11 @@ public class AddItemListener implements Listener {
                         if (e.getInventory().getItem(5).getItemMeta().getDisplayName() != null && e.getInventory().getItem(5).getItemMeta().getDisplayName().equals(Language.getString("MainGUI", "Arrangement"))) {
                             int slot = e.getSlot();
                             int page = Integer.parseInt(e.getInventory().getItem(13).getItemMeta().getDisplayName().substring(Language.getString("MainGUI", "Page").length() + 3));
-                            if (((Rearrange) shop.getMenu(MenuType.REARRANGE)).arrange.containsKey(p.getUniqueId())) {
-                                boolean sell = ((Rearrange) shop.getMenu(MenuType.REARRANGE)).arrange.get(p.getUniqueId()).isSelling();
-                                ((Rearrange) shop.getMenu(MenuType.REARRANGE)).arrange.get(p.getUniqueId()).setObject("Page", page);
-                                ((Rearrange) shop.getMenu(MenuType.REARRANGE)).arrange.get(p.getUniqueId()).setObject("Slot", slot);
-                                ((Rearrange) shop.getMenu(MenuType.REARRANGE)).arrange.remove(p.getUniqueId());
+                            if (shop.getArrange().containsKey(p.getUniqueId())) {
+                                boolean sell = shop.getArrange().get(p.getUniqueId()).isSelling();
+                                shop.getArrange().get(p.getUniqueId()).setObject("Page", page);
+                                shop.getArrange().get(p.getUniqueId()).setObject("Slot", slot);
+                                shop.getArrange().remove(p.getUniqueId());
                                 shop.getMenu(MenuType.REARRANGE).draw(p, page, sell);
                             }
                         }

@@ -56,7 +56,7 @@ public class Core extends JavaPlugin {
     private static boolean aboveEight = false;
     private static boolean holo = false;
     private static boolean wg = false;
-    private static boolean beta = false;
+    private static boolean beta = true;
     private static boolean citizens = false;
     private static Connection c;
     private static Database db;

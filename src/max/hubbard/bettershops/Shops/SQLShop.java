@@ -61,6 +61,7 @@ public class SQLShop implements Shop {
     private boolean transLoaded = false;
     private History history = new History(this);
     private String name;
+    public HashMap<UUID, ShopItem> arrange = new HashMap<>();
 
     public SQLShop(String name) throws SQLException {
 
@@ -87,32 +88,6 @@ public class SQLShop implements Shop {
                     loadBlacklist();
                     TradeManager.loadTrades(t);
                     loadTransactions();
-
-                    if (isHoloShop()) {
-                        String s = "BS" + getName();
-                        try {
-                            NamedHologram holo = HologramDatabase.loadHologram(s);
-//                            if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
-//                                if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
-                            if (getHolographicShop() == null) {
-                                NamedHologramManager.removeHologram(holo);
-                                holo.delete();
-                                HologramDatabase.deleteHologram(s);
-                                HologramDatabase.saveToDisk();
-
-                            } else {
-                                holo.delete();
-                            }
-//                                }
-//                            }
-                        } catch (Exception e) {
-                            HologramDatabase.deleteHologram(s);
-                            HologramDatabase.trySaveToDisk();
-
-                        } finally {
-                            CreateHologram.createHolographicShop(t);
-                        }
-                    }
 
                     if (isNPCShop()) {
                         boolean made = false;
@@ -344,6 +319,32 @@ public class SQLShop implements Shop {
 
         } catch (Exception ignored) {
 
+        } finally {
+            if (isHoloShop()) {
+                String s = "BS" + getName();
+                try {
+                    NamedHologram holo = HologramDatabase.loadHologram(s);
+//                            if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
+//                                if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
+                    if (getHolographicShop() == null) {
+                        NamedHologramManager.removeHologram(holo);
+                        holo.delete();
+                        HologramDatabase.deleteHologram(s);
+                        HologramDatabase.saveToDisk();
+
+                    } else {
+                        holo.delete();
+                    }
+//                                }
+//                            }
+                } catch (Exception e) {
+                    HologramDatabase.deleteHologram(s);
+                    HologramDatabase.trySaveToDisk();
+
+                } finally {
+                    CreateHologram.createHolographicShop(this);
+                }
+            }
         }
 
     }
@@ -484,6 +485,11 @@ public class SQLShop implements Shop {
 
         }
 
+    }
+
+    @Override
+    public HashMap<UUID, ShopItem> getArrange() {
+        return arrange;
     }
 
     public byte getFrameColor() {

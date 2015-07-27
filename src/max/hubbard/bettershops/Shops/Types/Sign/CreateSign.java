@@ -65,7 +65,9 @@ public class CreateSign implements Listener {
             Chest chest = null;
 
             if (!admin) {
-                chest = (Chest) face.getState();
+                if (face.getState() instanceof Chest) {
+                    chest = (Chest) face.getState();
+                }
             }
 
             String n = e.getLine(1);
@@ -174,7 +176,7 @@ public class CreateSign implements Listener {
                     }
 
                     if (s.isNPCShop()) {
-                        if (!s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                        if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                 @Override
                                 public void run() {
@@ -228,7 +230,7 @@ public class CreateSign implements Listener {
                     }
 
                     if (s.isNPCShop()) {
-                        if (!s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                        if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                 @Override
                                 public void run() {

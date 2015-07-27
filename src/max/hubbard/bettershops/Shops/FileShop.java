@@ -56,6 +56,7 @@ public class FileShop implements Shop {
     private HashMap<MenuType, ShopMenu> menus = new HashMap<>();
     private boolean transLoaded;
     private History history;
+    public HashMap<UUID, ShopItem> arrange = new HashMap<>();
 
     public FileShop(final YamlConfiguration config, File file, OfflinePlayer owner) {
         this.config = config;
@@ -96,29 +97,6 @@ public class FileShop implements Shop {
                 loadBlacklist();
                 TradeManager.loadTrades(t);
 
-                if (isHoloShop()) {
-                    String s = "BS" + getName();
-                    try {
-                        NamedHologram holo = HologramDatabase.loadHologram(s);
-
-                        if (getHolographicShop() == null) {
-                            NamedHologramManager.removeHologram(holo);
-                            holo.delete();
-                            HologramDatabase.deleteHologram(s);
-                            HologramDatabase.saveToDisk();
-
-                        } else {
-                            holo.delete();
-                        }
-
-                    } catch (Exception e) {
-                        HologramDatabase.deleteHologram(s);
-                        HologramDatabase.trySaveToDisk();
-
-                    } finally {
-                        CreateHologram.createHolographicShop(t);
-                    }
-                }
 
                 if (isNPCShop()) {
                     boolean made = false;
@@ -307,6 +285,32 @@ public class FileShop implements Shop {
         } else {
             convert();
         }
+
+        if (isHoloShop()) {
+            String s = "BS" + getName();
+            try {
+                NamedHologram holo = HologramDatabase.loadHologram(s);
+//                            if (holo.getLine(0) instanceof TextLine && shop.isHoloShop()) {
+//                                if (((TextLine) holo.getLine(0)).getText().equals("§a§l" + shop.getName())) {
+                if (getHolographicShop() == null) {
+                    NamedHologramManager.removeHologram(holo);
+                    holo.delete();
+                    HologramDatabase.deleteHologram(s);
+                    HologramDatabase.saveToDisk();
+
+                } else {
+                    holo.delete();
+                }
+//                                }
+//                            }
+            } catch (Exception e) {
+                HologramDatabase.deleteHologram(s);
+                HologramDatabase.trySaveToDisk();
+
+            } finally {
+                CreateHologram.createHolographicShop(this);
+            }
+        }
     }
 
     public void loadMenus() {
@@ -468,6 +472,11 @@ public class FileShop implements Shop {
 
         saveConfig();
 
+    }
+
+    @Override
+    public HashMap<UUID, ShopItem> getArrange() {
+        return arrange;
     }
 
     public void deleteFirstTransaction() {

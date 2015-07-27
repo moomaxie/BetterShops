@@ -32,7 +32,6 @@ public class Rearrange implements ShopMenu {
 
     Shop shop;
     Inventory inv;
-    public HashMap<UUID, ShopItem> arrange = new HashMap<>();
 
     public Rearrange(Shop shop) {
         this.shop = shop;
@@ -85,7 +84,7 @@ public class Rearrange implements ShopMenu {
         opClick.addLeftClickAction(new LeftClickAction() {
             @Override
             public void onAction(InventoryClickEvent e) {
-                arrange.remove(p.getUniqueId());
+                shop.getArrange().remove(p.getUniqueId());
                 if (sell) {
                     shop.getMenu(MenuType.OWNER_SELLING).draw(p, page);
                 } else {
@@ -148,7 +147,7 @@ public class Rearrange implements ShopMenu {
                         }
                     }
 
-                    if (arrange.containsKey(p.getUniqueId()) && arrange.get(p.getUniqueId()).getItem().isSimilar(itemStack)) {
+                    if (shop.getArrange().containsKey(p.getUniqueId()) && shop.getArrange().get(p.getUniqueId()).getItem().isSimilar(itemStack)) {
                         if (!lore.contains(Language.getString("MainGUI", "Selected"))) {
                             lore.add(" ");
                             lore.add(Language.getString("MainGUI", "Selected"));
@@ -166,23 +165,23 @@ public class Rearrange implements ShopMenu {
                     itemClick.addLeftClickAction(new LeftClickAction() {
                         @Override
                         public void onAction(InventoryClickEvent e) {
-                            if (arrange.containsKey(p.getUniqueId())) {
+                            if (shop.getArrange().containsKey(p.getUniqueId())) {
                                 int page = it.getPage();
                                 int slot = it.getSlot();
-                                int page2 = arrange.get(p.getUniqueId()).getPage();
-                                int slot2 = arrange.get(p.getUniqueId()).getSlot();
+                                int page2 = shop.getArrange().get(p.getUniqueId()).getPage();
+                                int slot2 = shop.getArrange().get(p.getUniqueId()).getSlot();
 
                                 it.setObject("Page", page2);
                                 it.setObject("Slot", slot2);
 
-                                arrange.get(p.getUniqueId()).setObject("Page", page);
-                                arrange.get(p.getUniqueId()).setObject("Slot", slot);
+                                shop.getArrange().get(p.getUniqueId()).setObject("Page", page);
+                                shop.getArrange().get(p.getUniqueId()).setObject("Slot", slot);
 
-                                arrange.remove(p.getUniqueId());
+                                shop.getArrange().remove(p.getUniqueId());
                                 draw(p, page, obj);
                             } else {
 
-                                arrange.put(p.getUniqueId(), it);
+                                shop.getArrange().put(p.getUniqueId(), it);
                                 draw(p, page, obj);
                             }
                         }

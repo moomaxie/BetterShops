@@ -274,7 +274,7 @@ public class BuyItem implements ShopMenu {
         }
 
 
-        double price = shopItem.getPrice();
+        final double price = shopItem.getPrice();
 
         boolean c = true;
 
@@ -289,7 +289,13 @@ public class BuyItem implements ShopMenu {
             if (!shop.isServerShop()) {
                 if (shopItem.getStock() > 0 || shopItem.isInfinite()) {
                     Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), price);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), price);
+                        }
+                    });
+
 
                     if (shop.isNotify()) {
                         if (shop.getOwner() != null && shop.getOwner().isOnline()) {
@@ -419,9 +425,10 @@ public class BuyItem implements ShopMenu {
         }
 
 
-        double price = shopItem.getPrice();
-        price = price / shopItem.getAmount();
-        price = price * amt;
+        double pric = shopItem.getPrice();
+        pric = pric / shopItem.getAmount();
+        pric = pric * amt;
+        final double price = pric;
 
         boolean c = true;
 
@@ -436,7 +443,12 @@ public class BuyItem implements ShopMenu {
             if (!shop.isServerShop()) {
                 if (shopItem.getStock() > 0 || shopItem.isInfinite()) {
                     Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), price);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), price);
+                        }
+                    });
 
                     if (shop.isNotify()) {
                         if (shop.getOwner() != null && shop.getOwner().isOnline()) {
