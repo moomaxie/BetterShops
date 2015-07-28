@@ -44,6 +44,7 @@ public class Spawner {
                         Class.forName("max.hubbard.bettershops.Versions." + version + ".Register").getMethod("unregisterNPCs").invoke(null);
                     } catch (IllegalAccessException | NoSuchMethodException | ClassNotFoundException | InvocationTargetException e) {
                         e.printStackTrace();
+                        latch.countDown();
                     }
                 } else {
                     try {
@@ -52,6 +53,8 @@ public class Spawner {
                         Class.forName("max.hubbard.bettershops.Versions." + version + ".Register").getMethod("unregisterNPCs").invoke(null);
                     } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
                         e.printStackTrace();
+
+                        latch.countDown();
                     }
                 }
                 latch.countDown();

@@ -372,6 +372,8 @@ public class BuyItem implements ShopMenu {
 
             if (shopItem.getLiveEco()) {
                 shopItem.setAmountTo(shopItem.getAmountTo() + 1);
+                if (shopItem.isSellEco())
+                    shopItem.getSister().setAmountTo(shopItem.getSister().getAmountTo() + 1);
             }
             if (shop.isHoloShop()) {
                 ShopHologram holo = shop.getHolographicShop();
@@ -525,6 +527,8 @@ public class BuyItem implements ShopMenu {
 
             if (shopItem.getLiveEco()) {
                 shopItem.setAmountTo(shopItem.getAmountTo() + 1);
+                if (shopItem.isSellEco())
+                    shopItem.getSister().setAmountTo(shopItem.getSister().getAmountTo() + 1);
             }
             if (shop.isHoloShop()) {
                 ShopHologram holo = shop.getHolographicShop();

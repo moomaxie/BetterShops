@@ -141,7 +141,7 @@ public class PlayerBlacklist implements ShopMenu{
         inv.setItem(3, desc);
         inv.setItem(2, desc);
 
-        for (OfflinePlayer pl : shop.getBlacklist()) {
+        for (final OfflinePlayer pl : shop.getBlacklist()) {
             ItemStack it = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
             SkullMeta sk = (SkullMeta) it.getItemMeta();
 
@@ -157,7 +157,7 @@ public class PlayerBlacklist implements ShopMenu{
             itClick.addLeftClickAction(new LeftClickAction() {
                 @Override
                 public void onAction(InventoryClickEvent e) {
-                    shop.removeBlacklist(p);
+                    shop.removeBlacklist(pl);
                     draw(p, page, shop);
                 }
             });

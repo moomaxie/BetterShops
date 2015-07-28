@@ -454,7 +454,7 @@ public class SellItem implements ShopMenu {
                 }
                 shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
 
-                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p,new Transaction(p, new Date(), shopItem, pr, price, true));
+                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p, new Transaction(p, new Date(), shopItem, pr, price, true));
 
                 Bukkit.getPluginManager().callEvent(ev);
 
@@ -463,7 +463,12 @@ public class SellItem implements ShopMenu {
                 }
 
                 if (shopItem.getLiveEco()) {
-                    shopItem.setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                    if (shopItem.isSellEco()) {
+                        shopItem.setAmountTo(shopItem.getAmountTo() - 2);
+                        shopItem.getSister().setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                    } else {
+                        shopItem.setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                    }
                 }
                 if (shop.isHoloShop()) {
                     ShopHologram holo = shop.getHolographicShop();
@@ -583,7 +588,7 @@ public class SellItem implements ShopMenu {
                 }
                 shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
 
-                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p,new Transaction(p, new Date(), shopItem, pr, price, true));
+                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p, new Transaction(p, new Date(), shopItem, pr, price, true));
 
                 Bukkit.getPluginManager().callEvent(ev);
 
@@ -595,7 +600,12 @@ public class SellItem implements ShopMenu {
 
                 if (shopItem.getLiveEco()) {
                     double o = price / shopItem.getAmount();
-                    shopItem.setAmountTo(shopItem.getSister().getAmountTo() - (o * 2));
+                    if (shopItem.isSellEco()) {
+                        shopItem.setAmountTo(shopItem.getAmountTo() - (o * 2));
+                        shopItem.getSister().setAmountTo(shopItem.getSister().getAmountTo() - (o * 2));
+                    } else {
+                        shopItem.setAmountTo(shopItem.getSister().getAmountTo() - (o * 2));
+                    }
                 }
 
                 if (shop.isHoloShop()) {
@@ -725,7 +735,7 @@ public class SellItem implements ShopMenu {
                 }
                 shop.getHistory().addTransaction(p, new Date(), shopItem, pr, price, true, true);
 
-                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p,new Transaction(p, new Date(), shopItem, pr, price, true));
+                ShopSellItemEvent ev = new ShopSellItemEvent(shopItem, shop, p, new Transaction(p, new Date(), shopItem, pr, price, true));
 
                 Bukkit.getPluginManager().callEvent(ev);
 
@@ -734,7 +744,13 @@ public class SellItem implements ShopMenu {
                 }
 
                 if (shopItem.getLiveEco()) {
-                    shopItem.setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                    if (shopItem.isSellEco()) {
+                        shopItem.setAmountTo(shopItem.getAmountTo() - 2);
+                        shopItem.getSister().setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                    } else {
+                        shopItem.setAmountTo(shopItem.getSister().getAmountTo() - 2);
+                    }
+
                 }
                 if (shop.isHoloShop()) {
                     ShopHologram holo = shop.getHolographicShop();

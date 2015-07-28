@@ -141,7 +141,7 @@ public class KeeperManager implements ShopMenu {
         inv.setItem(3, desc);
         inv.setItem(2, desc);
 
-        for (OfflinePlayer pl : shop.getKeepers()) {
+        for (final OfflinePlayer pl : shop.getKeepers()) {
             ItemStack it = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
             SkullMeta sk = (SkullMeta) it.getItemMeta();
             sk.setDisplayName("§a" + pl.getName());
@@ -156,7 +156,7 @@ public class KeeperManager implements ShopMenu {
             itClick.addLeftClickAction(new LeftClickAction() {
                 @Override
                 public void onAction(InventoryClickEvent e) {
-                    shop.removeKeeper(p);
+                    shop.removeKeeper(pl);
                     draw(p, page, shop);
                 }
             });

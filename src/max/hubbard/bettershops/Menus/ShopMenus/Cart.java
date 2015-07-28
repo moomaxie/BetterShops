@@ -543,6 +543,8 @@ public class Cart implements ShopMenu {
 
                                         if (it.getLiveEco()) {
                                             it.setAmountTo(it.getAmountTo() + a);
+                                            if (it.isSellEco())
+                                                it.getSister().setAmountTo(it.getSister().getAmountTo() + a);
                                         }
 
                                     } else {
@@ -645,6 +647,8 @@ public class Cart implements ShopMenu {
                                             if (it.getLiveEco()) {
                                                 double a = amt / it.getAmount();
                                                 it.setAmountTo(it.getAmountTo() + a);
+                                                if (it.isSellEco())
+                                                    it.getSister().setAmountTo(it.getSister().getAmountTo() + a);
                                             }
 
                                         } else {
