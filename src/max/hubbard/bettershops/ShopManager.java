@@ -227,37 +227,37 @@ public class ShopManager {
 
         ResultSet rs3 = md.getColumns(null, null, Config.getObject("prefix") + "Items", "DisplayName");
         if (!rs3.next()) {
-            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items" +
-                    "ADD COLUMN `DisplayName` TEXT NULL DEFAULT NULL AFTER `Item`," +
-                    "ADD COLUMN `Lore` TEXT NULL DEFAULT NULL AFTER `DisplayName`," +
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items " +
+                    "ADD COLUMN `DisplayName` TEXT NULL DEFAULT NULL AFTER `Item`, " +
+                    "ADD COLUMN `Lore` TEXT NULL DEFAULT NULL AFTER `DisplayName`, " +
                     "ADD COLUMN `Enchants` TEXT NULL DEFAULT NULL AFTER `Lore`;");
         }
 
         ResultSet rs4 = md.getColumns(null, null, Config.getObject("prefix") + "Shops", "NPCInfo");
         if (!rs4.next()) {
-            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Shops" +
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Shops " +
                     "ADD COLUMN `NPCInfo` TEXT NULL DEFAULT NULL;");
         }
 
         ResultSet rs6 = md.getColumns(null, null, Config.getObject("prefix") + "Shops", "Removal");
         if (!rs6.next()) {
-            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Shops" +
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Shops " +
                     "ADD COLUMN `Removal` TEXT NULL DEFAULT NULL;");
         }
 
         ResultSet rs5 = md.getColumns(null, null, Config.getObject("prefix") + "Items", "AutoStock");
         if (!rs5.next()) {
-            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items" +
-                    "ADD COLUMN `AutoStock` TEXT NULL DEFAULT NULL," +
-                    "ADD COLUMN `TransCool` TEXT NULL DEFAULT NULL," +
-                    "ADD COLUMN `Auto` BOOLEAN NULL DEFAULT NULL," +
-                    "ADD COLUMN `Trans` BOOLEAN NULL DEFAULT NULL," +
-                    "ADD COLUMN `Cooldowns` TEXT NULL DEFAULT NULL," +
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items " +
+                    "ADD COLUMN `AutoStock` TEXT NULL DEFAULT NULL, " +
+                    "ADD COLUMN `TransCool` TEXT NULL DEFAULT NULL, " +
+                    "ADD COLUMN `Auto` BOOLEAN NULL DEFAULT NULL, " +
+                    "ADD COLUMN `Trans` BOOLEAN NULL DEFAULT NULL, " +
+                    "ADD COLUMN `Cooldowns` TEXT NULL DEFAULT NULL, " +
                     "ADD COLUMN `SellEco` BOOLEAN NULL DEFAULT NULL;");
-            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items MODIFY Price DOUBLE," +
-                    "MODIFY OrigPrice DOUBLE," +
-                    "MODIFY MinimumPrice DOUBLE," +
-                    "MODIFY MaximumPrice DOUBLE," +
+            statement.executeUpdate("ALTER TABLE " + Config.getObject("prefix") + "Items MODIFY Price DOUBLE, " +
+                    "MODIFY OrigPrice DOUBLE, " +
+                    "MODIFY MinimumPrice DOUBLE, " +
+                    "MODIFY MaximumPrice DOUBLE, " +
                     "MODIFY AdjustedPrice DOUBLE;");
         }
 

@@ -105,7 +105,7 @@ public class ItemManagerSelling implements ShopMenu {
                         if (can) {
                             if (amt >= 0) {
                                 if (amt <= Config.getMaxPrice()) {
-                                    PriceChangeEvent e = new PriceChangeEvent(shopItem,shopItem.getPrice(),amt);
+                                    PriceChangeEvent e = new PriceChangeEvent(shopItem, shopItem.getPrice(), amt);
                                     Bukkit.getPluginManager().callEvent(e);
                                     shopItem.setPrice(amt);
                                     if (shop.isHoloShop()) {
@@ -175,8 +175,8 @@ public class ItemManagerSelling implements ShopMenu {
                         shop.getMenu(MenuType.OWNER_SELLING).draw(p, page);
                     }
 
-                    if (shop.getShopItems().size() == 0 && max.hubbard.bettershops.TradeManager.getTrades(shop).size() == 0){
-                        shop.setObject("Removal",new Date().getTime());
+                    if (shop.getShopItems().size() == 0 && max.hubbard.bettershops.TradeManager.getTrades(shop).size() == 0) {
+                        shop.setObject("Removal", new Date().getTime());
                     }
 
                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "RemoveItem"));
@@ -208,7 +208,7 @@ public class ItemManagerSelling implements ShopMenu {
                             amt = Integer.parseInt(name);
                         } catch (Exception ex) {
                             if (name.equalsIgnoreCase("all")) {
-                                StockChangeEvent e = new StockChangeEvent(shopItem,shopItem.getStock(),0);
+                                StockChangeEvent e = new StockChangeEvent(shopItem, shopItem.getStock(), 0);
                                 Bukkit.getPluginManager().callEvent(e);
                                 Stocks.collectAll(shopItem, shop, p);
                                 if (shop.isHoloShop()) {
@@ -224,7 +224,11 @@ public class ItemManagerSelling implements ShopMenu {
                             }
                         }
 
-
+                        if (amt > shopItem.getStock()) {
+                            amt = shopItem.getStock();
+                        }
+                        StockChangeEvent e = new StockChangeEvent(shopItem, shopItem.getStock(), shopItem.getStock() - amt);
+                        Bukkit.getPluginManager().callEvent(e);
                         Stocks.collectStock(shopItem, amt, p, shop);
                         draw(p, page, obj);
                     }
@@ -260,7 +264,7 @@ public class ItemManagerSelling implements ShopMenu {
                         if (can) {
 
                             if (amt > 0 && amt <= 2304) {
-                                AmountChangeEvent e = new AmountChangeEvent(shopItem,shopItem.getAmount(),amt);
+                                AmountChangeEvent e = new AmountChangeEvent(shopItem, shopItem.getAmount(), amt);
                                 Bukkit.getPluginManager().callEvent(e);
                                 shopItem.setObject("Amount", amt);
 
@@ -399,7 +403,7 @@ public class ItemManagerSelling implements ShopMenu {
         inv.setItem(inv.firstEmpty(), amount);
         inv.setItem(inv.firstEmpty(), data);
 
-       new BukkitRunnable() {
+        new BukkitRunnable() {
 
             @Override
             public void run() {

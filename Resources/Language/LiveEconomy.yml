@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: Snapshot-2.1-3
+Version: Snapshot-2.1-5
 
 LiveEcoOn: '&e&lLive Economy &7- &aOn'
 LiveEcoOff: '&e&lLive Economy &7- &cOff'
@@ -27,10 +27,15 @@ Info6: '&7Selling price = &a1/2 &7Buying'
 Info7: '&7Remember, This option is in beta'
 
 VariableAmount: '&e&lSecret Economic Variable &7- &d<Value>'
+SellVariableAmount: '&e&lSelling Secret Economic Variable &7- &d<Value>'
 VariableLore: '&e&lClick &7to Change'
 
 PriceChange: '&e&lPrice Change Percent &7- &d<Value>'
 
+SellPriceChange: '&e&lSelling Price Change Percent &7- &d<Value>'
+
 AffectPrice: '&7This will affect the current price'
 LowNumber: '&8Low Number = More Price Fluctuation'
 HighNumber: '&8High Number = Less Price Fluctuation'
+
+Active: '&cOnly active when &eCustom Selling &cis enabled'

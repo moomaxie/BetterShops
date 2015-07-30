@@ -935,7 +935,7 @@ public class FileShop implements Shop {
         try {
             config.save(file);
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
     }
 

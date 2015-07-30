@@ -79,16 +79,16 @@ public class FileShopItem implements ShopItem {
             durability = item.getDurability();
 
             if (getObject("AutoStock") != null) {
-                autoStock = new Timing(this, (String) getObject("AutoStock"),true);
+                autoStock = new Timing(this, (String) getObject("AutoStock"), true);
             } else {
-                autoStock = new Timing(this, 0, 0, 0, 0, 0,true);
+                autoStock = new Timing(this, 0, 0, 0, 0, 0, true);
                 setObject("AutoStock", autoStock.toString());
             }
 
             if (getObject("TransCool") != null) {
-                transCool = new Timing(this, (String) getObject("TransCool"),false);
+                transCool = new Timing(this, (String) getObject("TransCool"), false);
             } else {
-                transCool = new Timing(this, 0, 0, 0, 0, 0,false);
+                transCool = new Timing(this, 0, 0, 0, 0, 0, false);
                 setObject("TransCool", transCool.toString());
             }
 
@@ -114,16 +114,16 @@ public class FileShopItem implements ShopItem {
             shop.saveConfig();
 
             if (getObject("AutoStock") != null) {
-                autoStock = new Timing(this, (String) getObject("AutoStock"),true);
+                autoStock = new Timing(this, (String) getObject("AutoStock"), true);
             } else {
-                autoStock = new Timing(this, 0, 0, 0, 0, 0,true);
+                autoStock = new Timing(this, 0, 0, 0, 0, 0, true);
                 setObject("AutoStock", autoStock.toString());
             }
 
             if (getObject("TransCool") != null) {
-                transCool = new Timing(this, (String) getObject("TransCool"),false);
+                transCool = new Timing(this, (String) getObject("TransCool"), false);
             } else {
-                transCool = new Timing(this, 0, 0, 0, 0, 0,false);
+                transCool = new Timing(this, 0, 0, 0, 0, 0, false);
                 setObject("TransCool", transCool.toString());
             }
 
@@ -334,12 +334,7 @@ public class FileShopItem implements ShopItem {
     }
 
     public double calculateAmountTo() {
-//        System.out.println("amtTo = " + getPriceChangePercent() + " * " + getAmountToDouble() + " = " + getPriceChangePercent() * getAmountToDouble());
         amountTo = getPriceChangePercent() * getAmountToDouble();
-        amountTo = getAmountToDouble() - amountTo;
-//        System.out.println("percent = " + amountTo + " / " + getAmountToDouble() + " = " + amountTo / getAmountToDouble());
-//        System.out.println("double = " + amountTo + " / " + getPriceChangePercent() + " = " + amountTo / getPriceChangePercent());
-
         return amountTo;
     }
 
@@ -413,7 +408,8 @@ public class FileShopItem implements ShopItem {
 
         if (!sell) {
             if (getSister() != null) {
-                getSister().setAdjustedPrice(dec.doubleValue() / 2);
+                if (!isSellEco())
+                    getSister().setAdjustedPrice(dec.doubleValue() / 2);
             }
         }
     }
@@ -437,8 +433,11 @@ public class FileShopItem implements ShopItem {
     }
 
     public void setAmountToDouble(int amt) {
-        amountToDouble = amt;
+        this.amountToDouble = amt;
         setObject("DoubleAmount", amt);
+        if (!sell && getSister() != null && !isSellEco()) {
+            getSister().setAmountToDouble(amt);
+        }
         calculatePricePercent();
         calculatePrice();
 
@@ -475,7 +474,7 @@ public class FileShopItem implements ShopItem {
     }
 
     public void calculatePrice() {
-        double p = getOrigPrice() + (getOrigPrice() * (priceChangePercent/100));
+        double p = getOrigPrice() + (getOrigPrice() * (priceChangePercent / 100));
 
         if (p < minPrice) {
             setAdjustedPrice(minPrice);

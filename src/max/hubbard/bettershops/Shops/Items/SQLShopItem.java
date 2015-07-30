@@ -467,7 +467,7 @@ public class SQLShopItem implements ShopItem {
     public void setAmountToDouble(int amt) {
         this.amountToDouble = amt;
         setObject("DoubleAmount", amt);
-        if (!sell && getSister() != null) {
+        if (!sell && getSister() != null && !isSellEco()) {
             getSister().setAmountToDouble(amt);
         }
         calculatePricePercent();

@@ -401,6 +401,25 @@ public class Core extends JavaPlugin {
             });
 
         }
+
+        Metrics.Graph s = metrics.createGraph("Shop Storage");
+
+        if (useSQL()) {
+            s.addPlotter(new Metrics.Plotter("MySQL") {
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+        } else {
+            s.addPlotter(new Metrics.Plotter("Files") {
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+        }
+
     }
 
     public static Connection getConnection() {

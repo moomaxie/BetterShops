@@ -1,6 +1,6 @@
 name: BetterShops
 main: max.hubbard.bettershops.Core
-version: Snapshot-2.1-3
+version: Snapshot-2.1-5
 author: moomaxie
 softdepend: [WorldGuard, Vault, HolographicDisplays, Citizens]
 description: >

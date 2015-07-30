@@ -171,7 +171,11 @@ public class Trading implements ShopMenu {
             j = 36 * (page - 1);
         }
 
-        int k = TradeManager.getTrades(shop).size();
+        int k = 0;
+
+        if (TradeManager.getTrades(shop) != null){
+            k = TradeManager.getTrades(shop).size();
+        }
 
         if (page != maxPage) {
             k = k - (j + (TradeManager.getTrades(shop).size() - 36));

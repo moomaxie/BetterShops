@@ -143,12 +143,12 @@ public class BSCommand implements CommandExecutor {
 
                             Shop shop = ShopManager.fromString(p, name);
 
-                            if ((boolean) Config.getObject("Permissions") && !Permissions.hasOpenCommandWorldPerm(p, shop.getLocation().getWorld())) {
-                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));
-                                return true;
-                            }
 
                             if (shop != null) {
+                                if ((boolean) Config.getObject("Permissions") && !Permissions.hasOpenCommandWorldPerm(p, shop.getLocation().getWorld())) {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));
+                                    return true;
+                                }
                                 if (!shop.getBlacklist().contains(p)) {
                                     if (shop.getOwner() != null) {
                                         Opener.open(p, shop);

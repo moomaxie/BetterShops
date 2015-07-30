@@ -85,7 +85,7 @@ public class LiveEconomy implements ShopMenu {
                 item.setObject("LiveEconomy", !item.getLiveEco());
                 if (item.getSister() == null)
                     shop.createShopItem(item.getItem(), shop.getNextSlotForPage(shop.getNextAvailablePage(!item.isSelling()), !item.isSelling()), shop.getNextAvailablePage(!item.isSelling()), !item.isSelling());
-                item.getSister().setObject("SellEco",item.isSellEco());
+                item.getSister().setObject("SellEco", item.isSellEco());
                 if (!item.isSellEco()) {
                     item.getSister().setPrice(item.getAdjustedPrice() / 2);
                 } else {
@@ -157,6 +157,52 @@ public class LiveEconomy implements ShopMenu {
             }
         });
 
+        if (item.getSister() != null) {
+            ItemStack sellDoubleAmt = new ItemStack(Material.STAINED_CLAY, 1, (byte) 10);
+            ItemMeta sellDoubleAmtMeta = sellDoubleAmt.getItemMeta();
+            sellDoubleAmtMeta.setDisplayName(Language.getString("LiveEconomy", "VariableAmount").replaceAll("<Value>", "" + item.getSister().getAmountToDouble()));
+            sellDoubleAmtMeta.setLore(Arrays.asList(Language.getString("LiveEconomy", "Active"), Language.getString("LiveEconomy", "VariableLore"),
+                    Language.getString("LiveEconomy", "AffectPrice"),
+                    Language.getString("LiveEconomy", "LowNumber"),
+                    Language.getString("LiveEconomy", "HighNumber")));
+            sellDoubleAmt.setItemMeta(sellDoubleAmtMeta);
+            ClickableItem sdbClick = new ClickableItem(new ShopItemStack(sellDoubleAmt), inv, p);
+            sdbClick.addLeftClickAction(new LeftClickAction() {
+                @Override
+                public void onAction(InventoryClickEvent e) {
+                    final AnvilManager man = new AnvilManager(p);
+                    Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            String name = man.call();
+
+                            boolean can;
+                            int amt = 0;
+                            try {
+                                amt = Integer.parseInt(name);
+                                can = true;
+                            } catch (Exception ex) {
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidNumber"));
+                                can = false;
+                            }
+
+                            if (can) {
+                                if (amt > 0) {
+                                    item.getSister().setAmountToDouble(amt);
+                                } else {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Zero"));
+                                }
+                            }
+                            draw(p, page, obj);
+                        }
+                    });
+                }
+            });
+
+
+            inv.setItem(38, sellDoubleAmt);
+        }
+
 
         ItemStack percent = new ItemStack(Material.DIAMOND);
         ItemMeta percentMeta = percent.getItemMeta();
@@ -164,6 +210,18 @@ public class LiveEconomy implements ShopMenu {
         dec = dec.setScale(3, BigDecimal.ROUND_HALF_UP);
         percentMeta.setDisplayName(Language.getString("LiveEconomy", "PriceChange").replaceAll("<Value>", dec.doubleValue() + "%"));
         percent.setItemMeta(percentMeta);
+
+        if (item.getSister() != null) {
+            ItemStack sellPercent = new ItemStack(Material.DIAMOND);
+            ItemMeta sellPercentMeta = sellPercent.getItemMeta();
+            BigDecimal dec1 = new BigDecimal(item.getSister().getPriceChangePercent());
+            dec1 = dec1.setScale(3, BigDecimal.ROUND_HALF_UP);
+            sellPercentMeta.setDisplayName(Language.getString("LiveEconomy", "SellPriceChange").replaceAll("<Value>", dec1.doubleValue() + "%"));
+            sellPercent.setItemMeta(sellPercentMeta);
+
+            inv.setItem(47, sellPercent);
+
+        }
 
         ItemStack info = new ItemStack(Material.SIGN);
         ItemMeta infoMeta = info.getItemMeta();
@@ -243,7 +301,8 @@ public class LiveEconomy implements ShopMenu {
         inv.setItem(25, info);
         inv.setItem(36, doubleAmt);
         inv.setItem(45, percent);
-        inv.setItem(47, sellEco);
+
+        inv.setItem(29, sellEco);
         inv.setItem(4, item.getItem());
 
         new BukkitRunnable() {

@@ -299,6 +299,10 @@ public class ItemManagerBuying implements ShopMenu {
                                                         }
                                                     }
 
+                                                    if (amt > it.getStock()){
+                                                        amt = it.getStock();
+                                                    }
+
                                                     StockChangeEvent e = new StockChangeEvent(it, it.getStock(), it.getStock() - amt);
                                                     Bukkit.getPluginManager().callEvent(e);
                                                     Stocks.removeStock(it, amt, p, shop);

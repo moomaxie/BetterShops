@@ -176,13 +176,15 @@ public class CreateSign implements Listener {
                     }
 
                     if (s.isNPCShop()) {
-                        if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-                                @Override
-                                public void run() {
-                                    s.getNPCShop().spawn();
-                                }
-                            });
+                        if (s.getNPCShop() != null) {
+                            if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        s.getNPCShop().spawn();
+                                    }
+                                });
+                            }
                         }
                     }
                 }
@@ -230,13 +232,15 @@ public class CreateSign implements Listener {
                     }
 
                     if (s.isNPCShop()) {
-                        if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-                                @Override
-                                public void run() {
-                                    s.getNPCShop().spawn();
-                                }
-                            });
+                        if (s.getNPCShop() != null) {
+                            if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        s.getNPCShop().spawn();
+                                    }
+                                });
+                            }
                         }
                     }
                 }
