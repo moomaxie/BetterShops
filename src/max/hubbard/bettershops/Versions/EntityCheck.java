@@ -30,17 +30,9 @@ public class EntityCheck {
 
         try {
             Class clas = Class.forName("max.hubbard.bettershops.Versions." + version + ".Entities." + WordsCapitalizer.capitalizeEveryWord(e.getType().name().replaceAll("_", " ")).replaceAll(" ","") + "NPC");
-            System.out.println(clas.getCanonicalName());
-            System.out.println(clas.getSuperclass().getCanonicalName());
-            System.out.println("Here1");
             Method m = clas.getSuperclass().getMethod("getBukkitEntity");
             World mcWorld = (World) ((CraftWorld) e.getLocation().getWorld()).getHandle();
             Entity cl = (Entity) m.invoke(clas.getSuperclass().getConstructor(mcWorld.getClass()).newInstance(mcWorld));
-            System.out.println("Here2");
-            System.out.println(cl.getClass().getCanonicalName());
-            System.out.println(cl.getClass().getSuperclass().getCanonicalName());
-
-            System.out.println(e.getClass().isAssignableFrom(cl.getClass()));
 
             return clas != null && e.getClass().isAssignableFrom(cl.getClass());
         } catch (Exception e1) {

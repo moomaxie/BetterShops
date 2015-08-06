@@ -111,8 +111,6 @@ public class FileShopItem implements ShopItem {
             ((FileShop) shop).config.set("Items." + id + ".Page", page);
             ((FileShop) shop).config.set("Items." + id + ".Slot", slot);
 
-            shop.saveConfig();
-
             if (getObject("AutoStock") != null) {
                 autoStock = new Timing(this, (String) getObject("AutoStock"), true);
             } else {
@@ -132,7 +130,6 @@ public class FileShopItem implements ShopItem {
                 setObject("LiveEconomy", false);
                 setObject("OrigPrice", Config.getObject("DefaultPrice"));
                 setAdjustedPrice((double) Config.getObject("DefaultPrice"));
-                shop.saveConfig();
                 return;
             }
 

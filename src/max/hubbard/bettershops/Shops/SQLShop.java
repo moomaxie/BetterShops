@@ -115,59 +115,59 @@ public class SQLShop implements Shop {
                         }
 
                         if (!made) {
-                        if (l != null && l.getWorld() != null)
-                            for (LivingEntity entity : l.getWorld().getLivingEntities()) {
-                                if (entity.getCustomName() != null) {
-                                    if (entity.getCustomName().equals("§a§l" + t.name)) {
-                                        if (getNPCShop() == null) {
-                                            try {
+                            if (l != null && l.getWorld() != null)
+                                for (LivingEntity entity : l.getWorld().getLivingEntities()) {
+                                    if (entity.getCustomName() != null) {
+                                        if (entity.getCustomName().equals("§a§l" + t.name)) {
+                                            if (getNPCShop() == null) {
+                                                try {
 
-                                                if (Core.useCitizens()) {
-                                                    if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
-                                                        CitizensShop s = new CitizensShop(CitizensAPI.getNPCRegistry().getNPC(entity), entity, t);
-                                                        NPCManager.addNPCShop(s);
-                                                        s.removeChest();
-                                                        setObject("NPC", true);
-                                                        if (getObject("NPCInfo") != null) {
-                                                            EntityInfo in = EntityInfo.fromString((String) getObject("NPCInfo"));
-                                                            s.setInfo(in);
+                                                    if (Core.useCitizens()) {
+                                                        if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
+                                                            CitizensShop s = new CitizensShop(CitizensAPI.getNPCRegistry().getNPC(entity), entity, t);
+                                                            NPCManager.addNPCShop(s);
+                                                            s.removeChest();
+                                                            setObject("NPC", true);
+                                                            if (getObject("NPCInfo") != null) {
+                                                                EntityInfo in = EntityInfo.fromString((String) getObject("NPCInfo"));
+                                                                s.setInfo(in);
+                                                            }
+                                                        } else {
+                                                            CitizensShop s = new CitizensShop(EntityInfo.getInfo(entity), t);
+                                                            s.spawn();
+                                                            NPCManager.addNPCShop(s);
+                                                            s.removeChest();
+                                                            setObject("NPC", true);
                                                         }
+
                                                     } else {
-                                                        CitizensShop s = new CitizensShop(EntityInfo.getInfo(entity), t);
-                                                        s.spawn();
+                                                        ShopsNPC s = NPCInfo.createNewShopsNPC(entity, t);
                                                         NPCManager.addNPCShop(s);
                                                         s.removeChest();
                                                         setObject("NPC", true);
                                                     }
 
-                                                } else {
-                                                    ShopsNPC s = NPCInfo.createNewShopsNPC(entity, t);
-                                                    NPCManager.addNPCShop(s);
-                                                    s.removeChest();
-                                                    setObject("NPC", true);
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                } finally {
+                                                    made = true;
                                                 }
-
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            } finally {
-                                                made = true;
-                                            }
-                                        } else {
-                                            if (Core.useCitizens()) {
-                                                if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
-                                                    net.citizensnpcs.api.npc.NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
-                                                    npc.destroy();
-                                                    CitizensAPI.getNPCRegistry().deregister(npc);
+                                            } else {
+                                                if (Core.useCitizens()) {
+                                                    if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
+                                                        net.citizensnpcs.api.npc.NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
+                                                        npc.destroy();
+                                                        CitizensAPI.getNPCRegistry().deregister(npc);
+                                                    } else {
+                                                        entity.remove();
+                                                    }
                                                 } else {
                                                     entity.remove();
                                                 }
-                                            } else {
-                                                entity.remove();
                                             }
                                         }
                                     }
                                 }
-                            }
                         }
                         if (!made) {
 
@@ -193,6 +193,19 @@ public class SQLShop implements Shop {
                             }
                         }
                     }
+
+                    Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isHoloShop() && !isNPCShop()) {
+                                if (l != null && l.getWorld() != null) {
+                                    if (l.getBlock() != null && l.getBlock().getType() != Material.CHEST && l.getBlock().getType() != Material.TRAPPED_CHEST) {
+                                        DeleteNPC.addChest(t);
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
             });
         }
@@ -880,6 +893,9 @@ public class SQLShop implements Shop {
     }
 
     public void saveConfig() {
+    }
+
+    public void syncSaveConfig() {
     }
 
     public Sign getSign() {

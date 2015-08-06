@@ -79,10 +79,10 @@ public class OwnerSelling implements ShopMenu {
                 if (!shop.getObject("Removal").equals("")) {
                     String s1 = "";
                     Date dt1 = new Date();
-                    Date dt2 = new Date(Long.valueOf((String) shop.getObject("Removal")));
+                    Date dt2 = new Date((long) shop.getObject("Removal"));
                     Calendar c = Calendar.getInstance();
                     c.setTime(dt2);
-                    c.add(Calendar.DATE,(int) Config.getObject("RemoveAfter"));
+                    c.add(Calendar.DATE, (int) Config.getObject("RemoveAfter"));
                     dt2 = c.getTime();
 
                     long diff = dt2.getTime() - dt1.getTime();
@@ -91,23 +91,23 @@ public class OwnerSelling implements ShopMenu {
                     long diffHours = diff / (60 * 60 * 1000);
                     int diffInDays = (int) ((dt2.getTime() - dt1.getTime()) / (1000 * 60 * 60 * 24));
 
-                    if (diffInDays != 0){
-                        s1 = s1 + "§7" + Math.abs(diffInDays) + " " + Language.getString("Timings","Day") + " ";
+                    if (diffInDays != 0) {
+                        s1 = s1 + "§7" + Math.abs(diffInDays) + " " + Language.getString("Timings", "Day") + " ";
                     }
 
-                    if (diffHours != 0){
-                        s1 = s1 + "§7" + Math.abs(diffHours) + " " + Language.getString("Timings","Hour") + " ";
+                    if (diffHours != 0) {
+                        s1 = s1 + "§7" + Math.abs(diffHours) + " " + Language.getString("Timings", "Hour") + " ";
                     }
 
-                    if (diffMinutes != 0){
-                        s1 = s1 + "§7" + Math.abs(diffMinutes) + " " + Language.getString("Timings","Minute") + " ";
+                    if (diffMinutes != 0) {
+                        s1 = s1 + "§7" + Math.abs(diffMinutes) + " " + Language.getString("Timings", "Minute") + " ";
                     }
 
-                    if (diffSeconds != 0){
-                        s1 = s1 + "§7" + Math.abs(diffSeconds) + " " + Language.getString("Timings","Second");
+                    if (diffSeconds != 0) {
+                        s1 = s1 + "§7" + Math.abs(diffSeconds) + " " + Language.getString("Timings", "Second");
                     }
 
-                    lor.add(Language.getString("Timings","Removal") + s1);
+                    lor.add(Language.getString("Timings", "Removal") + s1);
 
                     lor.add(" ");
                 }
@@ -268,8 +268,8 @@ public class OwnerSelling implements ShopMenu {
                         }
                     }
 
-                    if (it.isTransCooldown()){
-                        if (!Cooldowns.canTransaction(p,it,1)) {
+                    if (it.isTransCooldown()) {
+                        if (!Cooldowns.canTransaction(p, it, 1)) {
                             lore.add(Language.getString("Timings", "Available") + it.getTransCooldownTiming().getDifferenceString());
                             lore.add(" ");
                         }

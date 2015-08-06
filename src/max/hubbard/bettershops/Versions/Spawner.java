@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -62,11 +63,13 @@ public class Spawner {
         }.runTask(Bukkit.getPluginManager().getPlugin("BetterShops"));
 
         try {
-            latch.await();
+            latch.await(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+
         return ref.get();
+
     }
 }

@@ -56,7 +56,7 @@ public class Core extends JavaPlugin {
     private static boolean aboveEight = false;
     private static boolean holo = false;
     private static boolean wg = false;
-    private static boolean beta = true;
+    private static boolean beta = false;
     private static boolean citizens = false;
     private static Connection c;
     private static Database db;
@@ -66,9 +66,12 @@ public class Core extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §eSaving Shops..");
         for (Shop shop : ShopManager.getShops()) {
             if (shop.isHoloShop()) {
+                shop.getHolographicShop().getHologram().despawnEntities();
+                shop.getHolographicShop().getHologram().clearLines();
                 shop.getHolographicShop().getHologram().delete();
             }
-            shop.saveConfig();
+
+            shop.syncSaveConfig();
         }
         Bukkit.getScheduler().cancelTasks(this);
         Bukkit.getScheduler().cancelTasks(Bukkit.getPluginManager().getPlugin("BetterShops"));

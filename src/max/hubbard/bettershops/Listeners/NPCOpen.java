@@ -6,10 +6,12 @@ import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Shops.Types.NPC.*;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 /**
@@ -68,12 +70,28 @@ public class NPCOpen implements Listener {
                             Player p = e.getPlayer();
 
                             if (!shop.getBlacklist().contains(p)) {
-                                Opener.open(p,shop);
+                                Opener.open(p, shop);
                             } else {
                                 p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotAllowed"));
                             }
                         }
                     });
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHit(EntityDamageEvent e) {
+        Entity ent = e.getEntity();
+
+        if (ent.getCustomName() != null && ent.getCustomName().contains("§a§l")) {
+
+            final Shop shop = ShopManager.fromString(ent.getCustomName().substring(4));
+
+            if (shop != null) {
+                if (shop.isNPCShop()) {
+                    e.setCancelled(true);
                 }
             }
         }

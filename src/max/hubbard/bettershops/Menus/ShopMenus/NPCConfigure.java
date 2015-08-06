@@ -102,8 +102,11 @@ public class NPCConfigure implements ShopMenu {
                         p.closeInventory();
                     } else {
                         ShopsNPC npc = new NPCShop(EntityType.valueOf(ty.getItemMeta().getDisplayName().substring(2)), lore, shop, bb, shear, vill);
-                        NPCManager.addNPCShop(npc);
-                        shop.setObject("NPC", true);
+
+                        if (npc.getEntity() != null) {
+                            NPCManager.addNPCShop(npc);
+                            shop.setObject("NPC", true);
+                        }
                         p.closeInventory();
                     }
                 }

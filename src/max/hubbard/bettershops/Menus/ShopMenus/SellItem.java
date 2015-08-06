@@ -337,7 +337,7 @@ public class SellItem implements ShopMenu {
         return inv;
     }
 
-    public void sellItem(ShopItem shopItem, Player p) {
+    public void sellItem(ShopItem shopItem, final Player p) {
         boolean c = true;
 
         if ((boolean) Config.getObject("Permissions")) {
@@ -409,11 +409,12 @@ public class SellItem implements ShopMenu {
                 }
 
                 if (!shop.isServerShop()) {
-                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         @Override
                         public void run() {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                         }
                     });
 
@@ -437,7 +438,7 @@ public class SellItem implements ShopMenu {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         @Override
                         public void run() {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                         }
                     });
                 }
@@ -477,10 +478,12 @@ public class SellItem implements ShopMenu {
             } else {
                 p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LimitReached"));
             }
+        } else {
+            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));
         }
     }
 
-    public void sellAll(ShopItem shopItem, Player p) {
+    public void sellAll(ShopItem shopItem, final Player p) {
         boolean c = true;
 
         if ((boolean) Config.getObject("Permissions")) {
@@ -544,11 +547,12 @@ public class SellItem implements ShopMenu {
                 }
 
                 if (!shop.isServerShop()) {
-                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         @Override
                         public void run() {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                         }
                     });
 
@@ -572,7 +576,7 @@ public class SellItem implements ShopMenu {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         @Override
                         public void run() {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                         }
                     });
                 }
@@ -617,10 +621,12 @@ public class SellItem implements ShopMenu {
             } else {
                 p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LimitReached"));
             }
+        } else {
+            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));
         }
     }
 
-    public void sellItem(ShopItem shopItem, Player p, int price) {
+    public void sellItem(ShopItem shopItem, final Player p, int price) {
         boolean c = true;
 
         if ((boolean) Config.getObject("Permissions")) {
@@ -693,10 +699,11 @@ public class SellItem implements ShopMenu {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         @Override
                         public void run() {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                         }
                     });
-                    Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
+
 
 
                     if (shop.isNotify()) {
@@ -718,7 +725,7 @@ public class SellItem implements ShopMenu {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         @Override
                         public void run() {
-                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), pr);
+                            Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), pr);
                         }
                     });
                 }
@@ -759,6 +766,8 @@ public class SellItem implements ShopMenu {
             } else {
                 p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LimitReached"));
             }
+        } else {
+            p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NoPermission"));
         }
     }
 }

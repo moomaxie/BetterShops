@@ -144,9 +144,10 @@ public class ShopManager {
         if (file.listFiles() != null)
             for (File f : file.listFiles()) {
 
-                if (f.listFiles() != null)
+                if (f.listFiles() != null) {
+                    List<Shop> shops1 = new ArrayList<>();
                     for (File file1 : f.listFiles()) {
-                        List<Shop> shops1 = new ArrayList<>();
+
                         if (file1.getName().contains(".yml")) {
                             UUID id = UUID.fromString(f.getName());
 
@@ -156,15 +157,13 @@ public class ShopManager {
 
                             Shop shop = new FileShop(config, file1, Bukkit.getOfflinePlayer(id));
 
-                            shops1.add(shop);
-
                             shops.add(shop);
                             locs.put(shop.getLocation(), shop);
                             names.put(shop.getName(), shop);
                             if (!worlds.contains(shop.getLocation().getWorld()))
                                 worlds.add(shop.getLocation().getWorld());
 
-
+                            shops1.add(shop);
                             ss++;
 
                             i++;
@@ -189,9 +188,11 @@ public class ShopManager {
                             if (i == (total * .9)) {
                                 Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §a90%");
                             }
+
                         }
-                        playerShops.put(UUID.fromString(f.getName()), shops1);
                     }
+                    playerShops.put(UUID.fromString(f.getName()), shops1);
+                }
             }
         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
         if (Core.useSQL()) {

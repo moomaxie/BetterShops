@@ -156,7 +156,6 @@ public class SQLShopItem implements ShopItem {
                 Map<String, Object> m = ItemUtils.deserialize(ite);
                 try {
                     this.item = ItemStack.deserialize(m);
-                    System.out.println(item.serialize());
                 } catch (Exception e) {
                     this.item = ItemUtils.fromString(set.getString("Item"));
                     if (item.getItemMeta() != null) {

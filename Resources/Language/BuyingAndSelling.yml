@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: Snapshot-2.1-5
+Version: 2.1.0
 
 BuyItem: '&a&lBuy Item'
 BuyItemLore: '&e&lLeft Click &7to &aBuy &7this item'

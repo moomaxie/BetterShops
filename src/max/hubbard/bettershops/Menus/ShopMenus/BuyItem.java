@@ -231,7 +231,7 @@ public class BuyItem implements ShopMenu {
         return inv;
     }
 
-    public void buyItem(ShopItem shopItem, Player p) {
+    public void buyItem(ShopItem shopItem, final Player p) {
         if (!shop.isOpen() && !(boolean) Config.getObject("UseOnClose")) {
             p.closeInventory();
             p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
@@ -319,7 +319,12 @@ public class BuyItem implements ShopMenu {
                 }
             } else {
                 if (shopItem.getStock() > 0 || shopItem.isInfinite()) {
-                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
+                    Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
+                        }
+                    });
                 } else {
                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LowStock"));
                     shop.getMenu(MenuType.MAIN_BUYING).draw(p, shopItem.getPage());
@@ -384,7 +389,7 @@ public class BuyItem implements ShopMenu {
         }
     }
 
-    public void buyItem(ShopItem shopItem, Player p, int amt) {
+    public void buyItem(ShopItem shopItem, final Player p, int amt) {
         if (!shop.isOpen() && !(boolean) Config.getObject("UseOnClose")) {
             p.closeInventory();
             p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
@@ -445,7 +450,7 @@ public class BuyItem implements ShopMenu {
             if (!shop.isServerShop()) {
                 if (shopItem.getStock() > 0 || shopItem.isInfinite()) {
                     Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                    Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                         @Override
                         public void run() {
                             Core.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner().getUniqueId()), price);
@@ -474,7 +479,12 @@ public class BuyItem implements ShopMenu {
                 }
             } else {
                 if (shopItem.getStock() > 0 || shopItem.isInfinite()) {
-                    Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
+                    Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                        @Override
+                        public void run() {
+                            Core.getEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), price);
+                        }
+                    });
                 } else {
                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "LowStock"));
                     shop.getMenu(MenuType.MAIN_BUYING).draw(p, shopItem.getPage());

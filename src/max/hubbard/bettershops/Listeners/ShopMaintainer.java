@@ -6,11 +6,15 @@ import max.hubbard.bettershops.Shops.Items.FileShopItem;
 import max.hubbard.bettershops.Shops.Items.SQLShopItem;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
+import max.hubbard.bettershops.Shops.Types.NPC.NPCShop;
 import max.hubbard.bettershops.Utils.Stocks;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 
 /**
@@ -48,6 +52,36 @@ public class ShopMaintainer implements Listener {
                         }
                     });
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockExplode(BlockExplodeEvent e) {
+        for (final Block b : e.blockList()) {
+            Shop shop = ShopManager.fromLocation(b.getLocation());
+            if (shop != null) {
+                Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                    @Override
+                    public void run() {
+                        NPCShop.addChest(b.getLocation());
+                    }
+                }, 5L);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent e) {
+        for (final Block b : e.blockList()) {
+            Shop shop = ShopManager.fromLocation(b.getLocation());
+            if (shop != null) {
+                Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                    @Override
+                    public void run() {
+                        NPCShop.addChest(b.getLocation());
+                    }
+                }, 5L);
             }
         }
     }

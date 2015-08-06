@@ -178,6 +178,19 @@ public class FileShop implements Shop {
                         }
                     }
                 }
+
+                Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isHoloShop() && !isNPCShop()) {
+                            if (l != null && l.getWorld() != null) {
+                                if (l.getBlock() != null && l.getBlock().getType() != Material.CHEST && l.getBlock().getType() != Material.TRAPPED_CHEST) {
+                                    DeleteNPC.addChest(t);
+                                }
+                            }
+                        }
+                    }
+                });
             }
         });
 
@@ -344,33 +357,59 @@ public class FileShop implements Shop {
     }
 
     public ShopMenu getMenu(MenuType type) {
-        switch (type){
-            case OWNER_BUYING: return new OwnerBuying(this);
-            case OWNER_SELLING: return new OwnerSelling(this);
-            case MAIN_BUYING: return new MainBuying(this);
-            case MAIN_SELLING: return new MainSelling(this);
-            case KEEPER_MANAGER: return new KeeperManager(this);
-            case SHOP_SETTINGS: return new ShopSettings(this);
-            case HISTORY: return new max.hubbard.bettershops.Menus.ShopMenus.History(this);
-            case ITEM_MANAGER_BUYING: return new ItemManagerBuying(this);
-            case ITEM_MANAGER_SELLING: return new ItemManagerSelling(this);
-            case LIVE_ECONOMY: return new LiveEconomy(this);
-            case KEEPER_ITEM_MANAGER: return new KeeperItemManager(this);
-            case BUY_ITEM: return new BuyItem(this);
-            case SELL_ITEM: return new SellItem(this);
-            case NPC_CHOOSE: return new NPCChoose(this);
-            case NPC_CONFIGURE: return new NPCConfigure(this);
-            case REARRANGE: return new Rearrange(this);
-            case AMOUNT_CHOOSER: return new AmountChooser(this);
-            case CART: return new Cart(this);
-            case SEARCH_ENGINE: return new SearchEngine(this);
-            case TRADING: return new Trading(this);
-            case TRADE_MANAGER: return new max.hubbard.bettershops.Menus.ShopMenus.TradeManager(this);
-            case TRADE_CONFIRM: return new TradeConfirm(this);
-            case TRADE_CHOOSE: return new TradeChoose(this);
-            case PLAYER_BLACKLIST: return new PlayerBlacklist(this);
-            case AUTO_STOCK: return new AutoStock(this);
-            case COOLDOWNS: return new Cooldowns(this);
+        switch (type) {
+            case OWNER_BUYING:
+                return new OwnerBuying(this);
+            case OWNER_SELLING:
+                return new OwnerSelling(this);
+            case MAIN_BUYING:
+                return new MainBuying(this);
+            case MAIN_SELLING:
+                return new MainSelling(this);
+            case KEEPER_MANAGER:
+                return new KeeperManager(this);
+            case SHOP_SETTINGS:
+                return new ShopSettings(this);
+            case HISTORY:
+                return new max.hubbard.bettershops.Menus.ShopMenus.History(this);
+            case ITEM_MANAGER_BUYING:
+                return new ItemManagerBuying(this);
+            case ITEM_MANAGER_SELLING:
+                return new ItemManagerSelling(this);
+            case LIVE_ECONOMY:
+                return new LiveEconomy(this);
+            case KEEPER_ITEM_MANAGER:
+                return new KeeperItemManager(this);
+            case BUY_ITEM:
+                return new BuyItem(this);
+            case SELL_ITEM:
+                return new SellItem(this);
+            case NPC_CHOOSE:
+                return new NPCChoose(this);
+            case NPC_CONFIGURE:
+                return new NPCConfigure(this);
+            case REARRANGE:
+                return new Rearrange(this);
+            case AMOUNT_CHOOSER:
+                return new AmountChooser(this);
+            case CART:
+                return new Cart(this);
+            case SEARCH_ENGINE:
+                return new SearchEngine(this);
+            case TRADING:
+                return new Trading(this);
+            case TRADE_MANAGER:
+                return new max.hubbard.bettershops.Menus.ShopMenus.TradeManager(this);
+            case TRADE_CONFIRM:
+                return new TradeConfirm(this);
+            case TRADE_CHOOSE:
+                return new TradeChoose(this);
+            case PLAYER_BLACKLIST:
+                return new PlayerBlacklist(this);
+            case AUTO_STOCK:
+                return new AutoStock(this);
+            case COOLDOWNS:
+                return new Cooldowns(this);
         }
         return menus.get(type);
     }
@@ -932,14 +971,31 @@ public class FileShop implements Shop {
     }
 
     public void saveConfig() {
+        Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    config.save(file);
+                } catch (IOException e) {
+
+                }
+            }
+        });
+
+    }
+
+
+    public void syncSaveConfig() {
+
         try {
             config.save(file);
         } catch (IOException e) {
 
         }
+
     }
 
-    public Sign getSign(){
+    public Sign getSign() {
         if (l.getWorld().getBlockAt(l).getState() instanceof Chest) {
 
             Chest chest = (Chest) l.getWorld().getBlockAt(l).getState();

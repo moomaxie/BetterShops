@@ -79,7 +79,7 @@ public class OwnerBuying implements ShopMenu {
                 if (!shop.getObject("Removal").equals("")) {
                     String s1 = "";
                     Date dt1 = new Date();
-                    Date dt2 = new Date(Long.valueOf((String) shop.getObject("Removal")));
+                    Date dt2 = new Date((long)shop.getObject("Removal"));
                     Calendar c = Calendar.getInstance();
                     c.setTime(dt2);
                     c.add(Calendar.DATE,(int) Config.getObject("RemoveAfter"));

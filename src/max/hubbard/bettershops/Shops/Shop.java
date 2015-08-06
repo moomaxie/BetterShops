@@ -131,4 +131,6 @@ public interface Shop {
     public void convert();
 
     public void saveConfig();
+
+    public void syncSaveConfig();
 }

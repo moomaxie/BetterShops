@@ -91,6 +91,13 @@ public class NPCShop implements ShopsNPC {
                 }
             }
 
+            if (entity == null) {
+                shop.setObject("NPC",false);
+                addChest(l);
+                shop.getOwner().getPlayer().sendMessage(Language.getString("Messages","Prefix") + Language.getString("Messages","NPCTimeOut"));
+                return;
+            }
+
 
             entity.setCustomName("§a§l" + shop.getName());
             entity.setCustomNameVisible(true);
