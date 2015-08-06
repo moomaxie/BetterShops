@@ -1,5 +1,5 @@
 # BetterShops
-![](http://dev.bukkit.org/media/images/80/60/BetterShopsLogo.png)
+![](http://i.imgur.com/NliyO8H.png)
 
 ## THE REVOLUTIONARY SHOP PLUGIN ![](https://travis-ci.org/moomaxie/BetterShops.svg?branch=master)
 
