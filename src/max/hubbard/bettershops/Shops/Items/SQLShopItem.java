@@ -327,7 +327,11 @@ public class SQLShopItem implements ShopItem {
     }
 
     public int getPage() {
-        return (Integer) getObject("Page");
+        if (getObject("Page") != null) {
+            return (Integer) getObject("Page");
+        } else {
+            return 1;
+        }
     }
 
     public int getSlot() {

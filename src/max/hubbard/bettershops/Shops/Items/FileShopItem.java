@@ -195,7 +195,6 @@ public class FileShopItem implements ShopItem {
 
     public void setObject(String s, Object o) {
         ((FileShop) shop).config.getConfigurationSection("Items").getConfigurationSection("" + id).set(s, o);
-        shop.saveConfig();
 
         if (s.equals("LiveEconomy")) {
             if (!sell) {

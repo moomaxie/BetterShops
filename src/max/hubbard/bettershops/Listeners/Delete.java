@@ -41,7 +41,7 @@ public class Delete implements Listener {
 
             if (shop != null) {
                 OfflinePlayer owner = shop.getOwner();
-                if (owner == p || p.isOp() || (boolean) Config.getObject("Permissions") && Permissions.hasBreakPerm(p)) {
+                if (owner.getUniqueId().toString().equals(p.getUniqueId().toString()) || p.isOp() || (boolean) Config.getObject("Permissions") && Permissions.hasBreakPerm(p)) {
 
                     if ((boolean) Config.getObject("DeleteByBreak")) {
 
@@ -96,7 +96,7 @@ public class Delete implements Listener {
 
                                     if (shop != null) {
                                         OfflinePlayer owner = shop.getOwner();
-                                        if (owner == p || p.isOp() || (boolean) Config.getObject("Permissions") && Permissions.hasBreakPerm(p)) {
+                                        if (owner.getUniqueId().toString().equals(p.getUniqueId().toString()) || p.isOp() || (boolean) Config.getObject("Permissions") && Permissions.hasBreakPerm(p)) {
 
                                             if ((boolean) Config.getObject("DeleteByBreak")) {
 

@@ -4,8 +4,9 @@ import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Shop;
-import max.hubbard.bettershops.Shops.Types.NPC.*;
-import org.bukkit.Bukkit;
+import max.hubbard.bettershops.Shops.Types.NPC.EntityInfo;
+import max.hubbard.bettershops.Shops.Types.NPC.NPCShop;
+import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,45 +38,34 @@ public class NPCOpen implements Listener {
 
                 if (shop != null) {
 
+                    if (shop.getNPCShop() == null) {
+                        shop.setObject("NPC", true);
+
+                        try {
+                            ShopsNPC npc = new NPCShop(EntityInfo.getInfo(ent), shop);
+                            npc.returnNPC();
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    } else {
+                        shop.getNPCShop().returnNPC();
+
+                        if (!Core.useCitizens())
+                            if (!ent.equals(shop.getNPCShop().getEntity())) {
+                                ent.remove();
+                            }
+                    }
+
                     e.setCancelled(true);
 
-                    Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-                        @Override
-                        public void run() {
+                    Player p = e.getPlayer();
 
-                            if (!shop.isNPCShop() || shop.getNPCShop() == null) {
-                                shop.setObject("NPC", true);
+                    if (!shop.getBlacklist().contains(p)) {
+                        Opener.open(p, shop);
+                    } else {
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotAllowed"));
+                    }
 
-                                try {
-                                    EntityInfo info = EntityInfo.getInfo(ent);
-                                    if (Core.useCitizens()) {
-                                        ShopsNPC n = new CitizensShop(info, shop);
-                                        n.spawn();
-                                        n.removeChest();
-                                        n.returnNPC();
-                                        NPCManager.addNPCShop(n);
-                                    } else {
-                                        ShopsNPC n = new NPCShop(info.getType(), info.getLore(), shop, info.isBaby(), info.isSheared(), info.isVillagerZombie());
-                                        n.removeChest();
-                                        n.returnNPC();
-                                        NPCManager.addNPCShop(n);
-                                    }
-
-                                } catch (Exception e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
-                            e.setCancelled(true);
-
-                            Player p = e.getPlayer();
-
-                            if (!shop.getBlacklist().contains(p)) {
-                                Opener.open(p, shop);
-                            } else {
-                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "NotAllowed"));
-                            }
-                        }
-                    });
                 }
             }
         }

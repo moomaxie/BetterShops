@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 2.1.0
+Version: 2.1.2
 
 PriceDisplayName: '&a&lChange Price of Item'
 SellPriceDisplayName: '&a&lChange Price'
@@ -46,3 +46,7 @@ LiveEcoLore: '&e&lLeft Click &7to &dView'
 
 SellLimit: '&a&lSell Limit &7- &e<Amount>'
 SellLimitLore: '&e&lClick &7to change'
+
+IconOn: '&e&lShop Icon &7- &aOn'
+IconOff: '&e&lShop Icon &7- &cOff'
+IconLore: '&e&lClick &7to change &aShop Icon'

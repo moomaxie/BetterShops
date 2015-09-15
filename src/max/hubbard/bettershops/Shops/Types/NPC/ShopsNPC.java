@@ -1,6 +1,7 @@
 package max.hubbard.bettershops.Shops.Types.NPC;
 
 import max.hubbard.bettershops.Shops.Shop;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 /**
@@ -20,4 +21,5 @@ public interface ShopsNPC {
     public void returnNPC();
     public EntityInfo getInfo();
     public LivingEntity getEntity();
+    public void setLocation(Location l);
 }

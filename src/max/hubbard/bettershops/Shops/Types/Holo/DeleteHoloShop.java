@@ -123,4 +123,94 @@ public class DeleteHoloShop {
         return axis[Math.round(yaw / 90f) & 0x3];
 
     }
+
+    public static void deleteHoloShop(final ShopHologram holo) {
+
+
+        if (holo != null && holo.getHologram() != null) {
+            holo.getHologram().delete();
+            HologramDatabase.deleteHologram(((NamedHologram) holo.getHologram()).getName());
+            HologramDatabase.trySaveToDisk();
+
+            final Shop shop = holo.getShop();
+
+            final boolean open = shop.isOpen();
+
+            BlockFace fa = null;
+
+            if (shop.getOwner().isOnline()) {
+                fa = yawToFace(shop.getOwner().getPlayer().getLocation().getYaw()).getOppositeFace();
+            }
+
+            final BlockFace f = fa;
+
+            shop.setObject("Holo", false);
+            HologramManager.removeHolographicShop(holo);
+
+
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+                    shop.getLocation().getBlock().setType(Material.CHEST);
+
+                    Chest chest = (Chest) shop.getLocation().getBlock().getState();
+
+                    org.bukkit.material.Chest c = (org.bukkit.material.Chest) chest.getData();
+                    BlockFace fa;
+                    if (f == null) {
+                        fa = c.getFacing();
+                    } else {
+                        fa = f;
+                    }
+
+
+                    final BlockFace face = fa;
+
+                    c.setFacingDirection(face.getOppositeFace());
+
+                    chest.setData(c);
+
+                    chest.update();
+
+                    final Block b = chest.getBlock().getRelative(face.getOppositeFace());
+
+                    if (b != null) {
+
+
+                        b.setType(Material.WALL_SIGN);
+
+
+                        if (b.getState() instanceof Sign) {
+                            Sign s = (Sign) b.getState();
+
+                            org.bukkit.material.Sign sign = (org.bukkit.material.Sign) s.getData();
+
+                            sign.setFacingDirection(face.getOppositeFace());
+
+                            s.setData(sign);
+
+                            s.setLine(0, Language.getString("MainGUI", "SignLine1"));
+                            s.setLine(1, Language.getString("MainGUI", "SignLine2"));
+                            if (open) {
+                                s.setLine(2, Language.getString("MainGUI", "SignLine3Open"));
+                            } else {
+                                s.setLine(2, Language.getString("MainGUI", "SignLine3Closed"));
+                            }
+                            s.setLine(3, Language.getString("MainGUI", "SignLine4"));
+
+                            s.update();
+
+                            ShopManager.signLocs.values().remove(shop);
+                            ShopManager.signLocs.put(s.getLocation(), shop);
+                        }
+
+                    }
+                }
+
+            }.runTask(Bukkit.getPluginManager().getPlugin("BetterShops"));
+
+        }
+
+    }
 }

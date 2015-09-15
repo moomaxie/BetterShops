@@ -1,6 +1,7 @@
 package max.hubbard.bettershops.Shops.Types.Holo;
 
 import max.hubbard.bettershops.Shops.Shop;
+import max.hubbard.bettershops.Shops.Types.Holo.Icons.ShopIcon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,22 @@ public class HologramManager {
 
     public static ShopHologram getShopHologram(Shop shop){
         return shopHolos.get(shop);
+    }
+
+    private static HashMap<Shop,ShopIcon> shopIcons = new HashMap<>();
+
+    public static HashMap<Shop,ShopIcon> getShopIcons(){
+        return shopIcons;
+    }
+
+    public static void addIcon(ShopIcon icon){
+        shopIcons.put(icon.getItem().getShop(),icon);
+    }
+
+    public static void removeIcon(Shop shop){
+        shopIcons.get(shop).getHologram().delete();
+        shopIcons.remove(shop);
+
     }
 
     public static void addHolographicShop(ShopHologram holo){

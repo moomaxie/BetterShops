@@ -3,6 +3,7 @@ package max.hubbard.bettershops.Shops;
 import max.hubbard.bettershops.Menus.MenuType;
 import max.hubbard.bettershops.Menus.ShopMenu;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
+import max.hubbard.bettershops.Shops.Types.Holo.Icons.ShopIcon;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Shops.Types.NPC.ShopsNPC;
 import max.hubbard.bettershops.Utils.Transaction;
@@ -96,11 +97,17 @@ public interface Shop {
 
     public void setOpen(boolean b);
 
+    public void setLocation(Location l);
+
     public History getHistory();
 
     public ShopHologram getHolographicShop();
 
     public ShopsNPC getNPCShop();
+
+    public ShopIcon getShopIcon();
+
+    public boolean useIcon();
 
     public boolean isOpen();
 
@@ -133,4 +140,6 @@ public interface Shop {
     public void saveConfig();
 
     public void syncSaveConfig();
+
+    public void addChest();
 }

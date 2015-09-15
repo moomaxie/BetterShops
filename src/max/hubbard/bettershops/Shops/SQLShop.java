@@ -13,7 +13,9 @@ import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Items.SQLShopItem;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Types.Holo.CreateHologram;
+import max.hubbard.bettershops.Shops.Types.Holo.DeleteHoloShop;
 import max.hubbard.bettershops.Shops.Types.Holo.HologramManager;
+import max.hubbard.bettershops.Shops.Types.Holo.Icons.ShopIcon;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Shops.Types.NPC.*;
 import max.hubbard.bettershops.TradeManager;
@@ -333,6 +335,11 @@ public class SQLShop implements Shop {
         } catch (Exception ignored) {
 
         } finally {
+
+            if (useIcon()) {
+                HologramManager.addIcon(new ShopIcon(SQLShopItem.loadShopItem(this, (int) getObject("Icon"))));
+            }
+
             if (isHoloShop()) {
                 String s = "BS" + getName();
                 try {
@@ -725,6 +732,31 @@ public class SQLShop implements Shop {
         }
     }
 
+    @Override
+    public void setLocation(Location l) {
+        boolean npc = isNPCShop();
+        boolean holo = isHoloShop();
+
+        if (holo) {
+            DeleteHoloShop.deleteHoloShop(getHolographicShop());
+        } else {
+            addChest();
+        }
+
+        l = l.getBlock().getLocation();
+
+        setObject("Location", l.getWorld().getName() + " " + l.getX() + " " + l.getY() + " " + l.getZ());
+        this.l = l;
+
+        if (npc) {
+            getNPCShop().getEntity().teleport(l);
+        } else if (holo) {
+            CreateHologram.createHolographicShop(this);
+        } else {
+            DeleteNPC.addChest(this);
+        }
+    }
+
     public History getHistory() {
         return history;
     }
@@ -735,6 +767,16 @@ public class SQLShop implements Shop {
 
     public ShopsNPC getNPCShop() {
         return NPCManager.getNPCShop(this);
+    }
+
+    @Override
+    public ShopIcon getShopIcon() {
+        return null;
+    }
+
+    @Override
+    public boolean useIcon() {
+        return false;
     }
 
     public boolean isOpen() {
@@ -955,5 +997,57 @@ public class SQLShop implements Shop {
             }
         }
         return null;
+    }
+
+    public void addChest(){
+        if (getLocation().getBlock().getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(1, 0, 0).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        if (getLocation().getBlock().getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(-1, 0, 0).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        if (getLocation().getBlock().getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(0, 0, 1).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        if (getLocation().getBlock().getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(0, 0, -1).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        getLocation().getBlock().setType(Material.AIR);
     }
 }

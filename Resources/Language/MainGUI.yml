@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 2.1.0
+Version: 2.1.2
 
 ShopCreate: '[Shop]'
 SignShopBuy: '[Buy]'

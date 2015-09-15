@@ -13,14 +13,15 @@ import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Items.FileShopItem;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Types.Holo.CreateHologram;
+import max.hubbard.bettershops.Shops.Types.Holo.DeleteHoloShop;
 import max.hubbard.bettershops.Shops.Types.Holo.HologramManager;
+import max.hubbard.bettershops.Shops.Types.Holo.Icons.ShopIcon;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Shops.Types.NPC.*;
 import max.hubbard.bettershops.TradeManager;
 import max.hubbard.bettershops.Utils.NPCInfo;
 import max.hubbard.bettershops.Utils.TimingsManager;
 import max.hubbard.bettershops.Utils.Transaction;
-import net.citizensnpcs.api.CitizensAPI;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -104,29 +105,11 @@ public class FileShop implements Shop {
                         for (LivingEntity entity : l.getWorld().getLivingEntities()) {
                             if (entity.getCustomName() != null) {
                                 if (entity.getCustomName().equals("§a§l" + getName())) {
-                                    if (getNPCShop() == null) {
+                                    if (getNPCShop() == null && !made) {
                                         try {
 
-                                            if (Core.useCitizens()) {
-                                                if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
-                                                    CitizensShop s = new CitizensShop(CitizensAPI.getNPCRegistry().getNPC(entity), entity, t);
-                                                    NPCManager.addNPCShop(s);
-                                                    s.removeChest();
-                                                    setObject("NPC", true);
-                                                    if (getObject("NPCInfo") != null) {
-                                                        EntityInfo in = EntityInfo.fromString((String) getObject("NPCInfo"));
-                                                        s.setInfo(in);
-                                                    }
-                                                } else {
-                                                    CitizensShop s = new CitizensShop(EntityInfo.getInfo(entity), t);
-                                                    s.spawn();
-                                                    NPCManager.addNPCShop(s);
-                                                    s.removeChest();
-                                                    setObject("NPC", true);
-                                                    entity.remove();
-                                                }
+                                            if (!Core.useCitizens()) {
 
-                                            } else {
                                                 ShopsNPC s = NPCInfo.createNewShopsNPC(entity, t);
                                                 NPCManager.addNPCShop(s);
                                                 s.removeChest();
@@ -139,15 +122,8 @@ public class FileShop implements Shop {
                                             made = true;
                                         }
                                     } else {
-                                        if (Core.useCitizens()) {
-                                            if (CitizensAPI.getNPCRegistry().isNPC(entity)) {
-                                                net.citizensnpcs.api.npc.NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
-                                                npc.destroy();
-                                                CitizensAPI.getNPCRegistry().deregister(npc);
-                                            } else {
-                                                entity.remove();
-                                            }
-                                        } else {
+                                        if (!Core.useCitizens()) {
+
                                             entity.remove();
                                         }
                                     }
@@ -157,15 +133,8 @@ public class FileShop implements Shop {
                     if (!made) {
 
                         if (getObject("NPCInfo") != null) {
-                            if (Core.useCitizens()) {
+                            if (!Core.useCitizens()) {
 
-                                CitizensShop s = new CitizensShop(EntityInfo.fromString((String) getObject("NPCInfo")), t);
-                                s.spawn();
-                                NPCManager.addNPCShop(s);
-                                s.removeChest();
-                                setObject("NPC", true);
-
-                            } else {
                                 ShopsNPC s = new NPCShop(EntityInfo.fromString((String) getObject("NPCInfo")), t);
                                 NPCManager.addNPCShop(s);
                                 s.removeChest();
@@ -175,6 +144,18 @@ public class FileShop implements Shop {
 
                             setObject("NPC", false);
                             DeleteNPC.addChest(t);
+                        }
+                    }
+
+                }
+
+                if (getNPCShop() != null) {
+                    for (LivingEntity ent : l.getWorld().getLivingEntities()) {
+                        if (ent.getCustomName() != null && ent.getCustomName().equals("§a§l" + getName())) {
+
+                            if (!ent.equals(getNPCShop().getEntity())) {
+                                ent.remove();
+                            }
                         }
                     }
                 }
@@ -208,7 +189,7 @@ public class FileShop implements Shop {
 
     public void setObject(String path, Object obj) {
         config.set(path, obj);
-        saveConfig();
+//        saveConfig();
     }
 
     public String getName() {
@@ -299,6 +280,10 @@ public class FileShop implements Shop {
             convert();
         }
 
+        if (useIcon()) {
+            HologramManager.addIcon(new ShopIcon(FileShopItem.loadShopItem(this, (int) getObject("Icon"))));
+        }
+
         if (isHoloShop()) {
             String s = "BS" + getName();
             try {
@@ -318,7 +303,7 @@ public class FileShop implements Shop {
 //                            }
             } catch (Exception e) {
                 HologramDatabase.deleteHologram(s);
-                HologramDatabase.trySaveToDisk();
+//                HologramDatabase.trySaveToDisk();
 
             } finally {
                 CreateHologram.createHolographicShop(this);
@@ -421,7 +406,7 @@ public class FileShop implements Shop {
             config.createSection("Transactions");
         }
 
-        saveConfig();
+//        saveConfig();
     }
 
     public void loadTransactions() {
@@ -493,7 +478,7 @@ public class FileShop implements Shop {
 
         }
 
-        saveConfig();
+//        saveConfig();
 
         transLoaded = true;
     }
@@ -509,7 +494,7 @@ public class FileShop implements Shop {
             buy.remove(item);
         }
 
-        saveConfig();
+//        saveConfig();
 
     }
 
@@ -529,7 +514,7 @@ public class FileShop implements Shop {
                 config.getConfigurationSection("Transactions").set((String) carl[0], null);
             }
         }
-        saveConfig();
+//        saveConfig();
     }
 
     /**
@@ -554,7 +539,7 @@ public class FileShop implements Shop {
         config.getConfigurationSection("Transactions").getConfigurationSection("" + (amt + 1)).set("Selling", t.isSell());
 
         if (save) {
-            saveConfig();
+//            saveConfig();
         }
     }
 
@@ -575,7 +560,7 @@ public class FileShop implements Shop {
 
         if (!config.isConfigurationSection("Managers")) {
             config.createSection("Managers");
-            saveConfig();
+//            saveConfig();
         } else {
 
             for (String s : config.getConfigurationSection("Managers").getKeys(false)) {
@@ -588,13 +573,13 @@ public class FileShop implements Shop {
     public void addKeeper(OfflinePlayer p) {
         keepers.add(p);
         config.getConfigurationSection("Managers").set(p.getUniqueId().toString(), p.getUniqueId().toString());
-        saveConfig();
+//        saveConfig();
     }
 
     public void removeKeeper(OfflinePlayer p) {
         keepers.remove(p);
         config.getConfigurationSection("Managers").set(p.getUniqueId().toString(), null);
-        saveConfig();
+//        saveConfig();
     }
 
     public List<OfflinePlayer> getKeepers() {
@@ -605,7 +590,7 @@ public class FileShop implements Shop {
 
         if (!config.isConfigurationSection("Blacklist")) {
             config.createSection("Blacklist");
-            saveConfig();
+//            saveConfig();
         } else {
 
             for (String s : config.getConfigurationSection("Blacklist").getKeys(false)) {
@@ -618,13 +603,13 @@ public class FileShop implements Shop {
     public void addBlacklist(OfflinePlayer p) {
         blacklist.add(p);
         config.getConfigurationSection("Blacklist").set(p.getUniqueId().toString(), p.getUniqueId().toString());
-        saveConfig();
+//        saveConfig();
     }
 
     public void removeBlacklist(OfflinePlayer p) {
         blacklist.remove(p);
         config.getConfigurationSection("Blacklist").set(p.getUniqueId().toString(), null);
-        saveConfig();
+//        saveConfig();
     }
 
     public List<OfflinePlayer> getBlacklist() {
@@ -728,6 +713,32 @@ public class FileShop implements Shop {
         }
     }
 
+    @Override
+    public void setLocation(Location l) {
+        boolean npc = isNPCShop();
+        boolean holo = isHoloShop();
+
+        if (holo) {
+            DeleteHoloShop.deleteHoloShop(getHolographicShop());
+        } else {
+            addChest();
+        }
+        l = l.getBlock().getLocation();
+        setObject("Location", l.getWorld().getName() + " " + (int) l.getX() + " " + l.getY() + " " + (int) l.getZ());
+        l.setX((int) l.getX());
+        l.setZ((int) l.getZ());
+        this.l = l;
+
+        if (npc) {
+            getNPCShop().setLocation(l);
+        } else if (holo) {
+            CreateHologram.createHolographicShop(this);
+        } else {
+            DeleteNPC.addChest(this);
+        }
+
+    }
+
     public History getHistory() {
         return history;
     }
@@ -738,6 +749,16 @@ public class FileShop implements Shop {
 
     public ShopsNPC getNPCShop() {
         return NPCManager.getNPCShop(this);
+    }
+
+    @Override
+    public ShopIcon getShopIcon() {
+        return HologramManager.getShopIcons().get(this);
+    }
+
+    @Override
+    public boolean useIcon() {
+        return getObject("Icon") != null && config.isInt("Icon") && getObject("Icon") != -1;
     }
 
     public boolean isOpen() {
@@ -789,12 +810,12 @@ public class FileShop implements Shop {
             config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("AdjustedPrice", Config.getObject("DefaultPrice"));
             config.set("NextShopId", item.getId() + 1);
 
-            try {
-                config.save(file);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                config.save(file);
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
             if (sell) {
                 this.sell.add(item);
@@ -834,7 +855,7 @@ public class FileShop implements Shop {
             config.getConfigurationSection("Items").getConfigurationSection("" + item.getId()).set("AdjustedPrice", price);
             config.set("NextShopId", item.getId() + 1);
 
-            saveConfig();
+//            saveConfig();
 
             if (sell) {
                 this.sell.add(item);
@@ -907,11 +928,11 @@ public class FileShop implements Shop {
             config.createSection("Items");
         }
 
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            config.save(file);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
         if (config.isConfigurationSection("Contents")) {
@@ -967,16 +988,16 @@ public class FileShop implements Shop {
         config.set("Contents", null);
         config.set("Sell", null);
 
-        saveConfig();
+//        saveConfig();
     }
 
     public void saveConfig() {
-        Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             @Override
             public void run() {
                 try {
                     config.save(file);
-                } catch (IOException e) {
+                } catch (IOException ignored) {
 
                 }
             }
@@ -989,10 +1010,62 @@ public class FileShop implements Shop {
 
         try {
             config.save(file);
-        } catch (IOException e) {
+        } catch (IOException ignored) {
 
         }
 
+    }
+
+    public void addChest() {
+        if (getLocation().getBlock().getRelative(1, 0, 0).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(1, 0, 0).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        if (getLocation().getBlock().getRelative(-1, 0, 0).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(-1, 0, 0).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        if (getLocation().getBlock().getRelative(0, 0, 1).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(0, 0, 1).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        if (getLocation().getBlock().getRelative(0, 0, -1).getType() == Material.WALL_SIGN) {
+            Sign s = (Sign) getLocation().getBlock().getRelative(0, 0, -1).getState();
+
+            if (s.getLine(0).contains(Language.getString("MainGUI", "SignLine1"))) {
+                if (s.getLine(3).contains(Language.getString("MainGUI", "SignLine4"))) {
+                    if (s.getLine(1).contains(Language.getString("MainGUI", "SignLine2"))) {
+                        s.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
+        getLocation().getBlock().setType(Material.AIR);
     }
 
     public Sign getSign() {

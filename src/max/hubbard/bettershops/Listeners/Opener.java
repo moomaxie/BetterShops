@@ -161,8 +161,30 @@ public class Opener implements Listener {
 
             if (!shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) && !shop.isOpen()) {
                 if (!Permissions.hasEditPerm(p, shop)) {
-                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
-                    return;
+
+                    if (p.isOp()) {
+                        if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
+                            if (shop.getMenu(MenuType.MAIN_BUYING) != null)
+                                shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
+                            else
+                                p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                        } else {
+                            if ((boolean) Config.getObject("SellingShops")) {
+                                if (shop.getMenu(MenuType.MAIN_SELLING) != null)
+                                    shop.getMenu(MenuType.MAIN_SELLING).draw(p, 1);
+                                else
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                            } else {
+                                if (shop.getMenu(MenuType.MAIN_BUYING) != null)
+                                    shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
+                                else
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                            }
+                        }
+                    } else {
+                        p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "ShopClosed"));
+                        return;
+                    }
                 } else {
                     if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
 
@@ -188,7 +210,7 @@ public class Opener implements Listener {
 
             if (shop.getShopItems(false).size() != 0 || shop.getShopItems(false).size() == 0 && shop.getShopItems(true).size() == 0) {
                 if (shop.getMenu(MenuType.MAIN_BUYING) != null)
-                shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
+                    shop.getMenu(MenuType.MAIN_BUYING).draw(p, 1);
                 else
                     p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
             } else {

@@ -7,7 +7,7 @@
 #
 #     Lines starting with # are comments and will be ignored.
 #
-Version: 2.1.0
+Version: 2.1.2
 
 SearchBuyItems: '&a&lSearch Buying Items'
 SearchSellItems: '&a&lSearch Selling Items'
@@ -37,3 +37,5 @@ ItemName: 'Type Item or id'
 NewDescription: 'Type Description'
 
 Name: 'Type Name/Amount'
+
+Confirm: '&e&lClick &7here to confirm'

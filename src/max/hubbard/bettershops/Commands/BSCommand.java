@@ -58,7 +58,7 @@ public class BSCommand implements CommandExecutor {
                             ShopManager.loadFile();
 
                             Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
-                            p.sendMessage(Language.getString("Messages", "Prefix") + "§aDone");
+                            p.sendMessage(Language.getString("Messages", "Prefix") + "§aDone! Please restart the server to fix any issues.");
                         } catch (Exception e) {
                             e.printStackTrace();
                             p.sendMessage(Language.getString("Messages", "Prefix") + "§cAn error occurred, please inform a server administrator.");
@@ -126,12 +126,45 @@ public class BSCommand implements CommandExecutor {
                         p.sendMessage("    §a/bs blacklist");
                         p.sendMessage("    §a/bs open <Shop>");
                         p.sendMessage("    §a/bs remove <Shop>");
+                        p.sendMessage("    §a/bs move <Shop>");
                         p.sendMessage("    §a/bs list <Player>");
                         p.sendMessage("    §a/bs migrate");
                         p.sendMessage("§d<-Better Shops Help->");
                     }
                 } else if (args.length >= 2) {
-                    if (args[0].equalsIgnoreCase("open")) {
+
+                    if (args[0].equalsIgnoreCase("move")) {
+                        if ((boolean) Config.getObject("Permissions") && Permissions.hasMoveCommandPerm(p) || !(boolean) Config.getObject("Permissions")) {
+
+                            String name = args[1];
+
+                            for (int i = 2; i < args.length; i++) {
+                                name = name + " " + args[i];
+                            }
+
+                            Shop shop = ShopManager.fromString(p, name);
+
+
+                            if (shop != null) {
+
+                                if (shop.getOwner().getUniqueId().toString().equals(p.getUniqueId().toString()) || p.isOp()) {
+
+                                    shop.setLocation(p.getLocation());
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Move"));
+                                } else {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "DenyMove"));
+                                }
+
+                            } else {
+                                if (ShopManager.loadingTotal == ShopManager.getShops().size()) {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "InvalidShop"));
+                                } else {
+                                    p.sendMessage(Language.getString("Messages", "Prefix") + Language.getString("Messages", "Loading"));
+                                }
+                            }
+                        }
+
+                    } else if (args[0].equalsIgnoreCase("open")) {
                         if ((boolean) Config.getObject("Permissions") && Permissions.hasOpenCommandPerm(p) || !(boolean) Config.getObject("Permissions")) {
 
 
@@ -390,6 +423,7 @@ public class BSCommand implements CommandExecutor {
                         p.sendMessage("    §a/bs blacklist");
                         p.sendMessage("    §a/bs open <Shop>");
                         p.sendMessage("    §a/bs remove <Shop>");
+                        p.sendMessage("    §a/bs move <Shop>");
                         p.sendMessage("    §a/bs list <Player>");
                         p.sendMessage("    §a/bs migrate");
                         p.sendMessage("§d<-Better Shops Help->");
@@ -404,6 +438,7 @@ public class BSCommand implements CommandExecutor {
                     p.sendMessage("    §a/bs blacklist");
                     p.sendMessage("    §a/bs open <Shop>");
                     p.sendMessage("    §a/bs remove <Shop>");
+                    p.sendMessage("    §a/bs move <Shop>");
                     p.sendMessage("    §a/bs list <Player>");
                     p.sendMessage("    §a/bs migrate");
                     p.sendMessage("§d<-Better Shops Help->");

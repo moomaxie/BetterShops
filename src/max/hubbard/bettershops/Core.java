@@ -21,6 +21,7 @@ import max.hubbard.bettershops.Shops.Types.Sign.DeleteSign;
 import max.hubbard.bettershops.Shops.Types.Sign.Purchase;
 import max.hubbard.bettershops.Shops.Types.Sign.SignShopManager;
 import max.hubbard.bettershops.Utils.ChatManager;
+import max.hubbard.bettershops.Utils.CitizensStuff;
 import max.hubbard.bettershops.Utils.Conversion;
 import max.hubbard.bettershops.Utils.Metrics;
 import max.hubbard.bettershops.Versions.AnvilGUI;
@@ -69,6 +70,10 @@ public class Core extends JavaPlugin {
                 shop.getHolographicShop().getHologram().despawnEntities();
                 shop.getHolographicShop().getHologram().clearLines();
                 shop.getHolographicShop().getHologram().delete();
+            }
+
+            if (shop.useIcon()) {
+                HologramManager.removeIcon(shop);
             }
 
             shop.syncSaveConfig();
@@ -191,31 +196,38 @@ public class Core extends JavaPlugin {
                     Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aLoading support for §eCitizens");
                 }
 
+                if (Config.getObject("SQL").equals("true") || (boolean) Config.getObject("SQL")) {
+                    String user = String.valueOf(Config.getObject("username"));
+                    String pass = String.valueOf(Config.getObject("password"));
+                    String host = String.valueOf(Config.getObject("host"));
+                    int port = (int) Config.getObject("port");
+                    String dataBase = String.valueOf(Config.getObject("database"));
+                    db = new MySQL(this, host, String.valueOf(port), dataBase, user, pass);
+
+                    c = db.openConnection();
+                }
+
                 if ((boolean) Config.getObject("Metrics")) {
                     metrics = new Metrics(this);
                     setUpMetrics();
                     metrics.start();
                     Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aUsing §eMetrics §7- http://mcstats.org");
                 }
-                if (Config.getObject("SQL").equals("true") || (boolean) Config.getObject("SQL")) {
-                    String user = (String) Config.getObject("username");
-                    String pass = (String) Config.getObject("password");
-                    String host = (String) Config.getObject("host");
-                    int port = (int) Config.getObject("port");
-                    String dataBase = (String) Config.getObject("database");
-                    db = new MySQL(this, host, String.valueOf(port), dataBase, user, pass);
-
-                    c = db.openConnection();
-                }
 
                 //OTHER CHANGES
                 Language.moveMessagesFile();
+
+
+                if (useCitizens()) {
+                    Bukkit.getPluginManager().registerEvents(new CitizensStuff(), this);
+                }
 
                 //LOAD SHOPS
                 if (Conversion.checkConversion()) {
                     Conversion.startConversion();
                 }
                 loadShops();
+
                 Updater.startCheckForUpdate();
                 ReturnNPC.beginReturning();
 

@@ -1,6 +1,6 @@
 name: BetterShops
 main: max.hubbard.bettershops.Core
-version: 2.1.0
+version: 2.1.2
 author: moomaxie
 softdepend: [WorldGuard, Vault, HolographicDisplays, Citizens]
 description: >
@@ -99,6 +99,7 @@ permissions:
             bettershops.command.language: true
             bettershops.command.open: true
             bettershops.command.remove: true
+            beetershops.command.move: true
             bettershops.command.blacklist: true
             bettershops.command.list: true
             bettershops.command.open.*: true
@@ -111,6 +112,9 @@ permissions:
     bettershops.command.language:
         description: Allows ability to use the Language GUI
         default: op
+    bettershops.command.move:
+        description: Allows ability to use the /bs move <Shop> command
+        default: true
     bettershops.command.open:
         description: Allows ability to use the /bs open <Shop> command
         default: op

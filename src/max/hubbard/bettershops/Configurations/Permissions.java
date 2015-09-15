@@ -103,6 +103,10 @@ public class Permissions {
         return p.isOp() || p.getPlayer().hasPermission("bettershops.command.open") || p.getPlayer().hasPermission("bettershops.command.*");
     }
 
+    public static boolean hasMoveCommandPerm(OfflinePlayer p) {
+        return p.isOp() || p.getPlayer().hasPermission("bettershops.command.move") || p.getPlayer().hasPermission("bettershops.command.*");
+    }
+
     public static boolean hasOpenCommandWorldPerm(OfflinePlayer p, World w) {
         return p.isOp() || p.getPlayer().hasPermission("bettershops.command.open." + w.getName()) || p.getPlayer().hasPermission("bettershops.command.open.*") || p.getPlayer().hasPermission("bettershops.command.*");
     }

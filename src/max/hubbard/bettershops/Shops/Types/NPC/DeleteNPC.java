@@ -28,30 +28,32 @@ public class DeleteNPC {
 
     public static void deleteNPC(final ShopsNPC npc) {
 
-
+        Shop shop = null;
         if (npc != null) {
             for (Entity e : npc.getShop().getLocation().getWorld().getLivingEntities()) {
-                if (e.getType() == npc.getEntity().getType()) {
+                if (npc.getEntity() != null) {
+                    if (e.getType() == npc.getEntity().getType()) {
 
-                    if (npc.getEntity().getCustomName() != null && npc.getEntity().getCustomName().equals("§a§l" + npc.getShop().getName())) {
+                        if (npc.getEntity().getCustomName() != null && npc.getEntity().getCustomName().equals("§a§l" + npc.getShop().getName())) {
 
 //                    ShopManager.loadShops();
 
-                        final Shop shop = ShopManager.fromString(npc.getEntity().getCustomName().substring(4));
-                        shop.setObject("NPC", false);
-                        NPCManager.removeNPCShop(npc);
-                        if (Core.useCitizens()) {
-                            CitizensStuff.deleteCitizensNPC(npc.getEntity());
-                        } else {
-                            npc.getEntity().remove();
+                            shop = ShopManager.fromString(npc.getEntity().getCustomName().substring(4));
+                            shop.setObject("NPC", false);
+                            NPCManager.removeNPCShop(npc);
+                            if (Core.useCitizens()) {
+                                CitizensStuff.deleteCitizensNPC(npc.getEntity());
+                            } else {
+                                npc.getEntity().remove();
+                            }
                         }
-
-                        addChest(shop);
-                        shop.getMenu(MenuType.SHOP_SETTINGS).draw(shop.getOwner().getPlayer(), 1);
-                        break;
                     }
                 }
             }
+
+            addChest(npc.getShop());
+            npc.getShop().getMenu(MenuType.SHOP_SETTINGS).draw(npc.getShop().getOwner().getPlayer(), 1);
+
         }
 
     }

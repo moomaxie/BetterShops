@@ -8,6 +8,7 @@ import max.hubbard.bettershops.Shops.History;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.TradeManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -65,8 +66,9 @@ public class SQLUtil {
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.getObject("prefix") + "Transactions (Shop VARCHAR(30) NOT NULL, Item TEXT, Player TEXT, Owner TEXT, Price DECIMAL, " +
                 "Amount INTEGER, Selling BOOLEAN, Date TEXT);");
 
-        for (Shop shop : ShopManager.getShops()) {
+        for (final Shop shop : ShopManager.getShops()) {
             if (shop instanceof FileShop) {
+
                 String name = shop.getName();
                 String id = shop.getOwner().getUniqueId().toString();
                 String description = (String) shop.getObject("Description");
@@ -79,7 +81,7 @@ public class SQLUtil {
                 boolean notify = shop.isNotify();
                 boolean server = shop.isServerShop();
                 int nextId = shop.getNextAvailableId();
-                List<ShopItem> items = shop.getShopItems();
+
                 History history = shop.getHistory();
 
                 Object removal = shop.getObject("Removal");
@@ -119,51 +121,60 @@ public class SQLUtil {
                             + sell + ", '" + date + "'" +
                             ");");
                 }
-
-                for (ShopItem item : items) {
-                    int idd = item.getId();
-                    ItemStack ite = item.getItem();
-                    String display = item.getDisplayName();
-                    String l = null;
-                    if (item.getLore() != null) {
-                        l = item.getLore().get(0);
-                        for (int i = 1; i < item.getLore().size(); i++) {
-                            l = l + "||BS||" + item.getLore().get(i);
+                Bukkit.getScheduler().runTaskLaterAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                    @Override
+                    public void run() {
+                        List<ShopItem> items = shop.getShopItems();
+                        for (ShopItem item : items) {
+                            int idd = item.getId();
+                            ItemStack ite = item.getItem();
+                            String display = item.getDisplayName();
+                            String l = null;
+                            if (item.getLore() != null) {
+                                l = item.getLore().get(0);
+                                for (int i = 1; i < item.getLore().size(); i++) {
+                                    l = l + "||BS||" + item.getLore().get(i);
+                                }
+                            }
+                            String enchants = "";
+                            if (item.getItem().getEnchantments().size() > 0) {
+                                for (Enchantment en : item.getItem().getEnchantments().keySet()) {
+                                    enchants = enchants + "||BS||" + en.getName() + "-" + item.getItem().getEnchantments().get(en);
+                                }
+                            }
+                            int page = item.getPage();
+                            int slot = item.getSlot();
+                            boolean sell = item.isSelling();
+                            int stock = item.getStock();
+                            int amt = item.getAmount();
+                            double price = item.getPrice();
+                            double origPrice = item.getOrigPrice();
+                            boolean infinite = item.isInfinite();
+                            boolean liveEco = item.getLiveEco();
+                            double percent = item.getPriceChangePercent();
+                            int doubleAmt = item.getAmountToDouble();
+                            double min = item.getMinPrice();
+                            double max = (Double) item.getObject("MaximumPrice");
+                            double adjust = item.getAdjustedPrice();
+                            String autoStock = item.getAutoStockTiming().toString();
+                            String transCool = item.getTransCooldownTiming().toString();
+                            boolean auto = item.isAutoStock();
+                            boolean trans = item.isTransCooldown();
+                            String cool = (String) item.getObject("Cooldowns");
+                            boolean selleco = item.isSellEco();
+                            try {
+                                Core.getConnection().createStatement().executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Items VALUES " +
+                                        "('" + shop.getName() + "', '" + idd + "', '" + ItemUtils.toString(ite) + "', '" + display + "', '" + l + "', '" + enchants + "', '" + page + "', '" + slot + "', '" + getBoolValue(sell) + "', '" + stock + "', " +
+                                        "'" + amt + "', '" + price + "', '" + origPrice + "', '" + getBoolValue(infinite) + "', '" + getBoolValue(liveEco) + "', '" + percent + "', " +
+                                        "'" + doubleAmt + "', '" + min + "', '" + max + "', '" + adjust + "', '" + item.getLimit() + "'" +
+                                        ", '" + autoStock + "', '" + transCool + "', '" + auto + "', '" + trans + "', '" + cool + "', '" + selleco + "');");
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                    String enchants = "";
-                    if (item.getItem().getEnchantments().size() > 0) {
-                        for (Enchantment en : item.getItem().getEnchantments().keySet()) {
-                            enchants = enchants + "||BS||" + en.getName() + "-" + item.getItem().getEnchantments().get(en);
-                        }
-                    }
-                    int page = item.getPage();
-                    int slot = item.getSlot();
-                    boolean sell = item.isSelling();
-                    int stock = item.getStock();
-                    int amt = item.getAmount();
-                    double price = item.getPrice();
-                    double origPrice = item.getOrigPrice();
-                    boolean infinite = item.isInfinite();
-                    boolean liveEco = item.getLiveEco();
-                    double percent = item.getPriceChangePercent();
-                    int doubleAmt = item.getAmountToDouble();
-                    double min = item.getMinPrice();
-                    double max = (Double) item.getObject("MaximumPrice");
-                    double adjust = item.getAdjustedPrice();
-                    String autoStock = item.getAutoStockTiming().toString();
-                    String transCool = item.getTransCooldownTiming().toString();
-                    boolean auto = item.isAutoStock();
-                    boolean trans = item.isTransCooldown();
-                    String cool = (String) item.getObject("Cooldowns");
-                    boolean selleco = item.isSellEco();
+                },50L);
 
-                    statement.executeUpdate("INSERT IGNORE INTO " + Config.getObject("prefix") + "Items VALUES " +
-                            "('" + name + "', '" + idd + "', '" + ItemUtils.toString(ite) + "', '" + display + "', '" + l + "', '" + enchants + "', '" + page + "', '" + slot + "', '" + getBoolValue(sell) + "', '" + stock + "', " +
-                            "'" + amt + "', '" + price + "', '" + origPrice + "', '" + getBoolValue(infinite) + "', '" + getBoolValue(liveEco) + "', '" + percent + "', " +
-                            "'" + doubleAmt + "', '" + min + "', '" + max + "', '" + adjust + "', '" + item.getLimit() + "'" +
-                            ", '" + autoStock + "', '" + transCool + "', '" + auto + "', '" + trans + "', '" + cool + "', '" + selleco + "');");
-                }
 
                 if (TradeManager.getTrades(shop) != null)
                     for (Trade t : TradeManager.getTrades(shop)) {

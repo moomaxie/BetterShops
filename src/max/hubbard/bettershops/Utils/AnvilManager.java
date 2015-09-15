@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,6 +43,7 @@ public class AnvilManager implements Callable {
             ItemStack it = new ItemStack(Material.PAPER);
             ItemMeta meta = it.getItemMeta();
             meta.setDisplayName(Language.getString("SearchEngine", "Name"));
+            meta.setLore(Arrays.asList(Language.getString("SearchEngine", "Confirm")));
             it.setItemMeta(meta);
             gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, it);
             gui.doGUIThing(p, new AnvilGUI.AnvilClickEventHandler() {

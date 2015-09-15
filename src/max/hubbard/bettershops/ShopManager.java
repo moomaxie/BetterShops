@@ -78,7 +78,7 @@ public class ShopManager {
     }
 
     public static boolean atLimit(OfflinePlayer p) {
-        return (boolean) Config.getObject("Creation Limit") && getShopAmt(p) >= (Double) Config.getObject("Limit");
+        return (boolean) Config.getObject("Creation Limit") && getShopAmt(p) >= (Integer) Config.getObject("Limit");
     }
 
     public static int getShopAmt(OfflinePlayer p) {
@@ -197,6 +197,7 @@ public class ShopManager {
         Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
         if (Core.useSQL()) {
             Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aConverting Shops to MySQL (Will take awhile)");
+
             SQLUtil.convertShopToSQL();
             Bukkit.getConsoleSender().sendMessage("§bBetterShops§7 - §aDone!");
             loadSQL();

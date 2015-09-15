@@ -8,7 +8,7 @@
 #     Lines starting with # are comments and will be ignored.
 #
 
-Version: 2.1.0
+Version: 2.1.2
 
 Prefix: '&b&lBetterShops &7&l» &d'
 
@@ -198,3 +198,6 @@ CannotUseOwn: '&cCannot use your own Sign Shop'
 
 NPCTimeOut: '&cServer issues forced a timeout to prevent lag/crash'
 
+DenyMove: '&cCannot Move Shop'
+
+Move: '&aMoved Shop!'

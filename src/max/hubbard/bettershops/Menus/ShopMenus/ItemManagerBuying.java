@@ -3,6 +3,7 @@ package max.hubbard.bettershops.Menus.ShopMenus;
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.Permissions;
+import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Events.AmountChangeEvent;
 import max.hubbard.bettershops.Events.PriceChangeEvent;
 import max.hubbard.bettershops.Events.StockChangeEvent;
@@ -14,6 +15,8 @@ import max.hubbard.bettershops.Shops.Items.Actions.ShopItemStack;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Shops.Types.Holo.DeleteHoloShop;
+import max.hubbard.bettershops.Shops.Types.Holo.HologramManager;
+import max.hubbard.bettershops.Shops.Types.Holo.Icons.ShopIcon;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Utils.AnvilManager;
 import max.hubbard.bettershops.Utils.Stocks;
@@ -173,6 +176,13 @@ public class ItemManagerBuying implements ShopMenu {
                         }
                     }
 
+                    if (shop.useIcon()) {
+                        if (shop.getShopIcon().getItem().equals(it)) {
+                            HologramManager.removeIcon(shop);
+                            shop.setObject("Icon", -1);
+                        }
+                    }
+
                     if (!it.isSelling()) {
                         shop.getMenu(MenuType.OWNER_BUYING).draw(p, page);
                     } else {
@@ -299,7 +309,7 @@ public class ItemManagerBuying implements ShopMenu {
                                                         }
                                                     }
 
-                                                    if (amt > it.getStock()){
+                                                    if (amt > it.getStock()) {
                                                         amt = it.getStock();
                                                     }
 
@@ -449,6 +459,40 @@ public class ItemManagerBuying implements ShopMenu {
 
         );
 
+        ItemStack icon = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+        ItemMeta iconMeta = icon.getItemMeta();
+        if (shop.useIcon() && shop.getShopIcon().getItem().equals(it)) {
+            iconMeta.setDisplayName(Language.getString("ItemTexts", "IconOn"));
+            icon = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
+        } else {
+            iconMeta.setDisplayName(Language.getString("ItemTexts", "IconOff"));
+        }
+        iconMeta.setLore(Arrays.asList(Language.getString("ItemTexts", "IconLore")));
+        icon.setItemMeta(iconMeta);
+        ClickableItem iconClick = new ClickableItem(new ShopItemStack(icon), inv, p);
+        iconClick.addLeftClickAction(new LeftClickAction() {
+                                         @Override
+                                         public void onAction(InventoryClickEvent e) {
+
+                                             if (shop.useIcon()) {
+                                                 if (shop.getShopIcon().getItem().equals(it)) {
+                                                     HologramManager.removeIcon(shop);
+                                                     shop.setObject("Icon", -1);
+                                                 } else {
+                                                     HologramManager.removeIcon(shop);
+                                                     HologramManager.addIcon(new ShopIcon(it));
+                                                     shop.setObject("Icon", it.getId());
+                                                 }
+                                             } else {
+                                                 HologramManager.addIcon(new ShopIcon(it));
+                                                 shop.setObject("Icon", it.getId());
+                                             }
+
+                                             draw(p, page, obj);
+                                         }
+                                     }
+        );
+
         inv.setItem(0, back);
 
         inv.setItem(4, it.getItem());
@@ -471,6 +515,8 @@ public class ItemManagerBuying implements ShopMenu {
 
         inv.setItem(48, transCool);
 
+        if (Core.useHolograms())
+            inv.setItem(40, icon);
 
         inv.setItem(32, removeStock);
         inv.setItem(33, removeStock);

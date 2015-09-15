@@ -2,6 +2,7 @@ package max.hubbard.bettershops.Menus.ShopMenus;
 
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
+import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.Events.AmountChangeEvent;
 import max.hubbard.bettershops.Events.PriceChangeEvent;
 import max.hubbard.bettershops.Events.StockChangeEvent;
@@ -13,6 +14,8 @@ import max.hubbard.bettershops.Shops.Items.Actions.ShopItemStack;
 import max.hubbard.bettershops.Shops.Items.ShopItem;
 import max.hubbard.bettershops.Shops.Shop;
 import max.hubbard.bettershops.Shops.Types.Holo.DeleteHoloShop;
+import max.hubbard.bettershops.Shops.Types.Holo.HologramManager;
+import max.hubbard.bettershops.Shops.Types.Holo.Icons.ShopIcon;
 import max.hubbard.bettershops.Shops.Types.Holo.ShopHologram;
 import max.hubbard.bettershops.Utils.AnvilManager;
 import max.hubbard.bettershops.Utils.Stocks;
@@ -166,6 +169,13 @@ public class ItemManagerSelling implements ShopMenu {
                                 DeleteHoloShop.deleteHologramShop(h);
                                 shop.setObject("Holo", false);
                             }
+                        }
+                    }
+
+                    if (shop.useIcon()) {
+                        if (shop.getShopIcon().getItem().equals(shopItem)) {
+                            HologramManager.removeIcon(shop);
+                            shop.setObject("Icon", -1);
                         }
                     }
 
@@ -390,10 +400,48 @@ public class ItemManagerSelling implements ShopMenu {
 
         );
 
+        ItemStack icon = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+        ItemMeta iconMeta = icon.getItemMeta();
+        if (shop.useIcon() && shop.getShopIcon().getItem().equals(shopItem)) {
+            iconMeta.setDisplayName(Language.getString("ItemTexts", "IconOn"));
+            icon = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 5);
+        } else {
+            iconMeta.setDisplayName(Language.getString("ItemTexts", "IconOff"));
+        }
+        iconMeta.setLore(Arrays.asList(Language.getString("ItemTexts", "IconLore")));
+        icon.setItemMeta(iconMeta);
+        ClickableItem iconClick = new ClickableItem(new ShopItemStack(icon), inv, p);
+        iconClick.addLeftClickAction(new LeftClickAction() {
+                                         @Override
+                                         public void onAction(InventoryClickEvent e) {
+
+                                             if (shop.useIcon()) {
+                                                 if (shop.getShopIcon().getItem().equals(shopItem)) {
+                                                     HologramManager.removeIcon(shop);
+                                                     shop.setObject("Icon", -1);
+                                                 } else {
+                                                     HologramManager.removeIcon(shop);
+                                                     HologramManager.addIcon(new ShopIcon(shopItem));
+                                                     shop.setObject("Icon", shopItem.getId());
+                                                 }
+                                             } else {
+                                                 HologramManager.addIcon(new ShopIcon(shopItem));
+                                                 shop.setObject("Icon", shopItem.getId());
+                                             }
+
+                                             draw(p, page, obj);
+                                         }
+                                     }
+        );
+
         inv.setItem(0, back);
 
         inv.setItem(4, shopItem.getItem());
-        inv.setItem(8, limit);
+
+        if (Core.useHolograms())
+            inv.setItem(8, limit);
+
+        inv.setItem(40, icon);
 
         inv.setItem(48, transCool);
 

@@ -3,8 +3,10 @@ package max.hubbard.bettershops.Shops.Types.Sign;
 import max.hubbard.bettershops.Configurations.Config;
 import max.hubbard.bettershops.Configurations.Language;
 import max.hubbard.bettershops.Configurations.Permissions;
+import max.hubbard.bettershops.Core;
 import max.hubbard.bettershops.ShopManager;
 import max.hubbard.bettershops.Shops.Shop;
+import max.hubbard.bettershops.Shops.Types.NPC.*;
 import max.hubbard.bettershops.Utils.MaterialSearch;
 import max.hubbard.bettershops.Utils.WordsCapitalizer;
 import max.hubbard.bettershops.Versions.SignChange;
@@ -13,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -156,12 +159,12 @@ public class CreateSign implements Listener {
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+        Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             @Override
             public void run() {
                 SignChange.updateSigns(e.getPlayer());
             }
-        }, 5L);
+        }, 20L);
         Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             @Override
             public void run() {
@@ -174,19 +177,57 @@ public class CreateSign implements Listener {
                             }
                         });
                     }
-
-                    if (s.isNPCShop()) {
-                        if (s.getNPCShop() != null) {
-                            if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                    if (s.useIcon()) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                            @Override
+                            public void run() {
+                                s.getShopIcon().getHologram().refreshAll();
+                            }
+                        });
+                    }
+                    if (!Core.useCitizens())
+                        if (s.isNPCShop()) {
+                            if (s.getNPCShop() == null) {
                                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                     @Override
                                     public void run() {
-                                        s.getNPCShop().spawn();
+
+                                        if (s.getObject("NPCInfo") != null) {
+                                            if (!Core.useCitizens()) {
+
+                                                ShopsNPC s1 = new NPCShop(EntityInfo.fromString((String) s.getObject("NPCInfo")), s);
+                                                NPCManager.addNPCShop(s1);
+                                                s1.removeChest();
+                                                s.setObject("NPC", true);
+                                            } else {
+
+                                                CitizensShop s1 = new CitizensShop(EntityInfo.fromString((String) s.getObject("NPCInfo")), s);
+                                                s1.spawn();
+                                                NPCManager.addNPCShop(s1);
+                                                s1.removeChest();
+                                                s.setObject("NPC", true);
+
+                                            }
+                                        } else {
+
+                                            s.setObject("NPC", false);
+                                            DeleteNPC.addChest(s);
+                                        }
+
                                     }
                                 });
+
+                            } else {
+                                for (LivingEntity ent : s.getLocation().getWorld().getLivingEntities()) {
+                                    if (ent.getCustomName() != null && ent.getCustomName().equals("§a§l" + s.getName())) {
+                                        if (!ent.equals(s.getNPCShop().getEntity())) {
+                                            ent.remove();
+                                        }
+                                    }
+                                }
+
                             }
                         }
-                    }
                 }
             }
         });
@@ -197,7 +238,7 @@ public class CreateSign implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
         if (!e.getInventory().getName().contains(Language.getString("MainGUI", "ShopHeader"))) {
-            Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+            Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                 @Override
                 public void run() {
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -211,12 +252,12 @@ public class CreateSign implements Listener {
     @EventHandler
     public void onTp(final PlayerTeleportEvent e) {
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+        Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             @Override
             public void run() {
                 SignChange.updateSigns(e.getPlayer());
             }
-        }, 5L);
+        }, 20L);
 
         Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
             @Override
@@ -230,19 +271,65 @@ public class CreateSign implements Listener {
                             }
                         });
                     }
+                    if (s.useIcon()) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                            @Override
+                            public void run() {
+                                s.getShopIcon().getHologram().refreshAll();
+                            }
+                        });
+                    }
 
-                    if (s.isNPCShop()) {
-                        if (s.getNPCShop() != null) {
-                            if (s.getNPCShop().getEntity() == null || !s.getNPCShop().getEntity().isValid() || s.getNPCShop().getEntity().isDead()) {
+                    if (!Core.useCitizens())
+                        if (s.isNPCShop())
+
+                        {
+                            if (s.getNPCShop() == null) {
                                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
                                     @Override
                                     public void run() {
-                                        s.getNPCShop().spawn();
+
+                                        if (s.getObject("NPCInfo") != null) {
+                                            if (!Core.useCitizens()) {
+
+                                                ShopsNPC s1 = new NPCShop(EntityInfo.fromString((String) s.getObject("NPCInfo")), s);
+                                                NPCManager.addNPCShop(s1);
+                                                s1.removeChest();
+                                                s.setObject("NPC", true);
+                                            } else {
+
+                                                CitizensShop s1 = new CitizensShop(EntityInfo.fromString((String) s.getObject("NPCInfo")), s);
+                                                s1.spawn();
+                                                NPCManager.addNPCShop(s1);
+                                                s1.removeChest();
+                                                s.setObject("NPC", true);
+
+                                            }
+                                        } else {
+
+                                            s.setObject("NPC", false);
+                                            DeleteNPC.addChest(s);
+                                        }
+
                                     }
                                 });
+
+                            } else {
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        for (LivingEntity ent : s.getLocation().getWorld().getLivingEntities()) {
+                                            if (ent.getCustomName() != null && ent.getCustomName().equals("§a§l" + s.getName())) {
+                                                if (!ent.equals(s.getNPCShop().getEntity())) {
+                                                    ent.remove();
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+
                             }
                         }
-                    }
                 }
             }
         });

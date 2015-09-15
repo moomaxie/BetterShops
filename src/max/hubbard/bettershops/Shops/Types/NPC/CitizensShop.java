@@ -9,11 +9,13 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.trait.LookClose;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -175,27 +177,35 @@ public class CitizensShop implements ShopsNPC {
     }
 
     public void spawn() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
-            @Override
-            public void run() {
+
+        if (shop.getNPCShop() == null || entity == null || !entity.isValid()) {
+            Bukkit.getScheduler().runTask(Bukkit.getPluginManager().getPlugin("BetterShops"), new Runnable() {
+                @Override
+                public void run() {
+
+                    npc.spawn(shop.getLocation().clone());
+                    npc.setProtected(true);
+                    npc.setName("§a§l" + shop.getName());
+                    LookClose lookclose = new LookClose();
+                    lookclose.setRealisticLooking(true);
+                    lookclose.lookClose(true);
+                    npc.addTrait(lookclose);
 
 
-                npc.spawn(shop.getLocation().clone().add(.5, 0, .5));
-                npc.setProtected(true);
-                npc.setName("§a§l" + shop.getName());
-                LookClose lookclose = new LookClose();
-                lookclose.setRealisticLooking(true);
-                lookclose.lookClose(true);
-                npc.addTrait(lookclose);
-                entity = (LivingEntity) npc.getEntity();
+                    entity = (LivingEntity) npc.getEntity();
+                    if (npc.isSpawned() && entity != null) {
+                        setInfo(info);
 
-                setInfo(info);
 
-                NPCShopCreateEvent en = new NPCShopCreateEvent(shop);
+                        NPCShopCreateEvent en = new NPCShopCreateEvent(shop);
 
-                Bukkit.getPluginManager().callEvent(en);
-            }
-        });
+                        Bukkit.getPluginManager().callEvent(en);
+                    }
+
+                }
+
+            });
+        }
     }
 
     @Override
@@ -270,6 +280,13 @@ public class CitizensShop implements ShopsNPC {
 
     public LivingEntity getEntity() {
         return entity;
+    }
+
+    @Override
+    public void setLocation(Location l) {
+        l.setX((int) l.getX() + .5);
+        l.setZ((int) l.getZ() + .5);
+        npc.teleport(l, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
 
     public EntityInfo getInfo() {

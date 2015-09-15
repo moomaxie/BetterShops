@@ -221,6 +221,8 @@ public class ShopSettings implements ShopMenu {
                 }
                 if (shop.isNPCShop()) {
                     DeleteNPC.deleteNPC(shop.getNPCShop());
+                    shop.setObject("NPC",false);
+                    draw(p,page);
                 } else {
                     shop.getMenu(MenuType.NPC_CHOOSE).draw(p, page, obj);
                 }
