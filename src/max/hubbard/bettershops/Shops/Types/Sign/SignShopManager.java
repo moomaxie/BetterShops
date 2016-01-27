@@ -178,8 +178,24 @@ public class SignShopManager {
                                         String data = split[2];
                                         String price = split[3];
                                         String amt = split[4];
-
-                                        SignShopManager.addSign(s, new ItemStack(Material.valueOf(mat), 1, (byte) Integer.parseInt(data)), Double.parseDouble(price), Integer.parseInt(amt), p.getUniqueId(), Boolean.parseBoolean(sell), admin, chest);
+                                        
+                                        Material MM = null;
+                                        try {
+                                            MM = Material.valueOf(mat);
+                                        }
+                                        catch(Exception e)
+                                        {
+                                            try
+                                            {
+                                                MM = Material.valueOf(mat.substring(1));
+                                            }
+                                            catch(Exception e)
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                        
+                                        SignShopManager.addSign(MM, s, new ItemStack(, 1, (byte) Integer.parseInt(data)), Double.parseDouble(price), Integer.parseInt(amt), p.getUniqueId(), Boolean.parseBoolean(sell), admin, chest);
                                         shops++;
                                     }
                                 }
