@@ -1,9 +1,46 @@
+/* MIT License
+
+Copyright (c) 2018 Andrea Ligios
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package max.hubbard.bettershops.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/** 
+ * 
+ * @author Andrea Ligios
+ * @version 1.0.0
+ * @see <a href="https://github.com/andrea-ligios/legendary-utils">Legendary Utils</a>
+ * 
+ * WordsCapitalizer performs a smart words capitalization, respecting Unicode and UTF-16 Surrogate Pairs, and a custom Locale if provided.
+ * <p> 
+ * Custom delimiters can be specified in order to instruct the engine how to handle each one of those, 
+ * by capitalizing only before, only after, or before and after the marker, to handle cases like O'Brian when parsing last names, for example.
+ * 
+ * Originally posted on November 30, 2012, on StackOverflow: https://stackoverflow.com/a/13649579/1654265
+ * 
+ */
 public class WordsCapitalizer {
 
     public static String capitalizeEveryWord(String source) {
